@@ -1,0 +1,244 @@
+/* Manual Card Component Styles */
+
+.manual-card-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.manual-card {
+  background: var(--surface, var(--bg-light, #ffffff));
+  border-radius: 16px;
+  border: 1px solid var(--border-muted, #e5e7eb);
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  transition: transform 0.12s ease, box-shadow 0.12s ease,
+    border-color 0.12s ease, background-color 0.3s ease;
+  height: 100%;
+}
+
+.manual-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.12);
+  border-color: var(--primary, #667eea);
+}
+
+/* Dark mode specific hover effects */
+body.dark .manual-card:hover {
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+}
+
+.manual-card-thumb {
+  height: 120px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.manual-card-thumb::after {
+  content: "📄";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 2.5rem;
+  opacity: 0.8;
+}
+
+.manual-card-body {
+  padding: 16px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.manual-card-title {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.4;
+  margin: 0;
+  color: var(--text, #111827);
+  overflow: hidden;
+  display: -webkit-box;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.manual-card-meta {
+  font-size: 12px;
+  color: var(--text-muted, #6b7280);
+  margin: 0;
+}
+
+.manual-card-description {
+  font-size: 13px;
+  color: var(--text-secondary, #4b5563);
+  line-height: 1.5;
+  margin: 0;
+  overflow: hidden;
+  display: -webkit-box;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  flex: 1;
+}
+
+.manual-card-tags-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+  align-items: center;
+}
+
+.manual-tag-pill {
+  border-radius: 999px;
+  padding: 4px 8px;
+  font-size: 10px;
+  background: var(--surface-soft, var(--bg-subtle, #f3f4f6));
+  color: var(--text-muted, #6b7280);
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
+  font-weight: 500;
+}
+
+.manual-tag-pill:hover {
+  background: var(--primary-soft, rgba(102, 126, 234, 0.1));
+  color: var(--primary, #667eea);
+  border-color: var(--primary-light, rgba(102, 126, 234, 0.3));
+}
+
+.manual-tag-pill.is-active {
+  background: var(--primary, #667eea);
+  color: white;
+  border-color: var(--primary, #667eea);
+}
+
+.manual-tag-more {
+  font-size: 10px;
+  color: var(--text-muted, #9ca3af);
+  font-weight: 500;
+}
+
+.manual-card-footer {
+  padding: 12px 16px;
+  background: var(--surface-soft, var(--bg-subtle, #f8fafc));
+  border-top: 1px solid var(--border-muted, #f1f5f9);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  color: var(--text-muted, #6b7280);
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.manual-card-footer-left {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.manual-circle-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--primary, #667eea);
+}
+
+.manual-card-footer-right {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.manual-icon-btn {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: var(--text-muted, #6b7280);
+  padding: 4px;
+  font-size: 12px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  border-radius: 4px;
+}
+
+.manual-icon-btn:hover {
+  color: var(--primary, #667eea);
+  background: var(--primary-soft, rgba(102, 126, 234, 0.1));
+  transform: translateY(-1px);
+}
+
+.manual-count {
+  font-size: 10px;
+  font-weight: 500;
+}
+
+/* Responsive Design */
+@media (max-width: 520px) {
+  .manual-card-thumb {
+    height: 100px;
+  }
+
+  .manual-card-thumb::after {
+    font-size: 2rem;
+  }
+
+  .manual-card-body {
+    padding: 12px;
+  }
+
+  .manual-card-title {
+    font-size: 14px;
+  }
+
+  .manual-card-description {
+    font-size: 12px;
+  }
+
+  .manual-card-footer {
+    padding: 10px 12px;
+  }
+
+  .manual-tag-pill {
+    padding: 3px 6px;
+    font-size: 9px;
+  }
+}
+
+/* Dark mode specific enhancements */
+body.dark .manual-card {
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.2);
+}
+
+body.dark .manual-card:hover {
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+}
+
+body.dark .manual-card-thumb {
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+}
+
+body.dark .manual-tag-pill:hover {
+  background: var(--primary-soft);
+  border-color: var(--primary);
+}
+
+body.dark .manual-icon-btn:hover {
+  background: var(--primary-soft);
+}
+
+/* Ensure proper contrast for dark mode */
+body.dark .manual-card-title {
+  color: var(--text);
+}
+
+body.dark .manual-card-description {
+  color: var(--text-secondary);
+}

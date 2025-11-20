@@ -1,0 +1,75 @@
+@import "tailwindcss";
+@import url("https://fonts.googleapis.com/css2?family=Josefin+Sans:ital,wght@0,100..700;1,100..700&display=swap");
+
+:root {
+  /* hsl (fallback color) */
+  --bg-dark: hsl(247 100% 100%);
+  --bg: hsl(247 100% 100%);
+  --bg-light: hsl(247 100% 100%);
+  --text: hsl(270 100% 11%);
+  --text-muted: hsl(261 71% 39%);
+  --text-secondary: hsl(261 71% 39%);
+  --highlight: hsl(250 100% 100%);
+  --border: hsl(254 79% 66%);
+  --border-muted: hsl(253 100% 79%);
+  --primary: hsl(261 71% 39%);
+  --secondary: hsl(57 100% 6%);
+  --danger: hsl(4 99% 37%);
+  --warning: hsl(50 100% 12%);
+  --success: hsl(159 100% 9%);
+  --info: hsl(215 95% 42%);
+  --primary-soft: hsl(261 71% 50% / 0.16);
+  --primary-border: hsl(261 71% 50% / 0.7);
+  --danger-soft: hsl(4 99% 57% / 0.12);
+  --danger-border: hsl(4 99% 57% / 0.7);
+  --surface: hsl(0 0% 100%);
+  --surface-soft: hsl(210 20% 96%);
+  --bg-subtle: hsl(210 20% 96%);
+}
+body.dark {
+  /* hsl (fallback color) */
+  --bg-dark: hsl(259 100% 6%);
+  --bg: hsl(261 100% 9%);
+  --bg-light: hsl(260 86% 13%);
+  --text: hsl(247 100% 100%);
+  --text-muted: hsl(248 66% 79%);
+  --text-secondary: hsl(248 66% 85%);
+  --highlight: hsl(257 56% 52%);
+  --border: hsl(261 71% 39%);
+  --border-muted: hsl(270 100% 22%);
+  --primary: hsl(252 100% 87%);
+  --secondary: hsl(60 100% 23%);
+  --danger: hsl(7 100% 66%);
+  --warning: hsl(53 100% 21%);
+  --success: hsl(162 100% 22%);
+  --info: hsl(217 100% 70%);
+  --primary-soft: hsl(252 100% 87% / 0.1);
+  --surface: hsl(222 47% 10%);
+  --surface-soft: hsl(222 47% 8%);
+  --bg-subtle: hsl(222 47% 8%);
+}
+body {
+  margin: 0;
+  font-family: "Josefin Sans", sans-serif;
+  background-color: var(--bg);
+  color: var(--text);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Add smooth transitions for all elements using CSS variables */
+*,
+*::before,
+*::after {
+  transition: background-color 0.3s ease, color 0.3s ease,
+    border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Ensure consistent theme transitions for common elements */
+.nav,
+.card,
+.btn,
+.form-control,
+.modal-content {
+  transition: background-color 0.3s ease, color 0.3s ease,
+    border-color 0.3s ease !important;
+}

@@ -1,0 +1,131 @@
+.login-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 90vh;
+  background: var(--bg);
+  padding: 2rem 1rem;
+}
+
+.login-card {
+  border: none;
+  border-radius: 15px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+  background: var(--bg-light);
+  width: 100%;
+  max-width: 450px;
+}
+
+.login-card .card-body {
+  padding: 2.5rem;
+}
+
+.form-label {
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 0.5rem;
+}
+
+.form-control {
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  background-color: var(--bg);
+color: var(--text);
+width: 100%;
+}
+
+.form-control:focus {
+  border-color: var(--border);
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  background-color: var(--bg);
+}
+
+.login-btn {
+  width: 100%;
+  padding: 0.75rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 8px;
+  border: none;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background-color: var(--primary);
+  color: var(--bg-dark);
+}
+
+.login-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.login-btn:disabled {
+  opacity: 0.7;
+  transform: none;
+  cursor: not-allowed;
+}
+
+.nav-tabs {
+  border-bottom: 2px solid var(--border);
+  margin-bottom: 1.5rem;
+}
+
+.nav-tabs .nav-link {
+  border: none;
+  border-radius: 0;
+  padding: 1rem 1.5rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  transition: all 0.3s ease;
+}
+
+.nav-tabs .nav-link:hover {
+  border: none;
+  color: var(--primary);
+}
+
+.nav-tabs .nav-link.active {
+  background: none;
+  border: none;
+  border-bottom: 2px solid var(--border);
+  color: var(--primary);
+}
+
+.alert {
+  border-radius: 8px;
+  border: none;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.alert-danger {
+  background-color: #fee2e2;
+  color: var(--danger);
+}
+
+.alert-success {
+  background-color: #d1fae5;
+  color: var(--success);
+}
+
+@media (max-width: 576px) {
+  .login-container {
+    padding: 1rem;
+  }
+
+  .login-card .card-body {
+    padding: 1.5rem;
+  }
+
+  .nav-tabs .nav-link {
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+  }
+}

@@ -1,0 +1,63 @@
+/* Manual Grid Component Styles */
+
+.manual-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.manual-grid-empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--text-muted, #6b7280);
+}
+
+.manual-grid-empty-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: var(--text, #111827);
+}
+
+.manual-grid-empty-text {
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+/* Responsive Grid */
+@media (max-width: 1040px) {
+  .manual-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 780px) {
+  .manual-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .manual-grid-empty {
+    padding: 2rem 1rem;
+  }
+}
+
+@media (max-width: 520px) {
+  .manual-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+  }
+
+  .manual-grid-empty {
+    padding: 1.5rem 0.5rem;
+  }
+
+  .manual-grid-empty-title {
+    font-size: 1.125rem;
+  }
+
+  .manual-grid-empty-text {
+    font-size: 0.8rem;
+  }
+}
