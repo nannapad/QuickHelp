@@ -1,16 +1,87 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import "./css/CreatorRequest.css";
 import { useTranslation } from "../utils/translations";
+import { addNotification } from "../utils/notifications";
+import { addRequest, getRequestByUserId } from "../data/CreatorRequests";
 
 const CreatorRequest = () => {
-  // mock: สมมติว่ามีคำขอค้างอยู่
-  const hasPendingRequest = true;
-  const requestStatus = "pending"; // pending | approved | rejected
-  const reviewedNote = "Admin จะตรวจสอบภายใน 1-2 วันทำการ";
   const { t } = useTranslation();
+  const [hasPendingRequest, setHasPendingRequest] = useState(false);
+  const [requestStatus, setRequestStatus] = useState("pending"); // pending | approved | rejected
+  const [reviewedNote, setReviewedNote] = useState("");
+
+  useEffect(() => {
+    const raw = localStorage.getItem("userData");
+    const currentUser = raw ? JSON.parse(raw) : null;
+    if (!currentUser) return;
+    const req = getRequestByUserId(currentUser.id);
+    if (req) {
+      setHasPendingRequest(req.status === "pending");
+      setRequestStatus(req.status);
+      setReviewedNote(req.note || "");
+    } else {
+      setHasPendingRequest(false);
+      setRequestStatus("pending");
+      setReviewedNote("");
+    }
+    // listen for external changes
+    const onChange = () => {
+      const r = getRequestByUserId(currentUser.id);
+      if (r) {
+        setHasPendingRequest(r.status === "pending");
+        setRequestStatus(r.status);
+        setReviewedNote(r.note || "");
+      } else {
+        setHasPendingRequest(false);
+        setRequestStatus("pending");
+        setReviewedNote("");
+      }
+    };
+    window.addEventListener("creatorRequestsChanged", onChange);
+    return () => window.removeEventListener("creatorRequestsChanged", onChange);
+  }, []);
   const handleSubmit = (e) => {
     e.preventDefault();
-    alert(t("creatorRequest.submit"));
+
+    try {
+      const raw = localStorage.getItem("userData");
+      const currentUser = raw ? JSON.parse(raw) : null;
+      if (!currentUser) {
+        alert(t("creatorRequest.mustLogin") || "Please log in to submit a request.");
+        return;
+      }
+
+      // For now we read simple form fields by name from DOM (could be refactored)
+      const form = e.target;
+      const team = form.querySelector('input[placeholder]')?.value || "";
+      const reason = form.querySelector('textarea')?.value || "";
+      const types = (form.querySelector('input[type="text"]')?.value || "").split(",").map((s) => s.trim()).filter(Boolean);
+
+      // add a persistent request (status pending)
+      const req = addRequest({
+        userId: currentUser.id,
+        username: currentUser.username,
+        team,
+        reason,
+        types,
+      });
+
+      // Create a notification for admins/creators
+      addNotification({
+        title: "New creator request",
+        body: `${currentUser.username} submitted a creator request.`,
+        toRoles: ["admin"], // notify admins primarily
+        data: { type: "creator_request", requestId: req.id, userId: currentUser.id },
+      });
+
+      setHasPendingRequest(true);
+      setRequestStatus("pending");
+
+      alert(t("creatorRequest.submit"));
+    } catch (err) {
+      console.error("Failed to submit creator request", err);
+      alert(t("creatorRequest.submitFailed") || "Failed to submit request");
+    }
   };
 
   return (

@@ -216,6 +216,20 @@ header {
   transform: translateY(-1px);
 }
 
+.notif-badge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: #ef4444;
+  color: white;
+  font-size: 11px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  line-height: 1;
+  min-width: 18px;
+  text-align: center;
+}
+
 .btn-theme {
   border-radius: 50%;
   border: none;
