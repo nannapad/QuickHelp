@@ -1,7 +1,7 @@
 .feed-page {
   min-height: calc(100vh - 52px); /* เผื่อมี navbar สูง 52px */
-  background: var(--bg, #f8fafc);
-  color: var(--text, #111827);
+  background: var(--bg);
+  color: var(--text);
 }
 
 /* HERO / QUICK SEARCH ----------------------------------------- */
@@ -31,7 +31,7 @@
 
 .feed-hero-sub {
   font-size: 18px;
-  color: var(--text-muted, #6b7280);
+  color: var(--text-muted);
   margin-bottom: 32px;
   max-width: 600px;
   line-height: 1.6;
@@ -49,12 +49,12 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  background: var(--bg-light, #ffffff);
+  background: var(--bg-light);
   border-radius: 999px;
   padding: 16px 24px;
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
     0 10px 10px -5px rgba(0, 0, 0, 0.04);
-  border: 2px solid var(--border-muted, #e5e7eb);
+  border: 2px solid var(--border-muted);
   transition: all 0.3s ease;
 }
 
@@ -67,7 +67,7 @@
 
 .feed-hero-searchIcon {
   font-size: 20px;
-  color: var(--text-muted, #6b7280);
+  color: var(--text-muted);
 }
 
 .feed-hero-search input {
@@ -76,12 +76,12 @@
   outline: none;
   background: transparent;
   font-size: 16px;
-  color: var(--text, #111827);
+  color: var(--text);
   font-weight: 500;
 }
 
 .feed-hero-search input::placeholder {
-  color: var(--text-muted, #9ca3af);
+  color: var(--text-muted);
   font-weight: 400;
 }
 
@@ -98,8 +98,8 @@
   border-radius: 999px;
   padding: 10px 20px;
   font-size: 14px;
-  background: var(--bg-light, #f8fafc);
-  color: var(--text-muted, #6b7280);
+  background: var(--bg-light);
+  color: var(--text-muted);
   cursor: pointer;
   border: 2px solid transparent;
   transition: all 0.3s ease;
@@ -107,7 +107,7 @@
 }
 
 .feed-chip:hover {
-  background: var(--bg-light, #f1f5f9);
+  background: var(--bg-light);
   transform: translateY(-1px);
 }
 
@@ -143,7 +143,7 @@
 
 .feed-mainSub {
   font-size: 12px;
-  color: var(--text-muted, #6b7280);
+  color: var(--text-muted);
 }
 
 /* GRID -------------------------------------------------------- */
@@ -225,9 +225,9 @@
 /* MANUAL CARD ------------------------------------------------- */
 
 .feed-manualCard {
-  background: var(--bg-light, #ffffff);
+  background: var(--bg-light);
   border-radius: 16px;
-  border: 1px solid var(--border-subtle, #e5e7eb);
+  border: 1px solid var(--border-subtle);
   box-shadow: var(--shadow-soft, 0 18px 40px rgba(15, 23, 42, 0.08));
   overflow: hidden;
   display: flex;
@@ -244,7 +244,7 @@
 }
 
 .feed-manualThumb {
-  background: var(--highlight, #e5e7eb);
+  background: var(--highlight);
   height: 130px;
 }
 
@@ -265,7 +265,7 @@
 .feed-manualMeta {
   margin: 0 0 6px;
   font-size: 11px;
-  color: var(--text-muted, #6b7280);
+  color: var(--text-muted);
 }
 
 .feed-manualTagsRow {
@@ -279,14 +279,14 @@
   border-radius: 999px;
   padding: 2px 8px;
   font-size: 11px;
-  background: var(--surface-soft, #f3f4f6);
-  color: var(--text-muted, #6b7280);
+  background: var(--surface-soft);
+  color: var(--text-muted);
   border: none;
   cursor: pointer;
 }
 
 .feed-tagPill.is-active {
-  background: var(--primary-soft, rgba(139, 92, 246, 0.16));
+  background: var(--primary-soft);
   color: var(--primary, hsl(261 71% 50%));
   font-weight: 500;
 }
@@ -294,13 +294,13 @@
 /* FOOTER ------------------------------------------------------ */
 
 .feed-manualFooter {
-  border-top: 1px solid var(--border-subtle, #e5e7eb);
+  border-top: 1px solid var(--border-subtle);
   padding: 6px 9px 5px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   font-size: 11px;
-  color: var(--text-muted, #6b7280);
+  color: var(--text-muted);
 }
 
 .feed-manualFooterLeft {
@@ -327,7 +327,7 @@
   border: none;
   background: transparent;
   cursor: pointer;
-  color: var(--text-muted, #6b7280);
+  color: var(--text-muted);
   padding: 0;
   font-size: 14px;
 }
@@ -339,8 +339,8 @@
   text-align: center;
   padding: 18px 14px 14px;
   border-radius: 18px;
-  border: 1px dashed var(--border-subtle, #e5e7eb);
-  background: var(--surface-soft, #f3f4f6);
+  border: 1px dashed var(--border-subtle);
+  background: var(--surface-soft);
 }
 
 .feed-emptyTitle {
@@ -351,15 +351,17 @@
 
 .feed-emptyText {
   font-size: 12px;
-  color: var(--text-muted, #6b7280);
+  color: var(--text-muted);
 }
 
 /* DARK MODE TWEAK --------------------------------------------- */
 
-body.dark .feed-hero-search {
-  background: var(--bg-dark, #020617);
+.feed-page.dark .feed-hero-search,
+body.dark .feed-page .feed-hero-search {
+  background: var(--bg-dark);
 }
 
-body.dark .feed-manualThumb {
-  background: var(--bg-dark, #020617);
+.feed-page.dark .feed-manualThumb,
+body.dark .feed-page .feed-manualThumb {
+  background: var(--bg-dark);
 }

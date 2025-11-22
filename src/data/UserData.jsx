@@ -35,6 +35,46 @@ const users = [
   },
   {
     id: 2,
+    username: "mariagarcia",
+    email: "maria.garcia@company.com",
+    firstName: "Maria",
+    lastName: "Garcia",
+    role: "creator",
+    avatar: null,
+    department: "Design",
+    position: "Senior UX Designer",
+    isActive: true,
+    preferences: {
+      notifications: true,
+      darkMode: false,
+      emailUpdates: true,
+      language: "en",
+    },
+    stats: {
+      manualsViewed: 89,
+      manualsDownloaded: 34,
+      manualsBookmarked: 18,
+      loginCount: 156,
+      manualsCreated: 7,
+      manualsEdited: 12,
+    },
+    createdAt: "2024-02-10T14:20:00Z",
+    lastLogin: "2024-11-19T09:30:00Z",
+    permissions: [
+      "view_manuals",
+      "download_manuals",
+      "bookmark_manuals",
+      "comment_manuals",
+      "like_manuals",
+      "create_manuals",
+      "edit_own_manuals",
+      "delete_own_manuals",
+      "manage_own_categories",
+      "manage_own_tags",
+    ],
+  },
+  {
+    id: 3,
     username: "admin",
     email: "admin@company.com",
     firstName: "Sarah",
@@ -98,6 +138,10 @@ export const getUserByUsername = (username) => {
 
 export const isAdmin = (user) => {
   return user && user.role === "admin";
+};
+
+export const isCreator = (user) => {
+  return user && user.role === "creator";
 };
 
 export const hasPermission = (user, permission) => {

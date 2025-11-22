@@ -1,0 +1,390 @@
+.manualPage {
+  min-height: calc(100vh - 52px);
+  background: var(--bg);
+  color: var(--text);
+}
+
+.manualPageInner {
+  max-width: 1120px;
+  margin: 24px auto 40px;
+  padding: 0 18px 24px;
+}
+
+/* breadcrumb / back ------------------------------------------ */
+
+.breadcrumbRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+  font-size: 11px;
+}
+
+.backLink {
+  border: none;
+  background: transparent;
+  color: var(--primary, hsl(261 71% 50%));
+  cursor: pointer;
+  padding: 0;
+}
+
+.breadcrumb {
+  color: var(--text-muted);
+}
+
+/* grid layout ------------------------------------------------ */
+
+.grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.9fr) minmax(0, 1.1fr);
+  gap: 18px;
+}
+
+@media (max-width: 880px) {
+  .grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* left main -------------------------------------------------- */
+
+.left {
+  background: var(--bg-light, #ffffff);
+  border-radius: 20px;
+  border: 1px solid var(--border, #e5e7eb);
+  box-shadow: var(--shadow-soft, 0 18px 40px rgba(15, 23, 42, 0.08));
+  padding: 16px 18px 18px;
+}
+
+.header {
+  margin-bottom: 10px;
+}
+
+.title {
+  margin: 0 0 4px;
+  font-size: 24px;
+  font-weight: 650;
+  letter-spacing: -0.04em;
+}
+
+.metaTop {
+  font-size: 11px;
+  color: var(--text-muted);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: center;
+}
+
+.dot {
+  opacity: 0.7;
+}
+
+/* hero ------------------------------------------------------- */
+
+.hero {
+  margin-top: 10px;
+  border-radius: 18px;
+  background: radial-gradient(circle at top left, #e9d5ff, #a855f7, #020617);
+  min-height: 180px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: flex-end;
+  color: #f9fafb;
+  position: relative;
+  overflow: hidden;
+}
+
+.heroFooter {
+  position: relative;
+  z-index: 1;
+}
+
+.heroMeta {
+  font-size: 11px;
+  opacity: 0.9;
+}
+
+.heroDot {
+  margin: 0 3px;
+}
+
+.heroTitle {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.heroBadge {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  transform: translate(-6px, -6px);
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.7);
+  font-size: 11px;
+}
+
+/* note bar --------------------------------------------------- */
+
+.noteBar {
+  margin-top: 10px;
+  border-radius: 999px;
+  background: var(--bg-light, #f3f4f6);
+  padding: 6px 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+}
+
+.noteIcon {
+  font-size: 13px;
+}
+
+.noteText {
+  color: var(--text-muted);
+}
+
+/* body sections ---------------------------------------------- */
+
+.section {
+  margin-top: 14px;
+}
+
+.sectionTitle {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.text {
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--text);
+}
+
+.tocList {
+  font-size: 13px;
+  margin: 0 0 0 18px;
+  padding: 0;
+}
+
+/* right sidebar ---------------------------------------------- */
+
+.right {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.card {
+  background: var(--bg-light, #ffffff);
+  border-radius: 18px;
+  border: 1px solid var(--border, #e5e7eb);
+  box-shadow: var(--shadow-soft, 0 18px 40px rgba(15, 23, 42, 0.08));
+  padding: 10px 12px 12px;
+  font-size: 12px;
+}
+
+.cardTitle {
+  margin: 0 0 4px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.cardDesc {
+  margin: 0 0 8px;
+  color: var(--text-muted);
+}
+
+.cardDescSmall {
+  margin: 0 0 8px;
+  color: var(--text-muted);
+  font-size: 11px;
+}
+
+/* BUTTONS ---------------------------------------------------- */
+
+.btn {
+  border-radius: 999px;
+  border: 1px solid transparent;
+  padding: 7px 14px;
+  font-size: 12px;
+  cursor: pointer;
+  background: transparent;
+}
+
+.btn.primary {
+  background: linear-gradient(
+    135deg,
+    var(--primary, hsl(261 71% 50%)),
+    hsl(291 76% 60%)
+  );
+  color: #ffffff;
+  box-shadow: 0 12px 26px rgba(139, 92, 246, 0.6);
+}
+
+.btn.full {
+  width: 100%;
+}
+
+.fileInfo {
+  margin-top: 6px;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* info rows -------------------------------------------------- */
+
+.infoRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.infoLabel {
+  color: var(--text-muted);
+}
+
+.infoValue {
+  font-weight: 500;
+}
+
+/* tags ------------------------------------------------------- */
+
+.tagsRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.tagChip {
+  border-radius: 999px;
+  padding: 3px 9px;
+  font-size: 11px;
+  background: var(--highlight, rgba(139, 92, 246, 0.08));
+  color: var(--primary, hsl(261 71% 50%));
+}
+
+/* related manuals ------------------------------------------- */
+
+.relatedItem {
+  width: 100%;
+  border-radius: 12px;
+  border: none;
+  background: transparent;
+  padding: 6px 6px;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.12s ease, transform 0.12s ease;
+}
+
+.relatedItem:hover {
+  background: var(--highlight, rgba(139, 92, 246, 0.08));
+  transform: translateY(-1px);
+}
+
+.relatedTitle {
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.relatedMeta {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* comments --------------------------------------------------- */
+
+.commentInput {
+  width: 100%;
+  border-radius: 10px;
+  border: 1px solid var(--border, #e5e7eb);
+  background: var(--bg-light, #f9fafb);
+  padding: 6px 8px;
+  font-size: 12px;
+  resize: vertical;
+  min-height: 60px;
+  outline: none;
+  margin: 4px 0 6px;
+}
+
+.commentInput:focus {
+  border-color: var(--primary, hsl(261 71% 50%));
+}
+
+.commentList {
+  margin-top: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.commentRow {
+  display: flex;
+  gap: 6px;
+}
+
+.commentAvatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  background: var(--highlight, rgba(139, 92, 246, 0.12));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--primary, hsl(261 71% 50%));
+  flex-shrink: 0;
+}
+
+.commentContent {
+  font-size: 12px;
+}
+
+.commentHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.commentAuthor {
+  font-weight: 500;
+}
+
+.commentTime {
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+.commentText {
+  margin: 2px 0 0;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+/* generic empty text ---------------------------------------- */
+
+.empty {
+  margin-top: 4px;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* dark mode tweaks ------------------------------------------ */
+
+.manualPage.dark .left,
+.manualPage.dark .card,
+body.dark .manualPage .left,
+body.dark .manualPage .card {
+  background: var(--bg-dark);
+  border-color: var(--border);
+}

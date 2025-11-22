@@ -1,258 +1,176 @@
-import React, { useState } from "react";
+import React from "react";
+import "./css/Settings.css";
+import { useTranslation } from "../utils/translations";
+import { useLanguage } from "../contexts/LanguageContext";
 
 const Settings = () => {
-  const [settings, setSettings] = useState({
-    notifications: true,
-    darkMode: false,
-    emailUpdates: true,
-    autoSave: true,
-  });
-
-  const handleSettingChange = (setting, value) => {
-    setSettings((prev) => ({
-      ...prev,
-      [setting]: value,
-    }));
-    // In a real app, you'd save this to the backend
-    console.log(`${setting} changed to:`, value);
-  };
-
   return (
-    <div style={{ maxWidth: "800px", margin: "2rem auto", padding: "0 1rem" }}>
-      <h1 style={{ fontSize: "2rem", marginBottom: "2rem", color: "#111827" }}>
-        Settings
-      </h1>
+    <main className="settings-page">
+      <div className="settings-inner">
+        <header className="settings-header">
+          <div>
+            <h1 className="settings-title">Settings</h1>
+            <p className="settings-sub">
+              จัดการการแจ้งเตือน, การแสดงผล และข้อมูลบัญชีของคุณใน QuickHelp
+            </p>
+          </div>
+          <div className="settings-badge">
+            <span className="settings-dot" />
+            <span>Signed in</span>
+          </div>
+        </header>
 
-      <div style={{ display: "grid", gap: "1.5rem" }}>
-        {/* Notifications Section */}
-        <div
-          style={{
-            background: "#ffffff",
-            padding: "1.5rem",
-            borderRadius: "8px",
-            border: "1px solid #e5e7eb",
-          }}
-        >
-          <h3
-            style={{
-              margin: "0 0 1rem 0",
-              color: "#111827",
-              fontSize: "1.125rem",
-            }}
-          >
-            Notifications
-          </h3>
+        <div className="settings-grid">
+          {/* Account */}
+          <section className="settings-card">
+            <h2 className="settings-card-title">Account</h2>
+            <p className="settings-card-sub">
+              ข้อมูลบัญชีหลักที่ใช้เข้าสู่ระบบ QuickHelp
+            </p>
 
-          <div style={{ display: "grid", gap: "1rem" }}>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-              }}
-            >
-              <div>
-                <p style={{ margin: "0", fontWeight: "500", color: "#374151" }}>
-                  Push Notifications
-                </p>
-                <p
-                  style={{
-                    margin: "0",
-                    fontSize: "0.875rem",
-                    color: "#6b7280",
-                  }}
-                >
-                  Receive notifications for new manuals and updates
-                </p>
+            <div className="settings-row">
+              <div className="settings-row-label">Email</div>
+              <div className="settings-row-main">
+                <div className="settings-row-text">you@company.com</div>
+                <button className="settings-btn ghost">Change email</button>
               </div>
-              <input
-                type="checkbox"
-                checked={settings.notifications}
-                onChange={(e) =>
-                  handleSettingChange("notifications", e.target.checked)
-                }
-                style={{ width: "20px", height: "20px" }}
-              />
             </div>
 
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-              }}
-            >
-              <div>
-                <p style={{ margin: "0", fontWeight: "500", color: "#374151" }}>
-                  Email Updates
-                </p>
-                <p
-                  style={{
-                    margin: "0",
-                    fontSize: "0.875rem",
-                    color: "#6b7280",
-                  }}
-                >
-                  Get weekly digest of new manuals via email
-                </p>
+            <div className="settings-row">
+              <div className="settings-row-label">Password</div>
+              <div className="settings-row-main">
+                <div className="settings-row-text">••••••••</div>
+                <button className="settings-btn ghost">Change password</button>
               </div>
-              <input
-                type="checkbox"
-                checked={settings.emailUpdates}
-                onChange={(e) =>
-                  handleSettingChange("emailUpdates", e.target.checked)
-                }
-                style={{ width: "20px", height: "20px" }}
-              />
             </div>
-          </div>
-        </div>
 
-        {/* Appearance Section */}
-        <div
-          style={{
-            background: "#ffffff",
-            padding: "1.5rem",
-            borderRadius: "8px",
-            border: "1px solid #e5e7eb",
-          }}
-        >
-          <h3
-            style={{
-              margin: "0 0 1rem 0",
-              color: "#111827",
-              fontSize: "1.125rem",
-            }}
-          >
-            Appearance
-          </h3>
-
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
-            <div>
-              <p style={{ margin: "0", fontWeight: "500", color: "#374151" }}>
-                Dark Mode
-              </p>
-              <p
-                style={{ margin: "0", fontSize: "0.875rem", color: "#6b7280" }}
-              >
-                Switch to dark theme
-              </p>
+            <div className="settings-row">
+              <div className="settings-row-label">Organization</div>
+              <div className="settings-row-main">
+                <div className="settings-row-text">
+                  QuickHelp Demo Workspace
+                </div>
+                <button className="settings-btn ghost">Leave workspace</button>
+              </div>
             </div>
-            <input
-              type="checkbox"
-              checked={settings.darkMode}
-              onChange={(e) =>
-                handleSettingChange("darkMode", e.target.checked)
-              }
-              style={{ width: "20px", height: "20px" }}
-            />
-          </div>
-        </div>
+          </section>
 
-        {/* Preferences Section */}
-        <div
-          style={{
-            background: "#ffffff",
-            padding: "1.5rem",
-            borderRadius: "8px",
-            border: "1px solid #e5e7eb",
-          }}
-        >
-          <h3
-            style={{
-              margin: "0 0 1rem 0",
-              color: "#111827",
-              fontSize: "1.125rem",
-            }}
-          >
-            Preferences
-          </h3>
+          {/* Appearance */}
+          <section className="settings-card">
+            <h2 className="settings-card-title">Appearance</h2>
+            <p className="settings-card-sub">
+              เลือกธีมและความหนาแน่นของคอนเทนต์ให้เหมาะกับการใช้งานของคุณ
+            </p>
 
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
-            <div>
-              <p style={{ margin: "0", fontWeight: "500", color: "#374151" }}>
-                Auto-save
-              </p>
-              <p
-                style={{ margin: "0", fontSize: "0.875rem", color: "#6b7280" }}
-              >
-                Automatically save your progress
-              </p>
+            <div className="settings-row">
+              <div className="settings-row-label">Theme</div>
+              <div className="settings-row-main settings-options">
+                <label className="settings-pillOption">
+                  <input type="radio" name="theme" defaultChecked />
+                  <span>System</span>
+                </label>
+                <label className="settings-pillOption">
+                  <input type="radio" name="theme" />
+                  <span>Light</span>
+                </label>
+                <label className="settings-pillOption">
+                  <input type="radio" name="theme" />
+                  <span>Dark</span>
+                </label>
+              </div>
             </div>
-            <input
-              type="checkbox"
-              checked={settings.autoSave}
-              onChange={(e) =>
-                handleSettingChange("autoSave", e.target.checked)
-              }
-              style={{ width: "20px", height: "20px" }}
-            />
-          </div>
+
+            <div className="settings-row">
+              <div className="settings-row-label">Density</div>
+              <div className="settings-row-main settings-options">
+                <label className="settings-pillOption">
+                  <input type="radio" name="density" defaultChecked />
+                  <span>Comfortable</span>
+                </label>
+                <label className="settings-pillOption">
+                  <input type="radio" name="density" />
+                  <span>Compact</span>
+                </label>
+              </div>
+            </div>
+          </section>
+
+          {/* Notifications */}
+          <section className="settings-card">
+            <h2 className="settings-card-title">Notifications</h2>
+            <p className="settings-card-sub">
+              ควบคุมว่าคุณจะได้รับการแจ้งเตือนอะไรจาก QuickHelp บ้าง
+            </p>
+
+            <label className="settings-toggleRow">
+              <div>
+                <div className="settings-toggle-title">
+                  Manual updated (favorite)
+                </div>
+                <div className="settings-toggle-sub">
+                  แจ้งเตือนเมื่อคู่มือที่คุณบันทึกไว้มีเวอร์ชันใหม่
+                </div>
+              </div>
+              <input type="checkbox" defaultChecked />
+            </label>
+
+            <label className="settings-toggleRow">
+              <div>
+                <div className="settings-toggle-title">
+                  Comments on my manuals
+                </div>
+                <div className="settings-toggle-sub">
+                  แจ้งเตือนเมื่อมีคอมเมนต์ในคู่มือที่คุณสร้าง
+                </div>
+              </div>
+              <input type="checkbox" defaultChecked />
+            </label>
+
+            <label className="settings-toggleRow">
+              <div>
+                <div className="settings-toggle-title">
+                  Product updates & tips
+                </div>
+                <div className="settings-toggle-sub">
+                  อีเมลอัปเดตฟีเจอร์ใหม่และเทคนิคการใช้งาน
+                </div>
+              </div>
+              <input type="checkbox" />
+            </label>
+          </section>
+
+          {/* Danger zone */}
+          <section className="settings-card danger">
+            <h2 className="settings-card-title">Danger zone</h2>
+            <p className="settings-card-sub">
+              การกระทำเหล่านี้อาจมีผลกับการเข้าถึงข้อมูลของคุณ
+              โปรดใช้อย่างระมัดระวัง
+            </p>
+
+            <div className="settings-row">
+              <div>
+                <div className="settings-toggle-title">Deactivate account</div>
+                <div className="settings-toggle-sub">
+                  ระงับการใช้งานบัญชีชั่วคราว คุณจะไม่สามารถเข้าสู่ระบบ
+                  QuickHelp ได้
+                </div>
+              </div>
+              <button className="settings-btn danger">Deactivate</button>
+            </div>
+          </section>
         </div>
 
-        {/* Account Actions */}
-        <div
-          style={{
-            background: "#ffffff",
-            padding: "1.5rem",
-            borderRadius: "8px",
-            border: "1px solid #e5e7eb",
-          }}
-        >
-          <h3
-            style={{
-              margin: "0 0 1rem 0",
-              color: "#111827",
-              fontSize: "1.125rem",
-            }}
+        <footer className="settings-footer">
+          <button
+            className="settings-btn primary"
+            onClick={() => alert("Mock: saved settings ✨")}
           >
-            Account Actions
-          </h3>
-
-          <div style={{ display: "flex", gap: "1rem" }}>
-            <button
-              style={{
-                padding: "0.75rem 1.5rem",
-                background: "#667eea",
-                color: "white",
-                border: "none",
-                borderRadius: "0.375rem",
-                cursor: "pointer",
-                fontWeight: "500",
-              }}
-            >
-              Save Changes
-            </button>
-
-            <button
-              style={{
-                padding: "0.75rem 1.5rem",
-                background: "#dc2626",
-                color: "white",
-                border: "none",
-                borderRadius: "0.375rem",
-                cursor: "pointer",
-                fontWeight: "500",
-              }}
-            >
-              Delete Account
-            </button>
-          </div>
-        </div>
+            Save changes
+          </button>
+          <button className="settings-btn ghost">Reset</button>
+        </footer>
       </div>
-    </div>
+    </main>
   );
 };
 

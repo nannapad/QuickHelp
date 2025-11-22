@@ -1,222 +1,120 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
+import "./css/Profile.css";
 
 const Profile = () => {
-  const [user, setUser] = useState(null);
-
-  useEffect(() => {
-    const userData = localStorage.getItem("userData");
-    if (userData) {
-      setUser(JSON.parse(userData));
-    }
-  }, []);
-
-  if (!user) {
-    return (
-      <div style={{ padding: "2rem", textAlign: "center" }}>
-        <h2>Please log in to view your profile</h2>
-      </div>
-    );
-  }
-
   return (
-    <div style={{ maxWidth: "800px", margin: "2rem auto", padding: "0 1rem" }}>
-      <h1 style={{ fontSize: "2rem", marginBottom: "2rem", color: "#111827" }}>
-        Profile
-      </h1>
-      
-      <div style={{ display: "grid", gap: "1.5rem" }}>
-        {/* User Info Card */}
-        <div style={{ 
-          background: "#ffffff", 
-          padding: "2rem", 
-          borderRadius: "8px", 
-          border: "1px solid #e5e7eb",
-          boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)"
-        }}>
-          <div style={{ display: "flex", alignItems: "center", marginBottom: "2rem" }}>
-            <div style={{ 
-              width: "80px", 
-              height: "80px", 
-              borderRadius: "50%", 
-              background: user.role === 'admin' ? "#dc2626" : "#667eea", 
-              display: "flex", 
-              alignItems: "center", 
-              justifyContent: "center", 
-              color: "white", 
-              fontSize: "2rem",
-              marginRight: "1rem"
-            }}>
-              {user.role === 'admin' ? '👑' : '👤'}
-            </div>
+    <main className="profile-page">
+      <div className="profile-inner">
+        <header className="profile-header">
+          <div className="profile-user">
+            <div className="profile-avatar">YS</div>
             <div>
-              <h2 style={{ margin: "0 0 0.5rem 0", color: "#111827" }}>
-                {user.firstName || user.username} {user.lastName || ''}
-              </h2>
-              <p style={{ margin: "0", color: "#6b7280" }}>
-                {user.position || 'User'} • {user.department || 'General'}
+              <h1 className="profile-name">Your Name</h1>
+              <div className="profile-meta">
+                <span>Creator</span>
+                <span className="profile-dot">•</span>
+                <span>Joined Aug 2024</span>
+              </div>
+            </div>
+          </div>
+          <button
+            className="profile-btn ghost"
+            onClick={() => alert("Mock: switch account")}
+          >
+            Switch account
+          </button>
+        </header>
+
+        <div className="profile-grid">
+          {/* Left: editable info */}
+          <section className="profile-card">
+            <h2 className="profile-card-title">Basic info</h2>
+            <p className="profile-card-sub">
+              ข้อมูลที่ใช้แสดงในคู่มือและคอมเมนต์ต่าง ๆ
+            </p>
+
+            <div className="profile-field">
+              <label>Display name</label>
+              <input type="text" placeholder="Your Name" />
+            </div>
+
+            <div className="profile-field">
+              <label>Job title</label>
+              <input type="text" placeholder="Product Designer" />
+            </div>
+
+            <div className="profile-field">
+              <label>Department</label>
+              <input type="text" placeholder="Design / IT / HR / Marketing" />
+            </div>
+
+            <div className="profile-field">
+              <label>Short bio</label>
+              <textarea
+                rows={3}
+                placeholder="เขียนแนะนำตัวสั้น ๆ เช่น งานที่ทำ ความถนัด หรือคู่มือที่มักเขียน"
+              />
+            </div>
+
+            <div className="profile-field">
+              <label>Skills / topics</label>
+              <input
+                type="text"
+                placeholder="เช่น VS Code, Onboarding, Brand guideline"
+              />
+              <p className="profile-hint">
+                ใช้เพื่อช่วยให้ทีมรู้ว่าคุณถนัดเขียนคู่มือด้านไหน
               </p>
-              <span style={{ 
-                display: "inline-block",
-                padding: "0.25rem 0.75rem",
-                borderRadius: "999px",
-                fontSize: "0.75rem",
-                fontWeight: "600",
-                textTransform: "uppercase",
-                background: user.role === 'admin' ? "#fef2f2" : "#f0f9ff",
-                color: user.role === 'admin' ? "#dc2626" : "#0369a1",
-                marginTop: "0.5rem"
-              }}>
-                {user.role || 'user'}
-              </span>
-            </div>
-          </div>
-
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
-            <div>
-              <label style={{ display: "block", fontWeight: "600", marginBottom: "0.5rem", color: "#374151" }}>
-                Username
-              </label>
-              <input 
-                type="text" 
-                value={user.username} 
-                readOnly
-                style={{
-                  width: "100%",
-                  padding: "0.75rem",
-                  border: "1px solid #d1d5db",
-                  borderRadius: "0.375rem",
-                  background: "#f9fafb"
-                }}
-              />
-            </div>
-            
-            <div>
-              <label style={{ display: "block", fontWeight: "600", marginBottom: "0.5rem", color: "#374151" }}>
-                Email
-              </label>
-              <input 
-                type="email" 
-                value={user.email} 
-                readOnly
-                style={{
-                  width: "100%",
-                  padding: "0.75rem",
-                  border: "1px solid #d1d5db",
-                  borderRadius: "0.375rem",
-                  background: "#f9fafb"
-                }}
-              />
             </div>
 
-            <div>
-              <label style={{ display: "block", fontWeight: "600", marginBottom: "0.5rem", color: "#374151" }}>
-                User ID
-              </label>
-              <input 
-                type="text" 
-                value={user.id} 
-                readOnly
-                style={{
-                  width: "100%",
-                  padding: "0.75rem",
-                  border: "1px solid #d1d5db",
-                  borderRadius: "0.375rem",
-                  background: "#f9fafb"
-                }}
-              />
+            <div className="profile-actions">
+              <button
+                className="profile-btn primary"
+                onClick={() => alert("Mock: saved profile")}
+              >
+                Save profile
+              </button>
+              <button className="profile-btn ghost">Reset</button>
             </div>
-            
-            <div>
-              <label style={{ display: "block", fontWeight: "600", marginBottom: "0.5rem", color: "#374151" }}>
-                Member Since
-              </label>
-              <input 
-                type="text" 
-                value={user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A'} 
-                readOnly
-                style={{
-                  width: "100%",
-                  padding: "0.75rem",
-                  border: "1px solid #d1d5db",
-                  borderRadius: "0.375rem",
-                  background: "#f9fafb"
-                }}
-              />
-            </div>
-          </div>
-        </div>
+          </section>
 
-        {/* Stats Card */}
-        {user.stats && (
-          <div style={{ 
-            background: "#ffffff", 
-            padding: "2rem", 
-            borderRadius: "8px", 
-            border: "1px solid #e5e7eb",
-            boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)"
-          }}>
-            <h3 style={{ margin: "0 0 1.5rem 0", color: "#111827", fontSize: "1.25rem" }}>
-              Activity Statistics
-            </h3>
-            
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "1rem" }}>
-              <div style={{ textAlign: "center", padding: "1rem", background: "#f8fafc", borderRadius: "0.5rem" }}>
-                <div style={{ fontSize: "2rem", fontWeight: "bold", color: "#667eea" }}>
-                  {user.stats.manualsViewed || 0}
-                </div>
-                <div style={{ fontSize: "0.875rem", color: "#6b7280" }}>Manuals Viewed</div>
-              </div>
-              
-              <div style={{ textAlign: "center", padding: "1rem", background: "#f8fafc", borderRadius: "0.5rem" }}>
-                <div style={{ fontSize: "2rem", fontWeight: "bold", color: "#10b981" }}>
-                  {user.stats.manualsDownloaded || 0}
-                </div>
-                <div style={{ fontSize: "0.875rem", color: "#6b7280" }}>Downloads</div>
-              </div>
-              
-              <div style={{ textAlign: "center", padding: "1rem", background: "#f8fafc", borderRadius: "0.5rem" }}>
-                <div style={{ fontSize: "2rem", fontWeight: "bold", color: "#f59e0b" }}>
-                  {user.stats.manualsBookmarked || 0}
-                </div>
-                <div style={{ fontSize: "0.875rem", color: "#6b7280" }}>Bookmarked</div>
-              </div>
-              
-              <div style={{ textAlign: "center", padding: "1rem", background: "#f8fafc", borderRadius: "0.5rem" }}>
-                <div style={{ fontSize: "2rem", fontWeight: "bold", color: "#8b5cf6" }}>
-                  {user.stats.loginCount || 0}
-                </div>
-                <div style={{ fontSize: "0.875rem", color: "#6b7280" }}>Total Logins</div>
-              </div>
-              
-              {/* Admin-specific stats */}
-              {user.role === 'admin' && user.stats.manualsCreated && (
-                <>
-                  <div style={{ textAlign: "center", padding: "1rem", background: "#fef2f2", borderRadius: "0.5rem" }}>
-                    <div style={{ fontSize: "2rem", fontWeight: "bold", color: "#dc2626" }}>
-                      {user.stats.manualsCreated}
-                    </div>
-                    <div style={{ fontSize: "0.875rem", color: "#6b7280" }}>Manuals Created</div>
-                  </div>
-                  
-                  <div style={{ textAlign: "center", padding: "1rem", background: "#fef2f2", borderRadius: "0.5rem" }}>
-                    <div style={{ fontSize: "2rem", fontWeight: "bold", color: "#dc2626" }}>
-                      {user.stats.usersManaged || 0}
-                    </div>
-                    <div style={{ fontSize: "0.875rem", color: "#6b7280" }}>Users Managed</div>
-                  </div>
-                </>
-              )}
-            </div>
-          </div>
-        )}
+          {/* Right: summary / readonly */}
+          <section className="profile-card">
+            <h2 className="profile-card-title">Profile summary</h2>
+            <p className="profile-card-sub">
+              สรุปภาพรวมการใช้งาน QuickHelp ของคุณ
+            </p>
 
-        <div style={{ marginTop: "1rem", padding: "1rem", background: "#f0f9ff", borderRadius: "0.375rem", border: "1px solid #0ea5e9" }}>
-          <p style={{ margin: "0", color: "#0369a1", fontSize: "0.875rem" }}>
-            ℹ️ Profile editing functionality would be implemented here in a real application.
-          </p>
+            <div className="profile-statRow">
+              <div>
+                <div className="profile-stat-label">Manuals created</div>
+                <div className="profile-stat-value">12</div>
+              </div>
+              <div>
+                <div className="profile-stat-label">Comments given</div>
+                <div className="profile-stat-value">37</div>
+              </div>
+            </div>
+
+            <div className="profile-statRow">
+              <div>
+                <div className="profile-stat-label">Most active category</div>
+                <div className="profile-stat-value">IT / Tools</div>
+              </div>
+            </div>
+
+            <div className="profile-divider" />
+
+            <div className="profile-tagsTitle">Recent tags</div>
+            <div className="profile-tagsRow">
+              <span className="profile-tagChip">vs-code</span>
+              <span className="profile-tagChip">onboarding</span>
+              <span className="profile-tagChip">checklist</span>
+            </div>
+          </section>
         </div>
       </div>
-    </div>
+    </main>
   );
 };
 

@@ -3,11 +3,14 @@ import { Button } from "react-bootstrap";
 import { useState, useEffect } from "react";
 import "./css/NavBar.css";
 import Logo from "../assets/logo.svg";
+import LanguageSwitcher from "./LanguageSwitcher";
+import { useTranslation } from "../utils/translations";
 
 const NavBar = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState(null);
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const { t } = useTranslation();
   // Check authentication status on component mount
   useEffect(() => {
     const checkAuthStatus = () => {
@@ -71,22 +74,22 @@ const NavBar = () => {
         <Link to="/" className="logo">
           <img src={Logo} alt="QuickHelp Logo" className="logo-image" />
           uickHelp
-        </Link>
+        </Link>{" "}
         <nav className="nav-links">
           <ul>
             <li>
               <Link to="/feed">
-                <Button>Feed</Button>
+                <Button>{t("nav.feed")}</Button>
               </Link>
             </li>
             <li>
               <Link to="/about">
-                <Button>About</Button>
+                <Button>{t("nav.about")}</Button>
               </Link>
             </li>
             <li>
               <Link to="/faq">
-                <Button>FAQ</Button>
+                <Button>{t("nav.faq")}</Button>
               </Link>
             </li>
           </ul>
@@ -95,14 +98,18 @@ const NavBar = () => {
       <div className="nav-right">
         <nav className="nav-links">
           <ul>
+            {" "}
             {/* Only show notifications if user is logged in */}
             {isLoggedIn && (
               <li>
-                <Button className="notif-btn" title="Notifications">
+                <Button className="notif-btn" title={t("nav.notifications")}>
                   🔔
                 </Button>
               </li>
             )}{" "}
+            <li>
+              <LanguageSwitcher />
+            </li>
             <li>
               <Button
                 className="btn-theme"
@@ -120,26 +127,29 @@ const NavBar = () => {
                   title={`Profile: ${user?.username || "User"}`}
                 >
                   👤
-                </Button>
+                </Button>{" "}
                 <div className="profile-menu">
                   <Link to="/profile" className="profile-menu-item">
-                    Profile
+                    {t("nav.profile")}
                   </Link>
                   <Link to="/settings" className="profile-menu-item">
-                    Settings
+                    {t("nav.settings")}
+                  </Link>
+                  <Link to="/creator-request" className="profile-menu-item">
+                    {t("nav.creatorRequest")}
                   </Link>
                   <button
                     onClick={handleLogout}
                     className="profile-menu-item logout-btn"
                   >
-                    Logout
+                    {t("nav.logout")}
                   </button>
                 </div>
               </li>
             ) : (
               <li>
                 <Link to="/login">
-                  <Button className="btn-login">Login</Button>
+                  <Button className="btn-login">{t("nav.login")}</Button>
                 </Link>
               </li>
             )}

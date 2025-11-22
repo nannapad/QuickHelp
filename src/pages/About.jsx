@@ -1,18 +1,21 @@
 import React from "react";
 import ManualGrid from "../components/ManualGrid";
 import manuals from "../data/ManualData";
+import { useTranslation } from "../utils/translations";
 
 const About = () => {
   // Show only the first 3 manuals as featured content
   const featuredManuals = manuals.slice(0, 3);
+  const { t } = useTranslation();
 
   return (
     <div style={{ padding: "2rem", maxWidth: "1200px", margin: "0 auto" }}>
+      {" "}
       <header style={{ textAlign: "center", marginBottom: "3rem" }}>
         <h1
           style={{ fontSize: "2.5rem", marginBottom: "1rem", color: "#111827" }}
         >
-          About QuickHelp
+          {t("about.title")}
         </h1>
         <p
           style={{
@@ -23,11 +26,9 @@ const About = () => {
             lineHeight: "1.6",
           }}
         >
-          Your one-stop solution for accessing company manuals, guides, and
-          documentation. Find what you need quickly and efficiently.
+          {t("about.subtitle")}
         </p>
       </header>
-
       <section style={{ marginBottom: "3rem" }}>
         <div
           style={{
@@ -43,6 +44,7 @@ const About = () => {
               borderRadius: "8px",
             }}
           >
+            {" "}
             <h3
               style={{
                 fontSize: "1.25rem",
@@ -50,11 +52,10 @@ const About = () => {
                 color: "#111827",
               }}
             >
-              🔍 Smart Search
+              {t("about.features.search.title")}
             </h3>
             <p style={{ color: "#6b7280", lineHeight: "1.5" }}>
-              Find manuals instantly with our intelligent search that looks
-              through titles, categories, tags, and content.
+              {t("about.features.search.desc")}
             </p>
           </div>
 
@@ -65,6 +66,7 @@ const About = () => {
               borderRadius: "8px",
             }}
           >
+            {" "}
             <h3
               style={{
                 fontSize: "1.25rem",
@@ -72,11 +74,10 @@ const About = () => {
                 color: "#111827",
               }}
             >
-              🤖 AI Assistant
+              {t("about.features.organized.title")}
             </h3>
             <p style={{ color: "#6b7280", lineHeight: "1.5" }}>
-              Get personalized recommendations and contextual help based on your
-              search queries and browsing patterns.
+              {t("about.features.organized.desc")}
             </p>
           </div>
 
@@ -87,6 +88,7 @@ const About = () => {
               borderRadius: "8px",
             }}
           >
+            {" "}
             <h3
               style={{
                 fontSize: "1.25rem",
@@ -94,17 +96,16 @@ const About = () => {
                 color: "#111827",
               }}
             >
-              📚 Organized Content
+              {t("about.features.updated.title")}
             </h3>
             <p style={{ color: "#6b7280", lineHeight: "1.5" }}>
-              Browse by categories like IT, Design, Marketing, and HR.
-              Everything is properly tagged and categorized.
+              {t("about.features.updated.desc")}
             </p>
           </div>
         </div>
       </section>
-
       <section>
+        {" "}
         <h2
           style={{
             fontSize: "1.875rem",
@@ -113,7 +114,7 @@ const About = () => {
             color: "#111827",
           }}
         >
-          Featured Manuals
+          {t("about.featuredTitle")}
         </h2>
         <p
           style={{
@@ -122,9 +123,8 @@ const About = () => {
             color: "#6b7280",
           }}
         >
-          Check out some of our most popular and helpful manuals
+          {t("about.featuredDesc")}
         </p>
-
         <ManualGrid
           manuals={featuredManuals}
           onTagClick={(tag) => console.log(`Clicked tag: ${tag}`)}

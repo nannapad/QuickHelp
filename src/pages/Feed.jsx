@@ -3,12 +3,14 @@ import React, { useEffect, useMemo, useState } from "react";
 import ManualGrid from "../components/ManualGrid";
 import manuals from "../data/ManualData";
 import "./css/Feed.css";
+import { useTranslation } from "../utils/translations";
 
 const Feed = () => {
   const [category, setCategory] = useState("all");
   const [searchInput, setSearchInput] = useState("");
   const [search, setSearch] = useState("");
   const [activeTag, setActiveTag] = useState("");
+  const { t } = useTranslation();
 
   const hasFilters = useMemo(
     () => Boolean(search || activeTag || category !== "all"),
@@ -45,17 +47,18 @@ const Feed = () => {
       return true;
     });
   }, [manuals, search, activeTag, category]);
-
   const resultText = useMemo(() => {
-    if (!hasFilters) return "Based on what's popular this week";
+    if (!hasFilters) return t("feed.resultsText");
 
     const parts = [];
     if (search) parts.push(`search: "${search}"`);
     if (category !== "all") parts.push(`category: ${category}`);
     if (activeTag) parts.push(`tag: ${activeTag}`);
 
-    return `Showing ${filteredManuals.length} manual(s) • ${parts.join(" • ")}`;
-  }, [hasFilters, search, category, activeTag, filteredManuals]);
+    return `${t("feed.searchResults")} ${
+      filteredManuals.length
+    } manual(s) • ${parts.join(" • ")}`;
+  }, [hasFilters, search, category, activeTag, filteredManuals, t]);
 
   const scrollToList = () => {
     const el = document.getElementById("manual-list");
@@ -101,10 +104,10 @@ const Feed = () => {
 
         <form className="feed-hero-searchWrapper" onSubmit={handleSubmit}>
           <div className="feed-hero-search">
-            <span className="feed-hero-searchIcon">🔍</span>
+            <span className="feed-hero-searchIcon">🔍</span>{" "}
             <input
               type="text"
-              placeholder="Search manuals, categories, tags..."
+              placeholder={t("feed.searchPlaceholder")}
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
             />
@@ -112,12 +115,13 @@ const Feed = () => {
         </form>
 
         <div className="feed-chipRow">
+          {" "}
           {[
-            { id: "all", label: "All" },
-            { id: "IT", label: "IT" },
-            { id: "Design", label: "Design" },
-            { id: "Marketing", label: "Marketing" },
-            { id: "HR", label: "HR" },
+            { id: "all", label: t("feed.categories.all") },
+            { id: "IT", label: t("feed.categories.it") },
+            { id: "Design", label: t("feed.categories.design") },
+            { id: "Marketing", label: t("feed.categories.marketing") },
+            { id: "HR", label: t("feed.categories.hr") },
           ].map((chip) => (
             <button
               key={chip.id}
@@ -133,13 +137,13 @@ const Feed = () => {
 
       {/* MAIN LIST */}
       <section className="feed-main" id="manual-list">
+        {" "}
         <header className="feed-mainHeader">
           <div className="feed-mainTitle">
-            {hasFilters ? "Search results" : "Recommended manuals"}
+            {hasFilters ? t("feed.searchResults") : t("feed.recommended")}
           </div>
           <div className="feed-mainSub">{resultText}</div>
         </header>
-
         <ManualGrid
           manuals={filteredManuals}
           activeTag={activeTag}

@@ -13,6 +13,7 @@ import {
 } from "react-bootstrap";
 import { authenticateUser } from "../data/UserData";
 import "./css/Login.css";
+import { useTranslation } from "../utils/translations";
 
 const Login = () => {
   const [activeTab, setActiveTab] = useState("login");
@@ -20,6 +21,7 @@ const Login = () => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const [loginData, setLoginData] = useState({
     email: "",

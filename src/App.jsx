@@ -9,24 +9,29 @@ import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
 import AppLayout from "./layouts/AppLayout";
 import NotFound from "./pages/NotFound";
+import CreatorRequest from "./pages/CreatorRequest";
+import { LanguageProvider } from "./contexts/LanguageContext";
 
 function App() {
   return (
-    <BrowserRouter basename="/QuickHelp/">
-      <Routes>
-        <Route element={<AppLayout />}>
-          <Route path="/" element={<Feed />} />
-          <Route path="feed" element={<Feed />} />
-          <Route path="manual/:id" element={<ManualDetail />} />
-          <Route path="about" element={<About />} />
-          <Route path="faq" element={<FAQ />} />
-          <Route path="login" element={<Login />} />
-          <Route path="profile" element={<Profile />} />
-          <Route path="settings" element={<Settings />} />
-          <Route path="*" element={<NotFound />} />
-        </Route>
-      </Routes>
-    </BrowserRouter>
+    <LanguageProvider>
+      <BrowserRouter basename="/QuickHelp/">
+        <Routes>
+          <Route element={<AppLayout />}>
+            <Route path="/" element={<Feed />} />
+            <Route path="feed" element={<Feed />} />
+            <Route path="manual/:id" element={<ManualDetail />} />
+            <Route path="about" element={<About />} />
+            <Route path="faq" element={<FAQ />} />
+            <Route path="login" element={<Login />} />
+            <Route path="profile" element={<Profile />} />
+            <Route path="settings" element={<Settings />} />
+            <Route path="creator-request" element={<CreatorRequest />} />
+            <Route path="*" element={<NotFound />} />
+          </Route>
+        </Routes>
+      </BrowserRouter>
+    </LanguageProvider>
   );
 }
 
