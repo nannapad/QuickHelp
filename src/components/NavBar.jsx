@@ -129,6 +129,10 @@ const NavBar = () => {
                   👤
                 </Button>{" "}
                 <div className="profile-menu">
+                  <Link to="/dashboard" className="profile-menu-item">
+                    {t("dashboard")}
+                  </Link>
+                  
                   <Link to="/profile" className="profile-menu-item">
                     {t("nav.profile")}
                   </Link>

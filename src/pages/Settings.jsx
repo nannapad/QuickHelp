@@ -149,13 +149,13 @@ const Settings = () => {
 
             <div className="settings-row">
               <div>
-                <div className="settings-toggle-title">Deactivate account</div>
+                <div className="settings-toggle-title">Delete Account</div>
                 <div className="settings-toggle-sub">
-                  ระงับการใช้งานบัญชีชั่วคราว คุณจะไม่สามารถเข้าสู่ระบบ
+                  ลบบัญชีถาวร คุณจะไม่สามารถเข้าสู่ระบบ
                   QuickHelp ได้
                 </div>
               </div>
-              <button className="settings-btn danger">Deactivate</button>
+              <button className="settings-btn danger">Delete Account</button>
             </div>
           </section>
         </div>
