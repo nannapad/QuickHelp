@@ -10,8 +10,40 @@ const NavBar = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState(null);
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
   const { t } = useTranslation();
   const navigate = useNavigate();
+  
+  // notification helpers
+  useEffect(() => {
+    const updateUnread = () => {
+      try {
+        const raw = localStorage.getItem("userData");
+        const currentUser = raw ? JSON.parse(raw) : null;
+        if (!currentUser) {
+          setUnreadCount(0);
+          return;
+        }
+        // lazy-load to avoid importing heavy utils here
+        const itemsRaw = localStorage.getItem("quickhelp_notifications");
+        const items = itemsRaw ? JSON.parse(itemsRaw) : [];
+        const count = items.filter((n) => n.toRoles.includes(currentUser.role) && !(n.readBy || []).includes(currentUser.id)).length;
+        setUnreadCount(count);
+      } catch (err) {
+        setUnreadCount(0);
+      }
+    };
+
+    updateUnread();
+    window.addEventListener("notificationsChanged", updateUnread);
+    window.addEventListener("authStateChanged", updateUnread);
+    window.addEventListener("storage", updateUnread);
+    return () => {
+      window.removeEventListener("notificationsChanged", updateUnread);
+      window.removeEventListener("authStateChanged", updateUnread);
+      window.removeEventListener("storage", updateUnread);
+    };
+  }, []);
   // Check authentication status on component mount
   useEffect(() => {
     const checkAuthStatus = () => {
@@ -107,9 +139,12 @@ const NavBar = () => {
               <li>
                 <Button className="notif-btn" title={t("nav.notifications")}>
                   🔔
+                  {unreadCount > 0 && (
+                    <span className="notif-badge">{unreadCount}</span>
+                  )}
                 </Button>
               </li>
-            )}{" "}
+            )} {" "}
             <li>
               <LanguageSwitcher />
             </li>
@@ -132,9 +167,11 @@ const NavBar = () => {
                   👤
                 </Button>{" "}
                 <div className="profile-menu">
-                  <Link to="/dashboard" className="profile-menu-item">
-                    {t("dashboard")}
-                  </Link>
+                  {user && (user.role === "admin" || user.role === "creator") && (
+                    <Link to="/dashboard" className="profile-menu-item">
+                      {t("dashboard")}
+                    </Link>
+                  )}
                   
                   <Link to="/profile" className="profile-menu-item">
                     {t("nav.profile")}
@@ -142,9 +179,11 @@ const NavBar = () => {
                   <Link to="/settings" className="profile-menu-item">
                     {t("nav.settings")}
                   </Link>
-                  <Link to="/creator-request" className="profile-menu-item">
-                    {t("nav.creatorRequest")}
-                  </Link>
+                  {user && user.role !== "admin" && user.role !== "creator" && (
+                    <Link to="/creator-request" className="profile-menu-item">
+                      {t("nav.creatorRequest")}
+                    </Link>
+                  )}
                   <button
                     onClick={handleLogout}
                     className="profile-menu-item logout-btn"
