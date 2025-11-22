@@ -265,7 +265,9 @@ export const translations = {
         text: "Type manual content here...",
         image: "Click to upload image or enter image URL",
       },
-    }, // Common
+    },
+
+    // Common
     common: {
       search: "Search",
       download: "Download",
@@ -285,7 +287,6 @@ export const translations = {
       back: "Back",
       next: "Next",
       previous: "Previous",
-      or: "or",
     },
   },
 
@@ -571,7 +572,6 @@ export const translations = {
       back: "ย้อนกลับ",
       next: "ถัดไป",
       previous: "ก่อนหน้า",
-      or: "หรือ",
     },
   },
 };

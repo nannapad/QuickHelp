@@ -132,8 +132,13 @@ const NavBar = () => {
                   👤
                 </Button>{" "}
                 <div className="profile-menu">
+                  {/* create manual button for Creator and Admin */}
+                  <Link to="/create-manual" className="profile-menu-item">
+                    {t("Create Manual")}
+                  </Link>
+
                   <Link to="/dashboard" className="profile-menu-item">
-                    {t("dashboard")}
+                    {t("Dashboard")}
                   </Link>
                   
                   <Link to="/profile" className="profile-menu-item">

@@ -14,6 +14,7 @@ import { LanguageProvider } from "./contexts/LanguageContext";
 import CreatorDashboard from "./pages/CreatorDashboard";
 import Admindashboard from "./pages/AdminDashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
+import CreateManual from "./pages/CreateManual";
 
 // Helper component: redirect to the appropriate dashboard based on role
 const DashboardRedirect = () => {
@@ -70,6 +71,7 @@ function App() {
                 </ProtectedRoute>
               }
             />
+            <Route path="create-manual" element={<ProtectedRoute allowedRoles={["admin","creator"]}><CreateManual/></ProtectedRoute>}/>
           </Route>
         </Routes>
       </BrowserRouter>

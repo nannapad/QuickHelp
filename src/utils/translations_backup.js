@@ -83,9 +83,7 @@ export const translations = {
           a: "We currently have IT, Design, Marketing, and HR categories. More categories may be added based on organizational needs.",
         },
       },
-    },
-
-    // Login Page
+    }, // Login Page
     login: {
       title: "Welcome to QuickHelp",
       subtitle: "Access your company's knowledge base",
@@ -230,8 +228,7 @@ export const translations = {
       shareManual: "Share",
     },
 
-    // Create Manual Page
-    createManual: {
+    // Create Manual Page    createManual: {
       title: "Create Manual",
       subtitle: "Create a new manual for your team and organization",
       titleLabel: "Title",
@@ -256,16 +253,18 @@ export const translations = {
         heading: "Heading",
         quote: "Quote",
         code: "Code",
-        image: "Image",
+        image: "Image"
       },
       blockPlaceholders: {
         heading: "Section title",
         quote: "Highlight text or short quote...",
         code: "Code example...",
         text: "Type manual content here...",
-        image: "Click to upload image or enter image URL",
-      },
-    }, // Common
+        image: "Click to upload image or enter image URL"
+      }
+    },
+
+    // Common
     common: {
       search: "Search",
       download: "Download",
@@ -285,7 +284,6 @@ export const translations = {
       back: "Back",
       next: "Next",
       previous: "Previous",
-      or: "or",
     },
   },
 
@@ -534,21 +532,6 @@ export const translations = {
       fillAllFields: "กรุณากรอกข้อมูลที่จำเป็นให้ครบถ้วน",
       success: "สร้างคู่มือสำเร็จ!",
       error: "การสร้างคู่มือไม่สำเร็จ กรุณาลองใหม่อีกครั้ง",
-      addBlock: "เพิ่มบล็อกใหม่",
-      blockTypes: {
-        text: "ข้อความ",
-        heading: "หัวข้อ",
-        quote: "คำคม",
-        code: "โค้ด",
-        image: "รูปภาพ",
-      },
-      blockPlaceholders: {
-        heading: "หัวข้อใหญ่ / Section title",
-        quote: "ข้อความเน้นย้ำ หรือคำคมสั้น ๆ…",
-        code: "โค้ดตัวอย่าง…",
-        text: "พิมพ์เนื้อหาคู่มือที่นี่…",
-        image: "คลิกเพื่ออัปโหลดรูปภาพหรือใส่ URL รูปภาพ",
-      },
     },
 
     // Common
@@ -571,7 +554,6 @@ export const translations = {
       back: "ย้อนกลับ",
       next: "ถัดไป",
       previous: "ก่อนหน้า",
-      or: "หรือ",
     },
   },
 };
