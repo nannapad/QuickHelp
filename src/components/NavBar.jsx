@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "react-bootstrap";
 import { useState, useEffect } from "react";
 import "./css/NavBar.css";
@@ -11,6 +11,7 @@ const NavBar = () => {
   const [user, setUser] = useState(null);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const { t } = useTranslation();
+  const navigate = useNavigate();
   // Check authentication status on component mount
   useEffect(() => {
     const checkAuthStatus = () => {
@@ -58,7 +59,6 @@ const NavBar = () => {
     document.body.classList.toggle("dark", newDarkMode);
     localStorage.setItem("darkMode", newDarkMode.toString());
   };
-
   const handleLogout = () => {
     localStorage.removeItem("authToken");
     localStorage.removeItem("userData");
@@ -67,6 +67,9 @@ const NavBar = () => {
 
     // Dispatch custom event to notify other components
     window.dispatchEvent(new Event("authStateChanged"));
+
+    // Redirect to feed page after logout
+    navigate("/feed");
   };
   return (
     <header className="nav">
