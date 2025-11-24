@@ -148,7 +148,7 @@
 .cd-tableHead,
 .cd-tableRow {
   display: grid;
-  grid-template-columns: 2fr 0.7fr 0.9fr 0.6fr;
+  grid-template-columns: 2fr 0.7fr 0.9fr 0.6fr 0.8fr;
   gap: 8px;
   font-size: 11px;
   align-items: center;
@@ -184,6 +184,32 @@
 .cd-tableViews {
   font-size: 11px;
   color: var(--text-muted);
+}
+
+.cd-tableRowActions {
+  background: transparent !important;
+  cursor: default;
+}
+
+.cd-tableActions {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.cd-btn.small {
+  padding: 4px 8px;
+  font-size: 14px;
+  min-width: 32px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cd-btn.small:hover {
+  background: var(--highlight, rgba(139, 92, 246, 0.1));
+  border-color: var(--primary);
 }
 
 /* drafts ----------------------------------------------------- */

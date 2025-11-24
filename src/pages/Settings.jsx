@@ -159,52 +159,8 @@ const Settings = () => {
             <span className="settings-dot" />
             <span>Signed in as {user.username}</span>
           </div>
-        </header>
+        </header>{" "}
         <div className="settings-grid">
-          {" "}
-          {/* Account */}
-          <section className="settings-card">
-            <h2 className="settings-card-title">Account</h2>
-            <p className="settings-card-sub">
-              Main account information used to sign in to QuickHelp
-            </p>
-
-            <div className="settings-row">
-              <div className="settings-row-label">Email</div>
-              <div className="settings-row-main">
-                <div className="settings-row-text">{user.email}</div>
-                <button className="settings-btn ghost" disabled>
-                  Change email
-                </button>
-              </div>
-            </div>
-
-            <div className="settings-row">
-              <div className="settings-row-label">Username</div>
-              <div className="settings-row-main">
-                <div className="settings-row-text">{user.username}</div>
-                <button className="settings-btn ghost" disabled>
-                  Change username
-                </button>
-              </div>
-            </div>
-
-            <div className="settings-row">
-              <div className="settings-row-label">Role</div>
-              <div className="settings-row-main">
-                <div className="settings-row-text">
-                  {user.role === "admin"
-                    ? "Administrator"
-                    : user.role === "creator"
-                    ? "Creator"
-                    : "User"}
-                </div>
-                <button className="settings-btn ghost" onClick={handleLogout}>
-                  {t("nav.logout")}
-                </button>
-              </div>
-            </div>
-          </section>
           {/* Language */}
           <section className="settings-card">
             <h2 className="settings-card-title">{t("settings.language")}</h2>
@@ -374,13 +330,18 @@ const Settings = () => {
 
             <div className="settings-row">
               <div>
-                <div className="settings-toggle-title">Delete Account</div>
+                <div className="settings-toggle-title">Deactivate account</div>
                 <div className="settings-toggle-sub">
-                  ลบบัญชีถาวร คุณจะไม่สามารถเข้าสู่ระบบ
-                  QuickHelp ได้
+                  Temporarily suspend account usage. You will not be able to
+                  sign in to QuickHelp.
                 </div>
               </div>
-              <button className="settings-btn danger">Delete Account</button>
+              <button
+                className="settings-btn danger"
+                onClick={handleDeactivateAccount}
+              >
+                Deactivate
+              </button>
             </div>
           </section>
         </div>

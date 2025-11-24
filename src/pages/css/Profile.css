@@ -38,6 +38,26 @@
   font-weight: 600;
   font-size: 18px;
   color: var(--primary);
+  transition: all 0.3s ease;
+}
+
+.profile-avatar:hover {
+  transform: scale(1.02);
+}
+
+.profile-avatar-loading {
+  background: var(--bg-muted);
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
 }
 
 .profile-name {
@@ -64,12 +84,40 @@
 .profile-grid {
   display: grid;
   grid-template-columns: minmax(0, 1.5fr) minmax(0, 1.1fr);
-  gap: 16px;
+  gap: 24px;
 }
 
 @media (max-width: 880px) {
   .profile-grid {
     grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .profile-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .profile-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .profile-user {
+    width: 100%;
+  }
+
+  .profile-action-buttons {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .profile-action-btn {
+    flex: 1;
+    min-width: 120px;
+    justify-content: center;
   }
 }
 
@@ -123,11 +171,18 @@
 .profile-field textarea {
   resize: vertical;
   min-height: 60px;
+  font-family: inherit;
+  line-height: 1.4;
 }
 
 .profile-field input:focus,
 .profile-field textarea:focus {
   border-color: var(--primary);
+}
+
+.profile-field input[disabled],
+.profile-field textarea[disabled] {
+  cursor: not-allowed;
 }
 
 .profile-hint {
@@ -154,11 +209,7 @@
 }
 
 .profile-btn.primary {
-  background: linear-gradient(
-    135deg,
-    var(--primary),
-    hsl(291 76% 60%)
-  );
+  background: linear-gradient(135deg, var(--primary), hsl(291 76% 60%));
   color: #fff;
   box-shadow: 0 12px 26px rgba(139, 92, 246, 0.6);
 }
@@ -211,4 +262,213 @@
   font-size: 11px;
   background: var(--highlight, rgba(139, 92, 246, 0.08));
   color: var(--primary);
+}
+
+.profile-tagChip.role-admin {
+  background: var(--danger-bg, #fef2f2);
+  color: var(--danger-text, #dc2626);
+  border: 1px solid var(--danger-border, #fecaca);
+}
+
+.profile-tagChip.role-creator {
+  background: var(--warning-bg, #fffbeb);
+  color: var(--warning-text, #d97706);
+  border: 1px solid var(--warning-border, #fed7aa);
+}
+
+.profile-tagChip.role-user {
+  background: var(--info-bg, #eff6ff);
+  color: var(--info-text, #2563eb);
+  border: 1px solid var(--info-border, #bfdbfe);
+}
+
+/* Profile Avatar Container with Edit Overlay */
+.profile-avatar-container {
+  position: relative;
+  display: inline-block;
+}
+
+.profile-avatar-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 999px;
+  object-fit: cover;
+}
+
+.profile-avatar-edit {
+  position: absolute;
+  bottom: -4px;
+  right: -4px;
+  display: flex;
+  gap: 4px;
+}
+
+.profile-avatar-upload,
+.profile-avatar-remove {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: white;
+  border: 2px solid white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.profile-avatar-remove {
+  background: var(--danger, #ef4444);
+}
+
+.profile-avatar-upload:hover {
+  transform: scale(1.1);
+}
+
+.profile-avatar-remove:hover {
+  transform: scale(1.1);
+  background: #dc2626;
+}
+
+/* Profile Bio */
+.profile-bio {
+  margin-top: 8px;
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.4;
+  max-width: 400px;
+}
+
+/* Section Titles */
+.profile-section-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 16px 0 8px 0;
+  color: var(--text);
+}
+
+/* Profile Status */
+.profile-status {
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.profile-status.active {
+  background: var(--success-bg, #dcfce7);
+  color: var(--success-text, #15803d);
+}
+
+/* Quick Actions */
+.profile-quick-actions {
+  margin-top: 8px;
+}
+
+.profile-action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.profile-action-btn {
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-light);
+  color: var(--text);
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.profile-action-btn:hover {
+  background: var(--highlight);
+  border-color: var(--primary);
+}
+
+/* Dark mode improvements */
+body.dark .profile-avatar-upload,
+body.dark .profile-avatar-remove {
+  border-color: var(--bg-dark);
+}
+
+body.dark .profile-status.active {
+  background: rgba(34, 197, 94, 0.2);
+  color: #22c55e;
+}
+
+
+/* Security section */
+.profile-security-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.profile-security-text {
+  font-size: 11px;
+  color: var(--text-muted);
+  max-width: 60%;
+}
+
+/* Toggle button for 2FA */
+.profile-toggle {
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  padding: 4px 10px;
+  font-size: 11px;
+  background: var(--bg-light);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.profile-toggle.on {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+
+/* Recent activity list (admin) */
+.profile-activity-list {
+  list-style: none;
+  padding: 0;
+  margin: 4px 0 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.profile-activity-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.profile-activity-dot {
+  font-size: 16px;
+  line-height: 1;
+  color: var(--primary);
+  margin-top: 1px;
+}
+
+.profile-activity-text {
+  font-size: 11px;
+}
+
+.profile-activity-time {
+  font-size: 10px;
+  opacity: 0.7;
 }

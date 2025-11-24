@@ -1,10 +1,20 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useTranslation } from "../utils/translations";
+import manuals from "../data/ManualData";
 import styles from "./css/CreateManual.module.css";
 
-const CreateManual = () => {
+const EditManual = () => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
+  const { id } = useParams();
+  const [searchParams] = useSearchParams();
+  const editId = id || searchParams.get("edit");
 
+  const [isLoading, setIsLoading] = useState(true);
+  const [manual, setManual] = useState(null);
+
+  // Form states - matching CreateManual exactly
   const [title, setTitle] = useState("");
   const [desc, setDesc] = useState("");
   const [blocks, setBlocks] = useState([
@@ -19,6 +29,129 @@ const CreateManual = () => {
   const [language, setLanguage] = useState("EN");
   const [tags, setTags] = useState([]);
 
+  // Load manual data on component mount
+  useEffect(() => {
+    const loadManual = () => {
+      try {
+        // Check if user is authenticated and has creator/admin role
+        const userData = localStorage.getItem("userData");
+        const authToken = localStorage.getItem("authToken");
+
+        if (!userData || !authToken) {
+          navigate("/login");
+          return;
+        }
+
+        const currentUser = JSON.parse(userData);
+
+        if (currentUser.role !== "creator" && currentUser.role !== "admin") {
+          navigate("/");
+          return;
+        }
+
+        if (!editId) {
+          navigate("/creator-dashboard");
+          return;
+        }
+
+        // Find the manual to edit
+        const manualToEdit = manuals.find((m) => m.id === parseInt(editId));
+        if (!manualToEdit) {
+          alert(t("editManual.notFound") || "Manual not found!");
+          navigate("/creator-dashboard");
+          return;
+        }
+
+        // Check if user has permission to edit this manual
+        const userFullName = `${currentUser.firstName} ${currentUser.lastName}`;
+        if (
+          currentUser.role !== "admin" &&
+          manualToEdit.author !== userFullName &&
+          manualToEdit.author !== currentUser.username
+        ) {
+          alert(
+            t("editManual.noPermission") ||
+              "You don't have permission to edit this manual!"
+          );
+          navigate("/creator-dashboard");
+          return;
+        } // Pre-populate form with manual data
+        setManual(manualToEdit);
+        setTitle(manualToEdit.title || "");
+        setDesc(manualToEdit.description || "");
+        setCategory(manualToEdit.category || "IT");
+        setTags(manualToEdit.tags || []);
+
+        // Set existing thumbnail if available
+        if (manualToEdit.thumbnail) {
+          setThumbnailUrl(manualToEdit.thumbnail);
+          // Extract filename from URL if possible
+          const urlParts = manualToEdit.thumbnail.split("/");
+          setThumbName(urlParts[urlParts.length - 1]);
+        }
+
+        // Extract version from meta if available
+        let extractedVersion = "1.0";
+        if (manualToEdit.meta) {
+          const versionMatch = manualToEdit.meta.match(/v(\d+\.\d+)/);
+          if (versionMatch) {
+            extractedVersion = versionMatch[1];
+          }
+        } else if (manualToEdit.version) {
+          extractedVersion = manualToEdit.version;
+        }
+        setVersion(extractedVersion);
+
+        // Initialize blocks
+        let initialBlocks = [];
+
+        // 1. If manual has 'blocks' (new format), use them
+        if (manualToEdit.blocks && manualToEdit.blocks.length > 0) {
+          initialBlocks = manualToEdit.blocks;
+        }
+        // 2. If manual has 'sections' (old format), convert to blocks
+        else if (manualToEdit.sections && manualToEdit.sections.length > 0) {
+          let blockIdCounter = 1;
+          initialBlocks = manualToEdit.sections.flatMap((section) => [
+            {
+              id: blockIdCounter++,
+              type: "heading",
+              value: section.title,
+              showToolbar: false,
+            },
+            {
+              id: blockIdCounter++,
+              type: "text",
+              value: section.content,
+              showToolbar: false,
+            },
+          ]);
+        }
+        // 3. Fallback for empty manual
+        else {
+          initialBlocks = [
+            {
+              id: 1,
+              type: "text",
+              value: manualToEdit.description || "",
+              showToolbar: false,
+            },
+          ];
+        }
+
+        setBlocks(initialBlocks);
+      } catch (error) {
+        console.error("Error loading manual:", error);
+        navigate("/creator-dashboard");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadManual();
+  }, [editId, navigate, t]);
+
+  // Functions matching CreateManual exactly
   const addBlock = (type = "text") => {
     setBlocks((prev) => [
       ...prev,
@@ -118,43 +251,50 @@ const CreateManual = () => {
     } catch (e) {
       console.error("Error getting user data", e);
     }
-    const newManual = {
-      id: Date.now(), // Generate a unique ID
+    const updatedManual = {
+      ...manual,
       title,
       description: desc,
       category,
       meta: `${category} • ${version || "v1.0"}`,
       tags,
-      views: 0,
-      likes: 0,
-      downloads: 0,
       author: authorName,
-      createdAt: new Date().toISOString().split("T")[0],
       updatedAt: new Date().toISOString().split("T")[0],
-      difficulty: "Beginner", // Default
-      estimatedTime: "10 min", // Default
-      thumbnail: thumbnailUrl, // Add thumbnail URL
+      difficulty: manual.difficulty || "Beginner",
+      estimatedTime: manual.estimatedTime || "10 min",
+      thumbnail: thumbnailUrl || manual.thumbnail, // Keep existing or use new thumbnail
       blocks, // Save blocks directly
-      // Also convert to sections for backward compatibility if needed,
-      // but ManualDetail now handles blocks, so we're good.
     };
 
     // Save to LocalStorage
     try {
+      // Update in ManualData (static data)
+      const manualIndex = manuals.findIndex((m) => m.id === parseInt(editId));
+      if (manualIndex !== -1) {
+        manuals[manualIndex] = updatedManual;
+      }
+
+      // Also save custom manuals
       const existingManuals = JSON.parse(
         localStorage.getItem("customManuals") || "[]"
       );
-      const updatedManuals = [...existingManuals, newManual];
-      localStorage.setItem("customManuals", JSON.stringify(updatedManuals));
+      const customIndex = existingManuals.findIndex(
+        (m) => m.id === parseInt(editId)
+      );
 
-      console.log("Manual saved:", newManual);
-      alert("Manual created successfully! Redirecting to dashboard...");
+      if (customIndex !== -1) {
+        existingManuals[customIndex] = updatedManual;
+      } else {
+        existingManuals.push(updatedManual);
+      }
+
+      localStorage.setItem("customManuals", JSON.stringify(existingManuals));
+
+      console.log("Manual updated:", updatedManual);
+      alert("Manual updated successfully! Redirecting to dashboard...");
 
       // Redirect
       setTimeout(() => {
-        // Use window.location to force reload so ManualData picks up the new data
-        // (if we update ManualData to read from LS)
-        // For now, just navigate
         window.location.href = "/creator-dashboard";
       }, 1000);
     } catch (error) {
@@ -248,12 +388,38 @@ const CreateManual = () => {
     );
   };
 
+  if (isLoading) {
+    return (
+      <div className={styles.root}>
+        <div className={styles.page}>
+          <div style={{ textAlign: "center", padding: "2rem" }}>
+            <h2>{t("editManual.loading") || "Loading manual..."}</h2>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!manual) {
+    return (
+      <div className={styles.root}>
+        <div className={styles.page}>
+          <div style={{ textAlign: "center", padding: "2rem" }}>
+            <h2>{t("editManual.notFound") || "Manual not found"}</h2>
+            <button onClick={() => navigate("/creator-dashboard")}>
+              {t("editManual.backToDashboard") || "Back to Dashboard"}
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className={styles.root}>
       <div className={styles.page}>
         {/* LEFT: EDITOR PANEL */}
         <section className={styles["editor-panel"]}>
-          {" "}
           <input
             className={styles["editor-title"]}
             placeholder={t("createManual.titlePlaceholder")}
@@ -267,7 +433,9 @@ const CreateManual = () => {
             value={desc}
             onChange={(e) => setDesc(e.target.value)}
           />
+
           <div className={styles["editor-divider"]}></div>
+
           <div className={styles.blocks}>
             {blocks.map((block) => (
               <div
@@ -357,7 +525,8 @@ const CreateManual = () => {
                 )}
               </div>
             ))}
-          </div>{" "}
+          </div>
+
           <button
             type="button"
             className={styles["btn-add-block"]}
@@ -399,7 +568,7 @@ const CreateManual = () => {
                 onChange={handleThumbnailChange}
               />
               {thumbName ? thumbName : "Click to upload thumbnail"}
-            </label>{" "}
+            </label>
             {/* Category */}
             <div className={styles["meta-field-label"]}>
               Category (หมวดใหญ่)
@@ -492,7 +661,7 @@ const CreateManual = () => {
               className={styles["publish-btn"]}
               onClick={handleSubmit}
             >
-              Publish
+              Update Manual
             </button>
           </div>
         </aside>
@@ -501,4 +670,4 @@ const CreateManual = () => {
   );
 };
 
-export default CreateManual;
+export default EditManual;

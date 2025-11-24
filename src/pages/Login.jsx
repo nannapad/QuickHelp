@@ -1,3 +1,4 @@
+// src/pages/Login.jsx
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
@@ -11,22 +12,24 @@ import {
   Tabs,
   Tab,
 } from "react-bootstrap";
-import { authenticateUser, createUser } from "../data/UserData";
 import "./css/Login.css";
 import { useTranslation } from "../utils/translations";
+import { authenticateUser } from "../data/UserData";
 
 const Login = () => {
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+
   const [activeTab, setActiveTab] = useState("login");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const navigate = useNavigate();
-  const { t } = useTranslation();
 
   const [loginData, setLoginData] = useState({
     email: "",
     password: "",
   });
+
   const [registerData, setRegisterData] = useState({
     username: "",
     email: "",
@@ -35,6 +38,17 @@ const Login = () => {
     firstName: "",
     lastName: "",
   });
+
+  // ---------- handlers ----------
+
+  const handleInputChange = (e, type) => {
+    const { name, value } = e.target;
+    if (type === "login") {
+      setLoginData((prev) => ({ ...prev, [name]: value }));
+    } else {
+      setRegisterData((prev) => ({ ...prev, [name]: value }));
+    }
+  };
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -42,37 +56,46 @@ const Login = () => {
     setSuccess("");
 
     try {
+      if (!loginData.email || !loginData.password) {
+        setError(t("login.fillAllFields"));
+        setLoading(false);
+        return;
+      }
+
       // Simulate API call delay
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      if (loginData.email && loginData.password) {
-        // Use mock authentication
-        const authResult = authenticateUser(
-          loginData.email,
-          loginData.password
-        );
-        if (authResult.success) {
-          // Store user data and auth token
-          localStorage.setItem("userData", JSON.stringify(authResult.user));
-          localStorage.setItem("authToken", authResult.token);
+      // Use mock authentication
+      const authResult = authenticateUser(loginData.email, loginData.password);
 
-          // Dispatch custom event to notify NavBar of auth state change
-          window.dispatchEvent(new Event("authStateChanged"));
-          setSuccess(
-            `${t("login.welcomeBack")}, ${authResult.user.firstName}! ${t(
-              "login.redirecting"
-            )}`
-          );
-          setTimeout(() => {
-            navigate("/feed");
-          }, 1500);
-        } else {
-          setError(authResult.message || t("login.invalidCredentials"));
-        }
+      if (authResult.success) {
+        // Store user data and auth token
+        localStorage.setItem("userData", JSON.stringify(authResult.user));
+        localStorage.setItem("authToken", authResult.token);
+
+        // Dispatch custom event for navbar to listen
+        window.dispatchEvent(new Event("authStateChanged"));
+
+        setSuccess(t("login.welcomeBack"));
+
+        // Clear form
+        setLoginData({ email: "", password: "" });
+
+        // Redirect based on user role
+        setTimeout(() => {
+          if (authResult.user.role === "admin") {
+            navigate("/admin");
+          } else if (authResult.user.role === "creator") {
+            navigate("/creator-dashboard");
+          } else {
+            navigate("/");
+          }
+        }, 800);
       } else {
-        setError(t("login.fillAllFields"));
+        setError(t("login.invalidCredentials"));
       }
     } catch (err) {
+      console.error("Login error:", err);
       setError(t("login.loginFailed"));
     } finally {
       setLoading(false);
@@ -84,89 +107,119 @@ const Login = () => {
     setLoading(true);
     setError("");
     setSuccess("");
+
     try {
-      // Validate passwords match
-      if (registerData.password !== registerData.confirmPassword) {
-        setError(t("login.passwordsDontMatch"));
-        return;
-      }
+      const {
+        username,
+        email,
+        password,
+        confirmPassword,
+        firstName,
+        lastName,
+      } = registerData;
 
-      if (registerData.password.length < 6) {
-        setError(t("login.passwordTooShort"));
-        return;
-      }
-
-      // Validate required fields
       if (
-        !registerData.username ||
-        !registerData.email ||
-        !registerData.password
+        !username ||
+        !email ||
+        !password ||
+        !confirmPassword ||
+        !firstName ||
+        !lastName
       ) {
         setError(t("login.fillAllFields"));
+        setLoading(false);
         return;
       }
 
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      if (password !== confirmPassword) {
+        setError(t("login.passwordsDontMatch"));
+        setLoading(false);
+        return;
+      }
 
-      // Create user using the new createUser function
-      const createResult = createUser({
-        username: registerData.username,
-        email: registerData.email,
-        firstName: registerData.firstName,
-        lastName: registerData.lastName,
+      if (password.length < 6) {
+        setError(t("login.passwordTooShort"));
+        setLoading(false);
+        return;
+      }
+
+      // Simulate API call delay
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+
+      // Mock registration logic
+      const newUser = {
+        id: Date.now(),
+        username,
+        email,
+        firstName,
+        lastName,
+        role: "user",
+        avatar: null,
+        department: "",
+        position: "",
+        isActive: true,
+        preferences: {
+          notifications: true,
+          darkMode: false,
+          emailUpdates: true,
+          language: "en",
+        },
+        stats: {
+          manualsViewed: 0,
+          manualsDownloaded: 0,
+          manualsBookmarked: 0,
+          loginCount: 1,
+        },
+        createdAt: new Date().toISOString(),
+        lastLogin: new Date().toISOString(),
+        permissions: ["view_manuals"],
+      };
+
+      // Store user data and auth token
+      localStorage.setItem("userData", JSON.stringify(newUser));
+      localStorage.setItem("authToken", "mock_token_" + Date.now());
+
+      // Dispatch custom event for navbar to listen
+      window.dispatchEvent(new Event("authStateChanged"));
+
+      setSuccess(t("login.accountCreated"));
+
+      setRegisterData({
+        username: "",
+        email: "",
+        password: "",
+        confirmPassword: "",
+        firstName: "",
+        lastName: "",
       });
 
-      if (createResult.success) {
-        // Store user data and auth token (auto-login after registration)
-        const authToken = "demo-token-" + Date.now();
-        localStorage.setItem("userData", JSON.stringify(createResult.user));
-        localStorage.setItem("authToken", authToken);
-
-        // Dispatch custom event to notify NavBar of auth state change
-        window.dispatchEvent(new Event("authStateChanged"));
-
-        setSuccess(t("login.accountCreated"));
-        setTimeout(() => {
-          navigate("/feed");
-        }, 1500);
-
-        setRegisterData({
-          username: "",
-          email: "",
-          password: "",
-          confirmPassword: "",
-          firstName: "",
-          lastName: "",
-        });
-      } else {
-        setError(
-          createResult.message === "Email already exists"
-            ? t("login.emailExists")
-            : createResult.message === "Username already exists"
-            ? t("login.usernameExists")
-            : createResult.message
-        );
-      }
+      setTimeout(() => navigate("/"), 1200);
     } catch (err) {
+      console.error("Registration error:", err);
       setError(t("login.registrationFailed"));
     } finally {
       setLoading(false);
     }
   };
+  const handleContinueAsGuest = () => {
+    // Clear any existing auth
+    localStorage.removeItem("userData");
+    localStorage.removeItem("authToken");
+    navigate("/");
+  };
+
+  // ---------- UI ----------
 
   return (
-    <div className="login-container">
-      <Container>
-        <Row className="justify-content-center">
-          <Col
-            xs={12}
-            sm={10}
-            md={8}
-            lg={6}
-            xl={5}
-            className="d-flex justify-content-center"
-          >
+    <div className="login-page">
+      <Container className="d-flex align-items-center justify-content-center">
+        <Row className="w-100 justify-content-center">
+          <Col xs={12} sm={10} md={8} lg={6} xl={5}>
+            <div className="text-center mb-4">
+              <h1 className="login-title">{t("login.title")}</h1>
+              <p className="login-subtitle">{t("login.subtitle")}</p>
+            </div>
+
             <Card className="login-card">
               <Card.Body>
                 {error && (
@@ -178,239 +231,214 @@ const Login = () => {
                   <Alert variant="success" className="mb-3">
                     {success}
                   </Alert>
-                )}{" "}
-                {/* Demo Credentials Info */}
-                <Alert variant="info" className="mb-3">
-                  <strong>{t("login.demoCredentials")}</strong>
-                  <br />
-                  <small>
-                    <strong>{t("login.demoUser")}</strong> john.doe@company.com{" "}
-                    {t("login.anyPassword")}
-                    <br />
-                    <strong>
-                      {t("login.demoAdmin")}
-                    </strong> admin@company.com {t("login.anyPassword")}
-                  </small>
-                </Alert>
-                <h1></h1>
+                )}
+
                 <Tabs
                   activeKey={activeTab}
-                  onSelect={(k) => setActiveTab(k)}
-                  className="mb-4 justify-content-center"
+                  onSelect={(key) => key && setActiveTab(key)}
+                  className="login-tabs nav-justified"
                   fill
                 >
-                  {" "}
+                  {/* --------- LOGIN TAB --------- */}
                   <Tab
                     eventKey="login"
                     title={
-                      <span className="fw-semibold">{t("login.signIn")}</span>
+                      <span className="tab-title">
+                        <i className="fas fa-sign-in-alt"></i>
+                        {t("login.signIn")}
+                      </span>
                     }
                   >
                     {activeTab === "login" && (
                       <Form onSubmit={handleLogin} className="mt-3">
                         <Form.Group className="mb-3">
-                          <Form.Label className="form-label">
-                            {t("login.email")}
-                          </Form.Label>
+                          <Form.Label>{t("login.email")}</Form.Label>
                           <Form.Control
                             type="email"
-                            value={loginData.email}
-                            onChange={(e) =>
-                              setLoginData({
-                                ...loginData,
-                                email: e.target.value,
-                              })
-                            }
+                            name="email"
                             placeholder={t("login.emailPlaceholder")}
+                            value={loginData.email}
+                            onChange={(e) => handleInputChange(e, "login")}
                             required
-                            className="form-control"
-                            autoComplete="email"
                           />
                         </Form.Group>
 
-                        <Form.Group className="mb-4">
-                          <Form.Label className="form-label">
-                            {t("login.password")}
-                          </Form.Label>
+                        <Form.Group className="mb-3">
+                          <Form.Label>{t("login.password")}</Form.Label>
                           <Form.Control
                             type="password"
-                            value={loginData.password}
-                            onChange={(e) =>
-                              setLoginData({
-                                ...loginData,
-                                password: e.target.value,
-                              })
-                            }
+                            name="password"
                             placeholder={t("login.passwordPlaceholder")}
+                            value={loginData.password}
+                            onChange={(e) => handleInputChange(e, "login")}
                             required
-                            className="form-control"
-                            autoComplete="current-password"
                           />
                         </Form.Group>
 
                         <Button
                           variant="primary"
                           type="submit"
-                          className="login-btn"
+                          className="w-100 login-btn mb-3"
                           disabled={loading}
                         >
-                          {loading ? t("login.signingIn") : t("login.signIn")}
+                          {loading ? (
+                            <>
+                              <span
+                                className="spinner-border spinner-border-sm me-2"
+                                role="status"
+                                aria-hidden="true"
+                              ></span>
+                              {t("login.signingIn")}
+                            </>
+                          ) : (
+                            t("login.signIn")
+                          )}
                         </Button>
                       </Form>
                     )}
-                  </Tab>{" "}
+                  </Tab>
+
+                  {/* --------- REGISTER TAB --------- */}
                   <Tab
                     eventKey="register"
                     title={
-                      <span className="fw-semibold">{t("login.signUp")}</span>
+                      <span className="tab-title">
+                        <i className="fas fa-user-plus me-2"></i>
+                        {t("login.signUp")}
+                      </span>
                     }
                   >
                     {activeTab === "register" && (
                       <Form onSubmit={handleRegister} className="mt-3">
-                        <Form.Group className="mb-3">
-                          <Form.Label className="form-label">
-                            {t("login.username")}
-                          </Form.Label>
-                          <Form.Control
-                            type="text"
-                            value={registerData.username}
-                            onChange={(e) =>
-                              setRegisterData({
-                                ...registerData,
-                                username: e.target.value,
-                              })
-                            }
-                            placeholder={t("login.usernamePlaceholder")}
-                            required
-                            className="form-control"
-                            autoComplete="username"
-                          />
-                        </Form.Group>
-
                         <Row>
                           <Col md={6}>
                             <Form.Group className="mb-3">
-                              <Form.Label className="form-label">
-                                {t("login.firstName")}
-                              </Form.Label>
+                              <Form.Label>{t("login.firstName")}</Form.Label>
                               <Form.Control
                                 type="text"
+                                name="firstName"
+                                placeholder={t("login.firstNamePlaceholder")}
                                 value={registerData.firstName}
                                 onChange={(e) =>
-                                  setRegisterData({
-                                    ...registerData,
-                                    firstName: e.target.value,
-                                  })
+                                  handleInputChange(e, "register")
                                 }
-                                placeholder={t("login.firstNamePlaceholder")}
-                                className="form-control"
-                                autoComplete="given-name"
+                                required
                               />
                             </Form.Group>
                           </Col>
                           <Col md={6}>
                             <Form.Group className="mb-3">
-                              <Form.Label className="form-label">
-                                {t("login.lastName")}
-                              </Form.Label>
+                              <Form.Label>{t("login.lastName")}</Form.Label>
                               <Form.Control
                                 type="text"
+                                name="lastName"
+                                placeholder={t("login.lastNamePlaceholder")}
                                 value={registerData.lastName}
                                 onChange={(e) =>
-                                  setRegisterData({
-                                    ...registerData,
-                                    lastName: e.target.value,
-                                  })
+                                  handleInputChange(e, "register")
                                 }
-                                placeholder={t("login.lastNamePlaceholder")}
-                                className="form-control"
-                                autoComplete="family-name"
+                                required
                               />
                             </Form.Group>
                           </Col>
                         </Row>
 
                         <Form.Group className="mb-3">
-                          <Form.Label className="form-label">
-                            {t("login.email")}
-                          </Form.Label>
+                          <Form.Label>{t("login.username")}</Form.Label>
                           <Form.Control
-                            type="email"
-                            value={registerData.email}
-                            onChange={(e) =>
-                              setRegisterData({
-                                ...registerData,
-                                email: e.target.value,
-                              })
-                            }
-                            placeholder={t("login.emailPlaceholder")}
+                            type="text"
+                            name="username"
+                            placeholder={t("login.usernamePlaceholder")}
+                            value={registerData.username}
+                            onChange={(e) => handleInputChange(e, "register")}
                             required
-                            className="form-control"
-                            autoComplete="email"
                           />
                         </Form.Group>
 
                         <Form.Group className="mb-3">
-                          <Form.Label className="form-label">
-                            {t("login.password")}
-                          </Form.Label>
+                          <Form.Label>{t("login.email")}</Form.Label>
                           <Form.Control
-                            type="password"
-                            value={registerData.password}
-                            onChange={(e) =>
-                              setRegisterData({
-                                ...registerData,
-                                password: e.target.value,
-                              })
-                            }
-                            placeholder={t("login.passwordPlaceholder")}
+                            type="email"
+                            name="email"
+                            placeholder={t("login.emailPlaceholder")}
+                            value={registerData.email}
+                            onChange={(e) => handleInputChange(e, "register")}
                             required
-                            className="form-control"
-                            autoComplete="new-password"
                           />
                         </Form.Group>
 
-                        <Form.Group className="mb-4">
-                          <Form.Label className="form-label">
-                            {t("login.confirmPassword")}
-                          </Form.Label>
+                        <Form.Group className="mb-3">
+                          <Form.Label>{t("login.password")}</Form.Label>
                           <Form.Control
                             type="password"
-                            value={registerData.confirmPassword}
-                            onChange={(e) =>
-                              setRegisterData({
-                                ...registerData,
-                                confirmPassword: e.target.value,
-                              })
-                            }
-                            placeholder={t("login.confirmPasswordPlaceholder")}
+                            name="password"
+                            placeholder={t("login.passwordPlaceholder")}
+                            value={registerData.password}
+                            onChange={(e) => handleInputChange(e, "register")}
                             required
-                            className="form-control"
-                            autoComplete="new-password"
+                          />
+                        </Form.Group>
+
+                        <Form.Group className="mb-3">
+                          <Form.Label>{t("login.confirmPassword")}</Form.Label>
+                          <Form.Control
+                            type="password"
+                            name="confirmPassword"
+                            placeholder={t("login.confirmPasswordPlaceholder")}
+                            value={registerData.confirmPassword}
+                            onChange={(e) => handleInputChange(e, "register")}
+                            required
                           />
                         </Form.Group>
 
                         <Button
                           variant="success"
                           type="submit"
-                          className="login-btn"
+                          className="w-100 register-btn mb-3"
                           disabled={loading}
                         >
-                          {loading
-                            ? t("login.creatingAccount")
-                            : t("login.createAccount")}
+                          {loading ? (
+                            <>
+                              <span
+                                className="spinner-border spinner-border-sm me-2"
+                                role="status"
+                                aria-hidden="true"
+                              ></span>
+                              {t("login.creatingAccount")}
+                            </>
+                          ) : (
+                            t("login.createAccount")
+                          )}
                         </Button>
                       </Form>
                     )}
                   </Tab>
-                </Tabs>{" "}
-                <div className="text-center mt-3">
-                  <Link to="/feed" className="text-decoration-none fw-semibold">
+                </Tabs>
+
+                <div className="text-center mt-4">
+                  <Button
+                    variant="outline-secondary"
+                    size="sm"
+                    onClick={handleContinueAsGuest}
+                    className="guest-btn"
+                  >
                     {t("login.continueAsGuest")}
-                  </Link>
+                  </Button>
                 </div>
               </Card.Body>
             </Card>
+
+            <div className="text-center mt-4">
+              <small className="text-muted">
+                <Link to="/about" className="text-decoration-none">
+                  {t("nav.about")}
+                </Link>
+                {" • "}
+                <Link to="/faq" className="text-decoration-none">
+                  {t("nav.faq")}
+                </Link>
+              </small>
+            </div>
           </Col>
         </Row>
       </Container>

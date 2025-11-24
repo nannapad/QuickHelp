@@ -12,9 +12,10 @@ import NotFound from "./pages/NotFound";
 import CreatorRequest from "./pages/CreatorRequest";
 import { LanguageProvider } from "./contexts/LanguageContext";
 import CreatorDashboard from "./pages/CreatorDashboard";
-import Admindashboard from "./pages/AdminDashboard";
+import AdminDashboard from "./pages/AdminDashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
 import CreateManual from "./pages/CreateManual";
+import EditManual from "./pages/EditManual";
 
 // Helper component: redirect to the appropriate dashboard based on role
 const DashboardRedirect = () => {
@@ -22,8 +23,10 @@ const DashboardRedirect = () => {
   if (!raw) return <Navigate to="/login" replace />;
   try {
     const user = JSON.parse(raw);
-    if (user.role === "admin") return <Navigate to="/admin-dashboard" replace />;
-    if (user.role === "creator") return <Navigate to="/creator-dashboard" replace />;
+    if (user.role === "admin")
+      return <Navigate to="/admin-dashboard" replace />;
+    if (user.role === "creator")
+      return <Navigate to="/creator-dashboard" replace />;
     // default for regular users
     return <Navigate to="/feed" replace />;
   } catch (err) {
@@ -46,11 +49,11 @@ function App() {
             <Route path="profile" element={<Profile />} />
             <Route path="settings" element={<Settings />} />
             <Route path="creator-request" element={<CreatorRequest />} />
-            <Route path="*" element={<NotFound />} />
+            <Route path="*" element={<NotFound />} />{" "}
             <Route
               path="creator-dashboard"
               element={
-                <ProtectedRoute allowedRoles={["creator"]}>
+                <ProtectedRoute allowedRoles={["creator", "admin"]}>
                   <CreatorDashboard />
                 </ProtectedRoute>
               }
@@ -59,7 +62,7 @@ function App() {
               path="admin-dashboard"
               element={
                 <ProtectedRoute allowedRoles={["admin"]}>
-                  <Admindashboard />
+                  <AdminDashboard />
                 </ProtectedRoute>
               }
             />
@@ -70,8 +73,31 @@ function App() {
                   <DashboardRedirect />
                 </ProtectedRoute>
               }
+            />{" "}
+            <Route
+              path="create-manual"
+              element={
+                <ProtectedRoute allowedRoles={["admin", "creator"]}>
+                  <CreateManual />
+                </ProtectedRoute>
+              }
             />
-            <Route path="create-manual" element={<ProtectedRoute allowedRoles={["admin","creator"]}><CreateManual/></ProtectedRoute>}/>
+            <Route
+              path="edit-manual/:id"
+              element={
+                <ProtectedRoute allowedRoles={["admin", "creator"]}>
+                  <EditManual />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="edit-manual"
+              element={
+                <ProtectedRoute allowedRoles={["admin", "creator"]}>
+                  <EditManual />
+                </ProtectedRoute>
+              }
+            />
           </Route>
         </Routes>
       </BrowserRouter>

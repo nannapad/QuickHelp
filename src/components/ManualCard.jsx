@@ -23,11 +23,26 @@ const ManualCard = ({
     e.stopPropagation();
     action();
   };
-
   return (
     <Link to={`/manual/${manual.id}`} className="manual-card-link">
       <article className="manual-card">
-        <div className="manual-card-thumb" />
+        <div className="manual-card-thumb">
+          {manual.thumbnail ? (
+            <img
+              src={manual.thumbnail}
+              alt={`Thumbnail for ${manual.title}`}
+              className="manual-card-thumb-img"
+              onError={(e) => {
+                // Fallback to empty div if image fails to load
+                e.target.style.display = "none";
+              }}
+            />
+          ) : (
+            <div className="manual-card-thumb-placeholder">
+              <span>📄</span>
+            </div>
+          )}
+        </div>
         <div className="manual-card-body">
           <h3 className="manual-card-title">{manual.title}</h3>
           <p className="manual-card-meta">{manual.meta}</p>

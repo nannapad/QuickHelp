@@ -16,6 +16,26 @@ const manuals = [
     updatedAt: "2024-03-20",
     difficulty: "Beginner",
     estimatedTime: "30 minutes",
+    thumbnail:
+      "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=400&h=300&fit=crop",
+    sections: [
+      {
+        title: "1. Installation",
+        content:
+          "Download and install VS Code from the official website. Ensure you select the correct version for your operating system (Windows, macOS, or Linux). During installation, check the 'Add to PATH' option for easier command-line access.",
+      },
+      {
+        title: "2. Recommended Extensions",
+        content:
+          "Install the following extensions for a better development experience: ESLint, Prettier, GitLens, and Live Server. These tools help with code formatting, version control, and real-time preview.",
+      },
+      {
+        title: "3. Workspace Settings",
+        content:
+          "Configure your workspace settings to enforce consistent coding standards. Create a .vscode folder in your project root and add a settings.json file with your team's preferred configurations.",
+      },
+    ],
+    versions: ["1.3", "1.2", "1.1", "1.0"],
   },
   {
     id: 2,
@@ -33,6 +53,26 @@ const manuals = [
     updatedAt: "2024-04-10",
     difficulty: "Intermediate",
     estimatedTime: "15 minutes",
+    thumbnail:
+      "https://images.unsplash.com/photo-1561070791-2526d30994b5?w=400&h=300&fit=crop",
+    sections: [
+      {
+        title: "1. Logo Usage",
+        content:
+          "Our logo is the primary identifier of our brand. Always use the provided files and do not alter the proportions or colors. Ensure sufficient clear space around the logo to maintain its visibility and impact.",
+      },
+      {
+        title: "2. Color Palette",
+        content:
+          "Our primary colors are Deep Blue (#003366) and Vibrant Orange (#FF6600). Use these colors consistently across all marketing materials. Secondary colors should be used sparingly for accents.",
+      },
+      {
+        title: "3. Typography",
+        content:
+          "We use 'Inter' for all digital and print communications. Use bold weights for headings and regular weights for body text to ensure readability and hierarchy.",
+      },
+    ],
+    versions: ["2.0", "1.5", "1.0"],
   },
   {
     id: 3,
@@ -50,6 +90,26 @@ const manuals = [
     updatedAt: "2024-03-15",
     difficulty: "Beginner",
     estimatedTime: "45 minutes",
+    thumbnail:
+      "https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=400&h=300&fit=crop",
+    sections: [
+      {
+        title: "1. First Day Essentials",
+        content:
+          "Welcome the new employee and introduce them to the team. Provide them with their ID badge, access card, and necessary equipment (laptop, monitor, etc.). Ensure they have access to the office Wi-Fi and email.",
+      },
+      {
+        title: "2. System Access",
+        content:
+          "Set up accounts for email, Slack, Jira, and other internal tools. specific permissions based on their role. Schedule a session with IT to ensure all software is installed and configured correctly.",
+      },
+      {
+        title: "3. Training & Documentation",
+        content:
+          "Assign mandatory training modules and share links to relevant documentation (like this manual!). Schedule introductory meetings with key team members and stakeholders.",
+      },
+    ],
+    versions: ["1.1", "1.0"],
   },
   {
     id: 4,
@@ -67,6 +127,24 @@ const manuals = [
     updatedAt: "2024-04-05",
     difficulty: "Advanced",
     estimatedTime: "60 minutes",
+    sections: [
+      {
+        title: "1. Campaign Goals",
+        content:
+          "Define clear, measurable goals for your campaign (e.g., increase brand awareness, drive website traffic, generate leads). specific KPIs to track progress and success.",
+      },
+      {
+        title: "2. Content Strategy",
+        content:
+          "Develop a content calendar with a mix of engaging formats (images, videos, stories). Ensure all content aligns with our brand voice and resonates with the target audience.",
+      },
+      {
+        title: "3. Analytics & Reporting",
+        content:
+          "Monitor campaign performance daily and adjust strategies as needed. Create a final report summarizing key metrics, insights, and recommendations for future campaigns.",
+      },
+    ],
+    versions: ["0.9", "0.8"],
   },
   {
     id: 5,
@@ -84,6 +162,24 @@ const manuals = [
     updatedAt: "2024-04-12",
     difficulty: "Intermediate",
     estimatedTime: "40 minutes",
+    sections: [
+      {
+        title: "1. Branching Strategy",
+        content:
+          "We use the Gitflow workflow. Create feature branches from 'develop' for new work. Submit pull requests for code review before merging back into 'develop'. Use 'main' only for production-ready code.",
+      },
+      {
+        title: "2. Commit Messages",
+        content:
+          "Write clear, concise commit messages that describe the 'why' and 'what' of your changes. Start with a verb in the imperative mood (e.g., 'Add', 'Fix', 'Update'). Reference issue numbers where applicable.",
+      },
+      {
+        title: "3. Code Review Process",
+        content:
+          "All code must be reviewed by at least one other team member before merging. Focus on logic, readability, and adherence to coding standards. Be constructive and respectful in your feedback.",
+      },
+    ],
+    versions: ["1.0", "0.9"],
   },
   {
     id: 6,
@@ -101,7 +197,38 @@ const manuals = [
     updatedAt: "2024-04-08",
     difficulty: "Intermediate",
     estimatedTime: "90 minutes",
+    sections: [
+      {
+        title: "1. Design Principles",
+        content:
+          "Our design system is built on clarity, consistency, and accessibility. We prioritize user needs and strive for intuitive, delightful experiences. Every component should serve a clear purpose.",
+      },
+      {
+        title: "2. Component Library",
+        content:
+          "Our library includes buttons, inputs, cards, modals, and more. Each component is documented with usage guidelines, variations, and code snippets. Use these components to build consistent interfaces.",
+      },
+      {
+        title: "3. Accessibility Guidelines",
+        content:
+          "Ensure all designs meet WCAG 2.1 AA standards. Use sufficient color contrast, provide text alternatives for images, and support keyboard navigation. Accessibility is not an afterthought.",
+      },
+    ],
+    versions: ["1.2", "1.1", "1.0"],
   },
 ];
 
-export default manuals;
+// Helper to get all manuals (static + local)
+const getAllManuals = () => {
+  try {
+    const localManuals = JSON.parse(
+      localStorage.getItem("customManuals") || "[]"
+    );
+    return [...manuals, ...localManuals];
+  } catch (e) {
+    console.error("Error reading local manuals:", e);
+    return manuals;
+  }
+};
+
+export default getAllManuals();

@@ -12,22 +12,55 @@ const NavBar = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const { t } = useTranslation();
-  const navigate = useNavigate();
-  
-  // notification helpers
+  const navigate = useNavigate(); // Check authentication status on component mount and when auth changes
+  useEffect(() => {
+    const checkAuthStatus = () => {
+      try {
+        // Check localStorage for user data and auth token
+        const userData = localStorage.getItem("userData");
+        const authToken = localStorage.getItem("authToken");
+
+        if (userData && authToken) {
+          const profile = JSON.parse(userData);
+          setUser(profile);
+          setIsLoggedIn(true);
+        } else {
+          setUser(null);
+          setIsLoggedIn(false);
+        }
+      } catch (error) {
+        console.error("Auth check error:", error);
+        setUser(null);
+        setIsLoggedIn(false);
+      }
+    };
+
+    checkAuthStatus();
+
+    // Listen for custom auth events
+    const handleAuthChange = () => checkAuthStatus();
+    window.addEventListener("authStateChanged", handleAuthChange);
+
+    return () => {
+      window.removeEventListener("authStateChanged", handleAuthChange);
+    };
+  }, []);
+
+  // Notification count effect
   useEffect(() => {
     const updateUnread = () => {
       try {
-        const raw = localStorage.getItem("userData");
-        const currentUser = raw ? JSON.parse(raw) : null;
-        if (!currentUser) {
+        if (!user) {
           setUnreadCount(0);
           return;
         }
-        // lazy-load to avoid importing heavy utils here
+        // Get notifications from localStorage (for now)
         const itemsRaw = localStorage.getItem("quickhelp_notifications");
         const items = itemsRaw ? JSON.parse(itemsRaw) : [];
-        const count = items.filter((n) => n.toRoles.includes(currentUser.role) && !(n.readBy || []).includes(currentUser.id)).length;
+        const count = items.filter(
+          (n) =>
+            n.toRoles.includes(user.role) && !(n.readBy || []).includes(user.id)
+        ).length;
         setUnreadCount(count);
       } catch (err) {
         setUnreadCount(0);
@@ -37,48 +70,17 @@ const NavBar = () => {
     updateUnread();
     window.addEventListener("notificationsChanged", updateUnread);
     window.addEventListener("authStateChanged", updateUnread);
-    window.addEventListener("storage", updateUnread);
+
     return () => {
       window.removeEventListener("notificationsChanged", updateUnread);
       window.removeEventListener("authStateChanged", updateUnread);
-      window.removeEventListener("storage", updateUnread);
     };
-  }, []);
-  // Check authentication status on component mount
-  useEffect(() => {
-    const checkAuthStatus = () => {
-      // Check localStorage for auth token or user data
-      const token = localStorage.getItem("authToken");
-      const userData = localStorage.getItem("userData");
+  }, [user]);
 
-      if (token && userData) {
-        setIsLoggedIn(true);
-        setUser(JSON.parse(userData));
-      } else {
-        setIsLoggedIn(false);
-        setUser(null);
-      }
-    };
-
-    checkAuthStatus();
-
-    // Listen for storage changes (when user logs in/out in another tab)
-    window.addEventListener("storage", checkAuthStatus);
-
-    // Listen for custom auth events (for same-tab changes)
-    window.addEventListener("authStateChanged", checkAuthStatus);
-
-    return () => {
-      window.removeEventListener("storage", checkAuthStatus);
-      window.removeEventListener("authStateChanged", checkAuthStatus);
-    };
-  }, []);
   // Dark mode initialization and management
   useEffect(() => {
     // Check localStorage for dark mode preference
     const savedTheme = localStorage.getItem("darkMode");
-
-    // Default to light mode instead of system preference
     const shouldBeDark = savedTheme === "true";
 
     setIsDarkMode(shouldBeDark);
@@ -92,24 +94,38 @@ const NavBar = () => {
     localStorage.setItem("darkMode", newDarkMode.toString());
   };
   const handleLogout = () => {
-    localStorage.removeItem("authToken");
-    localStorage.removeItem("userData");
-    setIsLoggedIn(false);
-    setUser(null);
+    try {
+      // Clear local storage
+      localStorage.removeItem("userData");
+      localStorage.removeItem("authToken");
 
-    // Dispatch custom event to notify other components
-    window.dispatchEvent(new Event("authStateChanged"));
+      // Update state
+      setIsLoggedIn(false);
+      setUser(null);
 
-    // Redirect to feed page after logout
-    navigate("/feed");
+      // Dispatch custom event to notify other components
+      window.dispatchEvent(new Event("authStateChanged"));
+
+      // Redirect to home page after logout
+      navigate("/");
+    } catch (error) {
+      console.error("Logout error:", error);
+      // Force logout even if there's an error
+      localStorage.removeItem("userData");
+      localStorage.removeItem("authToken");
+      setIsLoggedIn(false);
+      setUser(null);
+      navigate("/");
+    }
   };
+
   return (
     <header className="nav">
       <div className="nav-left">
         <Link to="/" className="logo">
           <img src={Logo} alt="QuickHelp Logo" className="logo-image" />
-          uickHelp
-        </Link>{" "}
+          QuickHelp
+        </Link>
         <nav className="nav-links">
           <ul>
             <li>
@@ -129,11 +145,11 @@ const NavBar = () => {
             </li>
           </ul>
         </nav>
-      </div>{" "}
+      </div>
+
       <div className="nav-right">
         <nav className="nav-links">
           <ul>
-            {" "}
             {/* Only show notifications if user is logged in */}
             {isLoggedIn && (
               <li>
@@ -144,10 +160,12 @@ const NavBar = () => {
                   )}
                 </Button>
               </li>
-            )} {" "}
+            )}
+
             <li>
               <LanguageSwitcher />
             </li>
+
             <li>
               <Button
                 className="btn-theme"
@@ -157,6 +175,7 @@ const NavBar = () => {
                 {isDarkMode ? "☀️" : "🌙"}
               </Button>
             </li>
+
             {/* Show login button or profile based on auth status */}
             {isLoggedIn ? (
               <li className="profile-dropdown">
@@ -165,28 +184,38 @@ const NavBar = () => {
                   title={`Profile: ${user?.username || "User"}`}
                 >
                   👤
-                </Button>{" "}
+                </Button>
+
                 <div className="profile-menu">
-                  {user && (user.role === "admin" || user.role === "creator") && (
-                    <Link to="/dashboard" className="profile-menu-item">
-                      {t("dashboard")}
-                    </Link>
-                  )}
-                  {/* create manual button for Creator and Admin */}
-                  <Link to="/create-manual" className="profile-menu-item">
-                    {t("Create Manual")}
-                  </Link>      
+                  {user &&
+                    (user.role === "admin" || user.role === "creator") && (
+                      <Link to="/dashboard" className="profile-menu-item">
+                        Dashboard
+                      </Link>
+                    )}
+
+                  {/* Create manual button for Creator and Admin */}
+                  {user &&
+                    (user.role === "admin" || user.role === "creator") && (
+                      <Link to="/create-manual" className="profile-menu-item">
+                        Create Manual
+                      </Link>
+                    )}
+
                   <Link to="/profile" className="profile-menu-item">
                     {t("nav.profile")}
                   </Link>
+
                   <Link to="/settings" className="profile-menu-item">
                     {t("nav.settings")}
                   </Link>
+
                   {user && user.role !== "admin" && user.role !== "creator" && (
                     <Link to="/creator-request" className="profile-menu-item">
                       {t("nav.creatorRequest")}
                     </Link>
                   )}
+
                   <button
                     onClick={handleLogout}
                     className="profile-menu-item logout-btn"

@@ -30,6 +30,10 @@ const defaultUsers = [
     lastName: "Doe",
     role: "user",
     avatar: null,
+    profilePicture: null,
+    bio: "Passionate software developer with 5+ years of experience in web technologies.",
+    phone: "+1 (555) 123-4567",
+    location: "San Francisco, CA",
     department: "IT",
     position: "Software Developer",
     isActive: true,
@@ -44,6 +48,7 @@ const defaultUsers = [
       manualsDownloaded: 8,
       manualsBookmarked: 5,
       loginCount: 47,
+      likesGiven: 12,
     },
     createdAt: "2024-01-15T09:30:00Z",
     lastLogin: "2024-11-19T08:15:00Z",
@@ -63,6 +68,11 @@ const defaultUsers = [
     lastName: "Garcia",
     role: "creator",
     avatar: null,
+    profilePicture:
+      "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face",
+    bio: "Senior UX Designer creating intuitive and accessible user experiences. Love crafting detailed design systems.",
+    phone: "+1 (555) 987-6543",
+    location: "Austin, TX",
     department: "Design",
     position: "Senior UX Designer",
     isActive: true,
@@ -79,6 +89,9 @@ const defaultUsers = [
       loginCount: 156,
       manualsCreated: 7,
       manualsEdited: 12,
+      likesGiven: 45,
+      totalManualViews: 892,
+      likesReceived: 134,
     },
     createdAt: "2024-02-10T14:20:00Z",
     lastLogin: "2024-11-19T09:30:00Z",
@@ -103,6 +116,11 @@ const defaultUsers = [
     lastName: "Wilson",
     role: "admin",
     avatar: null,
+    profilePicture:
+      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
+    bio: "System Administrator ensuring smooth operations and maintaining platform quality. Always happy to help users.",
+    phone: "+1 (555) 456-7890",
+    location: "Seattle, WA",
     department: "Management",
     position: "System Administrator",
     isActive: true,
@@ -119,6 +137,9 @@ const defaultUsers = [
       loginCount: 234,
       manualsCreated: 12,
       manualsModerated: 67,
+      likesGiven: 89,
+      totalManualViews: 1245,
+      likesReceived: 201,
       usersManaged: 125,
     },
     createdAt: "2023-12-01T10:00:00Z",
@@ -318,6 +339,42 @@ export const updateUserProfile = (userId, updatedData) => {
 // Function to get all users (for admin purposes)
 export const getAllUsers = () => {
   return getStoredUsers();
+};
+
+// Mock data for creator requests
+const defaultCreatorRequests = [
+  {
+    id: 1,
+    userId: 4,
+    name: "Alex Johnson",
+    department: "Marketing",
+    reason: "Need to create manuals for new marketing campaigns",
+    status: "pending",
+    createdAt: "2024-11-20T10:30:00Z",
+  },
+  {
+    id: 2,
+    userId: 5,
+    name: "Sam Smith",
+    department: "Sales",
+    reason: "Documenting sales processes",
+    status: "pending",
+    createdAt: "2024-11-21T14:15:00Z",
+  },
+  {
+    id: 3,
+    userId: 6,
+    name: "Jordan Lee",
+    department: "HR",
+    reason: "Updating employee handbook",
+    status: "approved",
+    createdAt: "2024-11-18T09:00:00Z",
+  },
+];
+
+export const getCreatorRequests = () => {
+  // In a real app, this would fetch from an API or database
+  return defaultCreatorRequests;
 };
 
 export default users;
