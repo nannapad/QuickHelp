@@ -46,12 +46,10 @@ export default defineConfig(({ mode }) => ({
     },
 
     // Compression and optimization
-    minify: "terser",
-    terserOptions: {
-      compress: {
-        drop_console: process.env.NODE_ENV === "production",
-        drop_debugger: true,
-      },
+    minify: "esbuild",
+    esbuild: {
+      drop:
+        process.env.NODE_ENV === "production" ? ["console", "debugger"] : [],
     },
   },
 
