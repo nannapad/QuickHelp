@@ -1,7 +1,7 @@
 .root {
   min-height: calc(100vh - 52px);
-  background: var(--bg);
-  color: var(--text);
+  background: var(--bg, #ffffff);
+  color: var(--text, #000000);
 }
 
 .page {
@@ -22,10 +22,10 @@
 /* EDITOR PANEL ---------------------------------------------- */
 
 .editor-panel {
-  background: var(--bg-light);
+  background: var(--bg-light, #f8f9fa);
   border-radius: var(--radius-lg, 18px);
-  box-shadow: var(--shadow-soft);
-  border: 1px solid var(--border);
+  box-shadow: var(--shadow-soft, 0 2px 8px rgba(0, 0, 0, 0.08));
+  border: 1px solid var(--border, #e5e7eb);
   padding: 22px 26px 22px;
 }
 
@@ -38,11 +38,11 @@
   letter-spacing: -0.04em;
   margin-bottom: 10px;
   background: transparent;
-  color: var(--text);
+  color: var(--text, #000000);
 }
 
 .editor-title::placeholder {
-  color: var(--text-muted);
+  color: var(--text-muted, #6b7280);
 }
 
 .editor-desc {
@@ -125,7 +125,7 @@
   z-index: 10;
 }
 
-/* เดิมคือ .block.show-toolbar .block-toolbar */
+/* Show toolbar when block is active */
 .block-show-toolbar .block-toolbar {
   opacity: 1;
   pointer-events: auto;
@@ -364,6 +364,19 @@
 .publish-btn:hover {
   transform: translateY(-1px);
   box-shadow: 0 12px 26px rgba(139, 92, 246, 0.6);
+}
+
+.draft-btn {
+  margin-top: 8px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  padding: 9px 14px;
+  background: var(--bg-light);
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 /* Image Block Styles */

@@ -19,6 +19,8 @@
   gap: 12px;
   margin-bottom: 16px;
   flex-wrap: wrap;
+  position: relative;
+  z-index: 1;
 }
 
 .creq-title {
@@ -160,11 +162,7 @@
 }
 
 .creq-btn.primary {
-  background: linear-gradient(
-    135deg,
-    var(--primary),
-    hsl(291 76% 60%)
-  );
+  background: linear-gradient(135deg, var(--primary), hsl(291 76% 60%));
   color: #fff;
   box-shadow: 0 12px 26px rgba(139, 92, 246, 0.6);
 }

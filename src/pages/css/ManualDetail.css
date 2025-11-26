@@ -71,6 +71,8 @@
   flex-direction: column;
   gap: 24px;
   margin-bottom: 10px;
+  position: relative;
+  z-index: 1;
 }
 
 .topRow {
@@ -234,18 +236,44 @@
 }
 
 /* Action button states */
-.actionBtn.liked,
-.actionBtn.bookmarked {
-  background: var(--primary, #8b5cf6);
-  border-color: var(--primary, #8b5cf6);
+.actionBtn.liked {
+  background: #ef4444;
+  border-color: #ef4444;
   color: white;
 }
 
-.actionBtn.liked:hover,
-.actionBtn.bookmarked:hover {
-  background: var(--primary-dark, #7c3aed);
-  border-color: var(--primary-dark, #7c3aed);
+.actionBtn.liked:hover {
+  background: #dc2626;
+  border-color: #dc2626;
   color: white;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
+}
+
+.actionBtn.bookmarked {
+  background: #eab308;
+  border-color: #eab308;
+  color: white;
+}
+
+.actionBtn.bookmarked:hover {
+  background: #ca8a04;
+  border-color: #ca8a04;
+  color: white;
+  box-shadow: 0 4px 12px rgba(234, 179, 8, 0.25);
+}
+
+.actionBtn.liked:active {
+  background: #dc2626;
+  border-color: #dc2626;
+  color: white;
+  transform: translateY(0);
+}
+
+.actionBtn.bookmarked:active {
+  background: #ca8a04;
+  border-color: #ca8a04;
+  color: white;
+  transform: translateY(0);
 }
 
 /* Edit button specific styling */
@@ -553,6 +581,7 @@
 /* comments --------------------------------------------------- */
 
 .commentInputWrapper {
+  display: flex;
   margin-bottom: 16px;
   position: relative;
 }
@@ -621,8 +650,9 @@
 .commentHeader {
   display: flex;
   justify-content: space-between;
-  align-items: baseline;
+  align-items: center;
   margin-bottom: 4px;
+  gap: 8px;
 }
 
 .commentAuthor {
@@ -634,6 +664,44 @@
 .commentTime {
   font-size: 11px;
   color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.editedBadge {
+  font-style: italic;
+  color: var(--text-muted);
+}
+
+.commentActions {
+  display: flex;
+  gap: 4px;
+  margin-left: auto;
+}
+
+.commentActionBtn {
+  background: none;
+  border: none;
+  padding: 4px 8px;
+  cursor: pointer;
+  font-size: 14px;
+  opacity: 0.6;
+  transition: opacity 0.2s, transform 0.1s;
+  border-radius: 4px;
+}
+
+.commentActionBtn:hover {
+  opacity: 1;
+  background: var(--bg-subtle);
+}
+
+.commentActionBtn:active {
+  transform: scale(0.95);
+}
+
+.commentActionBtn.deleteBtn:hover {
+  background: var(--danger-bg, #fee);
 }
 
 .commentText {
@@ -643,6 +711,65 @@
   color: var(--text-secondary);
 }
 
+.commentEditWrapper {
+  margin-top: 8px;
+}
+
+.commentEditInput {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 13px;
+  font-family: inherit;
+  background: var(--bg);
+  color: var(--text);
+  resize: vertical;
+  min-height: 60px;
+}
+
+.commentEditInput:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1);
+}
+
+.commentEditActions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.commentEditSaveBtn,
+.commentEditCancelBtn {
+  padding: 6px 14px;
+  border: none;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.commentEditSaveBtn {
+  background: var(--primary);
+  color: white;
+}
+
+.commentEditSaveBtn:hover {
+  background: var(--highlight);
+}
+
+.commentEditCancelBtn {
+  background: var(--bg-subtle);
+  color: var(--text-secondary);
+}
+
+.commentEditCancelBtn:hover {
+  background: var(--bg);
+  border: 1px solid var(--border);
+}
+
 .empty {
   text-align: center;
   font-size: 13px;
@@ -650,43 +777,46 @@
   padding: 12px 0;
 }
 
-/* dark mode tweaks ------------------------------------------ */
-
-.manualPage.dark .left,
-.manualPage.dark .card,
-.manualPage.dark .tocContainer,
-body.dark .manualPage .left,
-body.dark .manualPage .card,
-body.dark .manualPage .tocContainer {
-  background: var(--bg-dark);
-  border-color: var(--border);
+/* Comment login prompt */
+.commentLoginPrompt {
+  margin-bottom: 16px;
+  padding: 16px;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-muted);
+  border-radius: 8px;
+  text-align: center;
 }
 
-body.dark .text,
-body.dark .cardTitle,
-body.dark .sectionTitle {
-  color: #e5e7eb;
+.commentLoginPrompt p {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-muted);
 }
 
-body.dark .text-secondary {
-  color: #9ca3af;
+.loginLink {
+  background: none;
+  border: none;
+  color: var(--primary);
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: 13px;
+  padding: 0;
+  margin: 0 2px;
 }
 
-body.dark .versionSelect {
-  background: var(--bg-dark);
-  border-color: var(--border);
-  color: var(--text);
+.loginLink:hover {
+  color: var(--highlight);
 }
 
-/* Dark mode action buttons */
-body.dark .actionBtn {
-  background: var(--bg-dark, #1e293b);
-  border-color: var(--border-dark, #334155);
-  color: var(--text-dark, #e2e8f0);
+/* Enhanced comment styles */
+.commentSubmitBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: var(--text-muted);
 }
 
-body.dark .actionBtn:hover {
-  background: var(--bg-darker, #0f172a);
-  border-color: var(--primary, #8b5cf6);
-  color: var(--primary, #8b5cf6);
+.commentInput:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  background: var(--bg-subtle);
 }

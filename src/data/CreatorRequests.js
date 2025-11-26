@@ -19,7 +19,13 @@ const saveRequests = (items) => {
   }
 };
 
-export const addRequest = ({ userId, username, team = "", reason = "", types = [] }) => {
+export const addRequest = ({
+  userId,
+  username,
+  team = "",
+  reason = "",
+  types = [],
+}) => {
   const items = getRequests();
   const id = Date.now();
   const req = {
@@ -49,7 +55,10 @@ export const getRequestByUserId = (userId) => {
 
 export const getAllRequests = () => getRequests();
 
-export const updateRequestStatus = (requestId, { status, reviewerId, note }) => {
+export const updateRequestStatus = (
+  requestId,
+  { status, reviewerId, note }
+) => {
   const items = getRequests();
   const idx = items.findIndex((r) => r.id === parseInt(requestId));
   if (idx === -1) return null;

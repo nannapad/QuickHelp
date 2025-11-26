@@ -1,21 +1,51 @@
 import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
+import { Suspense, lazy, useEffect } from "react";
 import "./App.css";
-import Feed from "./pages/Feed";
-import Login from "./pages/Login";
-import About from "./pages/About";
-import FAQ from "./pages/FAQ";
-import ManualDetail from "./pages/ManualDetail";
-import Profile from "./pages/Profile";
-import Settings from "./pages/Settings";
-import AppLayout from "./layouts/AppLayout";
-import NotFound from "./pages/NotFound";
-import CreatorRequest from "./pages/CreatorRequest";
+
+// Context Providers
 import { LanguageProvider } from "./contexts/LanguageContext";
-import CreatorDashboard from "./pages/CreatorDashboard";
-import AdminDashboard from "./pages/AdminDashboard";
+import { AuthProvider } from "./contexts/AuthContext";
+
+// Core components that need to load immediately
+import AppLayout from "./layouts/AppLayout";
 import ProtectedRoute from "./components/ProtectedRoute";
-import CreateManual from "./pages/CreateManual";
-import EditManual from "./pages/EditManual";
+import ErrorBoundary from "./components/ErrorBoundary";
+import { SkipLink } from "./components/AccessibilityComponents";
+
+// Utilities
+import { cleanupLocalStorageBlobUrls } from "./utils/cleanupBlobUrls";
+
+// Lazy load components for better bundle splitting
+const Feed = lazy(() => import("./pages/Feed"));
+const Login = lazy(() => import("./pages/Login"));
+const About = lazy(() => import("./pages/About"));
+const FAQ = lazy(() => import("./pages/FAQ"));
+const ManualDetail = lazy(() => import("./pages/ManualDetail"));
+const Profile = lazy(() => import("./pages/Profile"));
+const Settings = lazy(() => import("./pages/Settings"));
+const NotFound = lazy(() => import("./pages/NotFound"));
+const CreatorRequest = lazy(() => import("./pages/CreatorRequest"));
+const CreatorDashboard = lazy(() => import("./pages/CreatorDashboard"));
+const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
+const CreateManual = lazy(() => import("./pages/CreateManual"));
+const EditManual = lazy(() => import("./pages/EditManual"));
+const EditDraft = lazy(() => import("./pages/EditDraft"));
+
+// Loading component
+const LoadingFallback = () => (
+  <div
+    style={{
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      minHeight: "50vh",
+      fontSize: "1.1rem",
+      color: "var(--text-muted)",
+    }}
+  >
+    <div>Loading...</div>
+  </div>
+);
 
 // Helper component: redirect to the appropriate dashboard based on role
 const DashboardRedirect = () => {
@@ -35,73 +65,87 @@ const DashboardRedirect = () => {
 };
 
 function App() {
+  useEffect(() => {
+    cleanupLocalStorageBlobUrls();
+  }, []);
+
   return (
-    <LanguageProvider>
-      <BrowserRouter basename="/QuickHelp/">
-        <Routes>
-          <Route element={<AppLayout />}>
-            <Route path="/" element={<Feed />} />
-            <Route path="feed" element={<Feed />} />
-            <Route path="manual/:id" element={<ManualDetail />} />
-            <Route path="about" element={<About />} />
-            <Route path="faq" element={<FAQ />} />
-            <Route path="login" element={<Login />} />
-            <Route path="profile" element={<Profile />} />
-            <Route path="settings" element={<Settings />} />
-            <Route path="creator-request" element={<CreatorRequest />} />
-            <Route path="*" element={<NotFound />} />{" "}
-            <Route
-              path="creator-dashboard"
-              element={
-                <ProtectedRoute allowedRoles={["creator", "admin"]}>
-                  <CreatorDashboard />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="admin-dashboard"
-              element={
-                <ProtectedRoute allowedRoles={["admin"]}>
-                  <AdminDashboard />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="dashboard"
-              element={
-                <ProtectedRoute allowedRoles={["admin", "creator", "user"]}>
-                  <DashboardRedirect />
-                </ProtectedRoute>
-              }
-            />{" "}
-            <Route
-              path="create-manual"
-              element={
-                <ProtectedRoute allowedRoles={["admin", "creator"]}>
-                  <CreateManual />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="edit-manual/:id"
-              element={
-                <ProtectedRoute allowedRoles={["admin", "creator"]}>
-                  <EditManual />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="edit-manual"
-              element={
-                <ProtectedRoute allowedRoles={["admin", "creator"]}>
-                  <EditManual />
-                </ProtectedRoute>
-              }
-            />
-          </Route>
-        </Routes>
-      </BrowserRouter>
-    </LanguageProvider>
+    <ErrorBoundary>
+      <AuthProvider>
+        <LanguageProvider>
+          <BrowserRouter basename="/QuickHelp/">
+            <SkipLink />
+            <Suspense fallback={<LoadingFallback />}>
+              <Routes>
+                <Route element={<AppLayout />}>
+                  <Route path="/" element={<Feed />} />
+                  <Route path="feed" element={<Feed />} />
+                  <Route path="manual/:id" element={<ManualDetail />} />
+                  <Route path="about" element={<About />} />
+                  <Route path="faq" element={<FAQ />} />
+                  <Route path="login" element={<Login />} />
+                  <Route path="profile" element={<Profile />} />
+                  <Route path="settings" element={<Settings />} />
+                  <Route path="creator-request" element={<CreatorRequest />} />
+                  <Route path="dashboard" element={<DashboardRedirect />} />
+                  {/* Protected Routes */}
+                  <Route
+                    path="creator-dashboard"
+                    element={
+                      <ProtectedRoute allowedRoles={["creator"]}>
+                        <CreatorDashboard />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="admin-dashboard"
+                    element={
+                      <ProtectedRoute allowedRoles={["admin"]}>
+                        <AdminDashboard />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="create-manual"
+                    element={
+                      <ProtectedRoute allowedRoles={["admin", "creator"]}>
+                        <CreateManual />
+                      </ProtectedRoute>
+                    }
+                  />{" "}
+                  <Route
+                    path="edit-manual/:id"
+                    element={
+                      <ProtectedRoute allowedRoles={["admin", "creator"]}>
+                        <EditManual />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="edit-manual"
+                    element={
+                      <ProtectedRoute allowedRoles={["admin", "creator"]}>
+                        <EditManual />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="edit-draft/:id"
+                    element={
+                      <ProtectedRoute allowedRoles={["admin", "creator"]}>
+                        <EditDraft />
+                      </ProtectedRoute>
+                    }
+                  />
+                  {/* 404 Route */}
+                  <Route path="*" element={<NotFound />} />
+                </Route>
+              </Routes>
+            </Suspense>
+          </BrowserRouter>
+        </LanguageProvider>
+      </AuthProvider>
+    </ErrorBoundary>
   );
 }
 

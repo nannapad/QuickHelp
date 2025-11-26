@@ -2,51 +2,67 @@
 @import url("https://fonts.googleapis.com/css2?family=Josefin+Sans:ital,wght@0,100..700;1,100..700&display=swap");
 
 :root {
-  /* hsl (fallback color) */
-  --bg-dark: hsl(247 100% 100%);
-  --bg: hsl(247 100% 100%);
-  --bg-light: hsl(247 100% 100%);
-  --text: hsl(270 100% 11%);
-  --text-muted: hsl(261 71% 39%);
-  --text-secondary: hsl(261 71% 39%);
-  --highlight: hsl(250 100% 100%);
-  --border: hsl(254 79% 66%);
-  --border-muted: hsl(253 100% 79%);
-  --primary: hsl(261 71% 39%);
-  --secondary: hsl(57 100% 6%);
-  --danger: hsl(4 99% 37%);
-  --warning: hsl(50 100% 12%);
-  --success: hsl(159 100% 9%);
-  --info: hsl(215 95% 42%);
-  --primary-soft: hsl(261 71% 50% / 0.16);
-  --primary-border: hsl(261 71% 50% / 0.7);
-  --danger-soft: hsl(4 99% 57% / 0.12);
-  --danger-border: hsl(4 99% 57% / 0.7);
+  /* Light theme colors */
+  --bg-dark: hsl(0 0% 98%);
+  --bg: hsl(0 0% 100%);
+  --bg-light: hsl(0 0% 98%);
+  --text: hsl(0 0% 9%);
+  --text-muted: hsl(0 0% 45%);
+  --text-secondary: hsl(0 0% 35%);
+  --highlight: hsl(261 71% 50%);
+  --border: hsl(0 0% 85%);
+  --border-muted: hsl(0 0% 90%);
+  --primary: hsl(261 71% 50%);
+  --secondary: hsl(220 13% 20%);
+  --danger: hsl(0 72% 51%);
+  --warning: hsl(38 100% 50%);
+  --success: hsl(142 71% 45%);
+  --info: hsl(217 91% 60%);
+  --primary-soft: hsl(261 71% 50% / 0.1);
+  --primary-border: hsl(261 71% 50% / 0.3);
+  --danger-soft: hsl(0 72% 51% / 0.1);
+  --danger-border: hsl(0 72% 51% / 0.3);
   --surface: hsl(0 0% 100%);
-  --surface-soft: hsl(210 20% 96%);
-  --bg-subtle: hsl(210 20% 96%);
+  --surface-soft: hsl(0 0% 98%);
+  --bg-subtle: hsl(0 0% 96%);
+
+  /* Additional design system variables */
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --shadow-soft: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --primary-light: hsl(261 71% 95%);
+  --primary-dark: hsl(261 71% 30%);
 }
 body.dark {
-  /* hsl (fallback color) */
-  --bg-dark: hsl(259 100% 6%);
-  --bg: hsl(261 100% 9%);
-  --bg-light: hsl(260 86% 13%);
-  --text: hsl(247 100% 100%);
-  --text-muted: hsl(248 66% 79%);
-  --text-secondary: hsl(248 66% 85%);
-  --highlight: hsl(257 56% 52%);
-  --border: hsl(261 71% 39%);
-  --border-muted: hsl(270 100% 22%);
-  --primary: hsl(252 100% 87%);
-  --secondary: hsl(60 100% 23%);
-  --danger: hsl(7 100% 66%);
-  --warning: hsl(53 100% 21%);
-  --success: hsl(162 100% 22%);
-  --info: hsl(217 100% 70%);
-  --primary-soft: hsl(252 100% 87% / 0.1);
-  --surface: hsl(222 47% 10%);
-  --surface-soft: hsl(222 47% 8%);
-  --bg-subtle: hsl(222 47% 8%);
+  /* Dark theme colors */
+  --bg-dark: hsl(220 13% 9%);
+  --bg: hsl(220 13% 11%);
+  --bg-light: hsl(220 13% 15%);
+  --text: hsl(0 0% 95%);
+  --text-muted: hsl(0 0% 65%);
+  --text-secondary: hsl(0 0% 75%);
+  --highlight: hsl(261 71% 60%);
+  --border: hsl(220 13% 25%);
+  --border-muted: hsl(220 13% 20%);
+  --primary: hsl(261 71% 60%);
+  --secondary: hsl(0 0% 80%);
+  --danger: hsl(0 72% 61%);
+  --warning: hsl(38 100% 60%);
+  --success: hsl(142 71% 55%);
+  --info: hsl(217 91% 70%);
+  --primary-soft: hsl(261 71% 60% / 0.15);
+  --surface: hsl(220 13% 12%);
+  --surface-soft: hsl(220 13% 10%);
+  --bg-subtle: hsl(220 13% 8%);
+
+  /* Additional design system variables */
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --shadow-soft: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --primary-light: hsl(261 71% 20%);
+  --primary-dark: hsl(261 71% 80%);
 }
 body {
   margin: 0;
@@ -72,4 +88,130 @@ body {
 .modal-content {
   transition: background-color 0.3s ease, color 0.3s ease,
     border-color 0.3s ease !important;
+}
+
+/* ==============================================
+   ACCESSIBILITY UTILITIES
+   ============================================== */
+
+/* Screen reader only text */
+.sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+/* Focus management */
+.focus-trap {
+  outline: none;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  :root {
+    --border: #000000;
+    --text: #000000;
+    --bg: #ffffff;
+  }
+
+  body.dark {
+    --border: #ffffff;
+    --text: #ffffff;
+    --bg: #000000;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ==============================================
+   RESPONSIVE DESIGN IMPROVEMENTS
+   ============================================== */
+
+/* Container queries for modern responsive design */
+@container (max-width: 768px) {
+  .responsive-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Improved fluid typography */
+.fluid-text {
+  font-size: clamp(1rem, 2.5vw, 1.25rem);
+}
+
+.fluid-heading {
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
+}
+
+/* Modern CSS Grid layouts */
+.auto-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
+  gap: 1rem;
+}
+
+/* ==============================================
+   PERFORMANCE OPTIMIZATIONS
+   ============================================== */
+
+/* Hardware acceleration for animations */
+.gpu-accelerated {
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+/* Image lazy loading optimization */
+img[loading="lazy"] {
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+img[loading="lazy"].loaded {
+  opacity: 1;
+}
+
+/* ==============================================
+   FOCUS MANAGEMENT
+   ============================================== */
+
+/* Enhanced focus indicators */
+*:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+
+/* Skip links */
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: -9999px;
+  z-index: 999999;
+  padding: 8px 16px;
+  background: #000;
+  color: #fff;
+  text-decoration: none;
+  font-weight: bold;
+  border-radius: 0 0 4px 4px;
+}
+
+.skip-link:focus {
+  left: 0;
+  top: 0;
 }

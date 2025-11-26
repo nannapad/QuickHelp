@@ -1,8 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAlertModal } from "../hooks/useAlertModal";
+import AlertModal from "../components/AlertModal";
 import "./css/Profile.css";
 import { useTranslation } from "../utils/translations";
 import { getUserById, updateUserProfile } from "../data/UserData";
+import ProfileAvatar from "../components/ProfileAvatar";
+import { getSafeImageUrl } from "../utils/cleanupBlobUrls";
 
 const Profile = () => {
   const [user, setUser] = useState(null);
@@ -14,6 +18,7 @@ const Profile = () => {
   const [isTwoFactorEnabled, setIsTwoFactorEnabled] = useState(false);
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { modalState, showAlert, hideAlert } = useAlertModal();
 
   useEffect(() => {
     const loadUserProfile = () => {
@@ -42,7 +47,9 @@ const Profile = () => {
           phone: baseUser.phone || "",
           location: baseUser.location || "",
         });
-        setProfilePictureUrl(baseUser.profilePicture || null);
+        // Filter out blob URLs using getSafeImageUrl
+        const safeProfilePicture = getSafeImageUrl(baseUser.profilePicture);
+        setProfilePictureUrl(safeProfilePicture);
       } catch (error) {
         console.error("Error loading user profile:", error);
         navigate("/login");
@@ -79,24 +86,26 @@ const Profile = () => {
         // Dispatch event to update navbar
         window.dispatchEvent(new Event("authStateChanged"));
 
-        alert("Profile updated successfully!");
+        showAlert("Profile updated successfully!", "success");
       } else {
-        alert("Failed to update profile");
+        showAlert("Failed to update profile", "error");
       }
     } catch (error) {
       console.error("Error saving profile:", error);
-      alert("Error saving profile");
+      showAlert("Error saving profile", "error");
     }
   };
-
   const handleProfilePictureChange = (e) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       setProfilePicture(file);
 
-      // Create URL for preview
-      const imageUrl = URL.createObjectURL(file);
-      setProfilePictureUrl(imageUrl);
+      // Convert to data URI for persistence instead of blob URL
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setProfilePictureUrl(reader.result);
+      };
+      reader.readAsDataURL(file);
     }
   };
 
@@ -169,7 +178,7 @@ const Profile = () => {
           },
           {
             id: 2,
-            label: "Reviewed draft: \"Social media campaign checklist\"",
+            label: 'Reviewed draft: "Social media campaign checklist"',
             time: "Yesterday",
           },
           {
@@ -183,20 +192,15 @@ const Profile = () => {
   return (
     <main className="profile-page">
       <div className="profile-inner">
+        {" "}
         <header className="profile-header">
           <div className="profile-user">
             <div className="profile-avatar-container">
-              <div className="profile-avatar">
-                {profilePictureUrl ? (
-                  <img
-                    src={profilePictureUrl}
-                    alt="Profile"
-                    className="profile-avatar-img"
-                  />
-                ) : (
-                  getInitials(user.firstName, user.lastName, user.username)
-                )}
-              </div>
+              <ProfileAvatar
+                user={user}
+                size="xlarge"
+                className="bordered-white"
+              />
               {isEditing && (
                 <div className="profile-avatar-edit">
                   <label className="profile-avatar-upload">
@@ -257,7 +261,6 @@ const Profile = () => {
             {isEditing ? t("common.cancel") : t("profile.editProfile")}
           </button>
         </header>
-
         <div className="profile-grid">
           {/* Left: Personal / Work / Account / Security */}
           <section className="profile-card">
@@ -414,13 +417,14 @@ const Profile = () => {
             <div className="profile-security-row">
               <div className="profile-security-text">
                 Change your password to keep your account secure.
-              </div>
+              </div>{" "}
               <button
                 type="button"
                 className="profile-btn ghost"
                 onClick={() =>
-                  alert(
-                    "This is a demo view. Password changes are not implemented."
+                  showAlert(
+                    "This is a demo view. Password changes are not implemented.",
+                    "info"
                   )
                 }
               >
@@ -434,16 +438,15 @@ const Profile = () => {
               </div>
               <button
                 type="button"
-                className={`profile-toggle ${
-                  isTwoFactorEnabled ? "on" : ""
-                }`}
+                className={`profile-toggle ${isTwoFactorEnabled ? "on" : ""}`}
                 onClick={() => {
                   const next = !isTwoFactorEnabled;
                   setIsTwoFactorEnabled(next);
-                  alert(
+                  showAlert(
                     `Two-factor authentication is now ${
                       next ? "enabled" : "disabled"
-                    } (demo only).`
+                    } (demo only).`,
+                    "success"
                   );
                 }}
               >
@@ -472,7 +475,7 @@ const Profile = () => {
                       phone: user.phone || "",
                       location: user.location || "",
                     });
-                    setProfilePictureUrl(user.profilePicture || null);
+                    setProfilePictureUrl(getSafeImageUrl(user.profilePicture));
                     setProfilePicture(null);
                   }}
                 >
@@ -488,7 +491,6 @@ const Profile = () => {
             <p className="profile-card-sub">
               Your activity and contributions to QuickHelp
             </p>
-
             {/* Usage Statistics */}
             <div className="profile-statRow">
               <div>
@@ -508,7 +510,6 @@ const Profile = () => {
                 </div>
               </div>
             </div>
-
             <div className="profile-statRow">
               <div>
                 <div className="profile-stat-label">
@@ -519,7 +520,6 @@ const Profile = () => {
                 </div>
               </div>
             </div>
-
             {/* Creator/Admin Statistics */}
             {(user.role === "creator" || user.role === "admin") && (
               <>
@@ -550,11 +550,9 @@ const Profile = () => {
                       {user.stats?.totalManualViews || 0}
                     </div>
                   </div>
-                  
                 </div>
               </>
             )}
-
             <div className="profile-divider" />
             <div className="profile-tagsTitle">Roles &amp; Permissions</div>
             <div className="profile-tagsRow">
@@ -574,10 +572,19 @@ const Profile = () => {
               {user.role !== "admin" && user.location && (
                 <span className="profile-tagChip">📍 {user.location}</span>
               )}
-            </div>
+            </div>{" "}
           </section>
         </div>
       </div>
+
+      {/* Alert Modal */}
+      <AlertModal
+        show={modalState.show}
+        onHide={hideAlert}
+        title={modalState.title}
+        message={modalState.message}
+        variant={modalState.variant}
+      />
     </main>
   );
 };

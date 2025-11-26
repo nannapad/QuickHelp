@@ -20,16 +20,22 @@ const saveNotifications = (items) => {
   }
 };
 
-export const addNotification = ({ title, body, toRoles = ["admin"], data = {} }) => {
+// Add notification for a specific user
+export const addNotification = ({
+  userId,
+  message,
+  type = "info",
+  link = null,
+}) => {
   const items = getNotifications();
   const id = Date.now();
   const n = {
     id,
-    title,
-    body,
-    toRoles,
-    readBy: [], // array of user ids who read
-    data,
+    userId,
+    message,
+    type, // info | success | warning | error
+    link,
+    read: false,
     createdAt: new Date().toISOString(),
   };
   const updated = [n, ...items];
@@ -39,22 +45,40 @@ export const addNotification = ({ title, body, toRoles = ["admin"], data = {} })
   return n;
 };
 
-export const getUnreadCountForUser = (user) => {
-  if (!user) return 0;
+// Get notifications for a specific user
+export const getNotificationsForUser = (userId) => {
+  if (!userId) return [];
   const items = getNotifications();
-  const role = user.role;
-  // unread = notifications targeted to this user's role AND not marked read by this user
-  return items.filter((n) => n.toRoles.includes(role) && !(n.readBy || []).includes(user.id)).length;
+  return items.filter((n) => n.userId === parseInt(userId));
 };
 
-export const markAllReadForUser = (user) => {
-  if (!user) return;
+// Get unread count for a specific user
+export const getUnreadCountForUser = (userId) => {
+  if (!userId) return 0;
+  const items = getNotificationsForUser(userId);
+  return items.filter((n) => !n.read).length;
+};
+
+// Mark all notifications as read for a user
+export const markAllReadForUser = (userId) => {
+  if (!userId) return;
   const items = getNotifications();
   const updated = items.map((n) => {
-    if (n.toRoles.includes(user.role)) {
-      const readBy = new Set(n.readBy || []);
-      readBy.add(user.id);
-      return { ...n, readBy: Array.from(readBy) };
+    if (n.userId === parseInt(userId) && !n.read) {
+      return { ...n, read: true };
+    }
+    return n;
+  });
+  saveNotifications(updated);
+  window.dispatchEvent(new Event("notificationsChanged"));
+};
+
+// Mark a specific notification as read
+export const markNotificationAsRead = (notificationId) => {
+  const items = getNotifications();
+  const updated = items.map((n) => {
+    if (n.id === parseInt(notificationId)) {
+      return { ...n, read: true };
     }
     return n;
   });
@@ -65,6 +89,8 @@ export const markAllReadForUser = (user) => {
 export default {
   getNotifications,
   addNotification,
+  getNotificationsForUser,
   getUnreadCountForUser,
   markAllReadForUser,
+  markNotificationAsRead,
 };

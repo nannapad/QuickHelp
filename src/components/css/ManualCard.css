@@ -189,6 +189,26 @@ body.dark .manual-card:hover {
   transform: translateY(-1px);
 }
 
+/* Liked state */
+.manual-icon-btn.is-liked {
+  color: #ef4444;
+}
+
+.manual-icon-btn.is-liked:hover {
+  color: #dc2626;
+  background: rgba(239, 68, 68, 0.1);
+}
+
+/* Bookmarked state */
+.manual-icon-btn.is-bookmarked {
+  color: #f59e0b;
+}
+
+.manual-icon-btn.is-bookmarked:hover {
+  color: #d97706;
+  background: rgba(245, 158, 11, 0.1);
+}
+
 .manual-count {
   font-size: 10px;
   font-weight: 500;

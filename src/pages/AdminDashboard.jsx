@@ -1,8 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAlertModal } from "../hooks/useAlertModal";
+import AlertModal from "../components/AlertModal";
 import "./css/AdminDashboard.css";
 import manuals from "../data/ManualData";
-import { getAllUsers, getCreatorRequests } from "../data/UserData";
+import { getAllUsers, updateUserProfile } from "../data/UserData";
+import { getAllRequests, updateRequestStatus } from "../data/CreatorRequests";
+import { addNotification } from "../utils/notifications";
 import { useTranslation } from "../utils/translations";
 
 const AdminDashboard = () => {
@@ -18,6 +22,7 @@ const AdminDashboard = () => {
   const [recentManuals, setRecentManuals] = useState([]);
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { modalState, showAlert, showConfirm, hideAlert } = useAlertModal();
 
   useEffect(() => {
     // Check if user is authenticated and has admin role
@@ -42,7 +47,6 @@ const AdminDashboard = () => {
     // Load data
     loadDashboardData();
   }, [navigate]);
-
   const loadDashboardData = () => {
     try {
       // Get all users
@@ -50,31 +54,228 @@ const AdminDashboard = () => {
       const creators = allUsers.filter((u) => u.role === "creator");
       const admins = allUsers.filter((u) => u.role === "admin");
 
-      // Get creator requests
-      const requests = getCreatorRequests();
+      // Get creator requests from localStorage
+      const requests = getAllRequests();
       const pendingRequests = requests.filter((r) => r.status === "pending");
 
-      // Get recent manuals (last 5)
-      const sortedManuals = [...manuals].sort(
+      // Get recent manuals including custom manuals with status
+      const customManuals = JSON.parse(
+        localStorage.getItem("customManuals") || "[]"
+      );
+      const allManuals = [...manuals, ...customManuals];
+
+      const sortedManuals = allManuals.sort(
         (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
       );
+
+      // Add status to existing manuals if not present (backward compatibility)
       const recent = sortedManuals.slice(0, 5).map((manual) => ({
         ...manual,
-        status: Math.random() > 0.7 ? "review" : "published", // Random status for demo
-      }));
+        status: manual.status || "published", // Default to published for existing manuals
+      })); // Count pending and draft manuals
+      const pendingManuals = customManuals.filter(
+        (m) => m.status === "pending"
+      );
+      const draftManuals = customManuals.filter((m) => m.status === "draft");
 
       setStats({
         totalUsers: allUsers.length,
         creators: creators.length,
         admins: admins.length,
-        manuals: manuals.length,
+        manuals: allManuals.length,
         pendingRequests: pendingRequests.length,
+        pendingManuals: pendingManuals.length,
+        draftManuals: draftManuals.length,
       });
 
       setCreatorRequests(pendingRequests.slice(0, 3)); // Show first 3
       setRecentManuals(recent);
     } catch (error) {
       console.error("Error loading dashboard data:", error);
+    }
+  };
+  const approveManual = (manualId) => {
+    try {
+      const customManuals = JSON.parse(
+        localStorage.getItem("customManuals") || "[]"
+      );
+      const manual = customManuals.find((m) => m.id === manualId);
+      const updatedManuals = customManuals.map((manual) =>
+        manual.id === manualId ? { ...manual, status: "published" } : manual
+      );
+
+      localStorage.setItem("customManuals", JSON.stringify(updatedManuals));
+
+      // Send notification to manual creator
+      if (manual && manual.authorId) {
+        addNotification({
+          userId: manual.authorId,
+          message: `Your manual "${manual.title}" has been approved and published!`,
+          type: "success",
+          link: `/manual/${manualId}`,
+        });
+      }
+
+      // Update state
+      setRecentManuals((prev) =>
+        prev.map((manual) =>
+          manual.id === manualId ? { ...manual, status: "published" } : manual
+        )
+      ); // Update pending count
+      setStats((prev) => ({
+        ...prev,
+        pendingManuals: prev.pendingManuals - 1,
+      }));
+
+      showAlert("Manual approved and published successfully!", "success");
+    } catch (error) {
+      console.error("Error approving manual:", error);
+      showAlert("Failed to approve manual", "error");
+    }
+  };
+  const rejectManual = (manualId, manualTitle) => {
+    showConfirm(
+      `Reject and delete manual "${manualTitle}"? This action cannot be undone.`,
+      () => {
+        performRejectManual(manualId);
+      },
+      "danger",
+      "Confirm Rejection",
+      "Reject",
+      "Cancel"
+    );
+  };
+
+  const performRejectManual = (manualId) => {
+    try {
+      const customManuals = JSON.parse(
+        localStorage.getItem("customManuals") || "[]"
+      );
+      const manual = customManuals.find((m) => m.id === manualId);
+      const updatedManuals = customManuals.filter(
+        (manual) => manual.id !== manualId
+      );
+
+      localStorage.setItem("customManuals", JSON.stringify(updatedManuals));
+
+      // Send notification to manual creator
+      if (manual && manual.authorId) {
+        addNotification({
+          userId: manual.authorId,
+          message: `Your manual "${manual.title}" was not approved.`,
+          type: "warning",
+          link: null,
+        });
+      }
+
+      // Update state
+      setRecentManuals((prev) =>
+        prev.filter((manual) => manual.id !== manualId)
+      );
+
+      // Update counts
+      setStats((prev) => ({
+        ...prev,
+        manuals: prev.manuals - 1,
+        pendingManuals: prev.pendingManuals - 1,
+      }));
+
+      showAlert("Manual rejected and deleted successfully!", "success");
+    } catch (error) {
+      console.error("Error rejecting manual:", error);
+      showAlert("Failed to reject manual", "error");
+    }
+  };
+  const deleteDraft = (manualId, manualTitle) => {
+    showConfirm(
+      `Delete draft "${manualTitle}"? This action cannot be undone.`,
+      () => {
+        performDeleteDraft(manualId);
+      },
+      "danger",
+      "Confirm Deletion",
+      "Delete",
+      "Cancel"
+    );
+  };
+
+  const performDeleteDraft = (manualId) => {
+    try {
+      const customManuals = JSON.parse(
+        localStorage.getItem("customManuals") || "[]"
+      );
+      const manual = customManuals.find((m) => m.id === manualId);
+      const updatedManuals = customManuals.filter(
+        (manual) => manual.id !== manualId
+      );
+
+      localStorage.setItem("customManuals", JSON.stringify(updatedManuals));
+
+      // Send notification to manual creator
+      if (manual && manual.authorId) {
+        addNotification({
+          userId: manual.authorId,
+          message: `Your draft "${manual.title}" has been deleted by an admin.`,
+          type: "warning",
+          link: null,
+        });
+      }
+
+      // Update state
+      setRecentManuals((prev) =>
+        prev.filter((manual) => manual.id !== manualId)
+      );
+
+      // Update counts
+      setStats((prev) => ({
+        ...prev,
+        manuals: prev.manuals - 1,
+        draftManuals: prev.draftManuals - 1,
+      }));
+
+      showAlert("Draft deleted successfully!", "success");
+    } catch (error) {
+      console.error("Error deleting draft:", error);
+      showAlert("Failed to delete draft", "error");
+    }
+  };
+  const deleteManual = (manualId, manualTitle) => {
+    showConfirm(
+      `Delete manual "${manualTitle}"? This action cannot be undone.`,
+      () => {
+        performDeleteManual(manualId);
+      },
+      "danger",
+      "Confirm Deletion",
+      "Delete",
+      "Cancel"
+    );
+  };
+
+  const performDeleteManual = (manualId) => {
+    try {
+      const customManuals = JSON.parse(
+        localStorage.getItem("customManuals") || "[]"
+      );
+      const updatedManuals = customManuals.filter(
+        (manual) => manual.id !== manualId
+      );
+
+      localStorage.setItem("customManuals", JSON.stringify(updatedManuals));
+
+      // Update state
+      setRecentManuals((prev) =>
+        prev.filter((manual) => manual.id !== manualId)
+      );
+      setStats((prev) => ({
+        ...prev,
+        manuals: prev.manuals - 1,
+      }));
+
+      showAlert("Manual deleted successfully!", "success");
+    } catch (error) {
+      console.error("Error deleting manual:", error);
+      showAlert("Failed to delete manual", "error");
     }
   };
 
@@ -99,18 +300,21 @@ const AdminDashboard = () => {
               {t("dashboard.admin.subtitle") ||
                 "Overview of users, manuals, and creator requests in your organization"}
             </p>
-          </div>
+          </div>{" "}
           <div className="ad-headerRight">
             <button
               className="ad-btn ghost"
               onClick={() =>
-                alert("Export report functionality would be implemented here")
+                showAlert(
+                  "Export report functionality would be implemented here",
+                  "info"
+                )
               }
             >
               {t("dashboard.admin.exportReport") || "Export report"}
             </button>
           </div>
-        </header>
+        </header>{" "}
         {/* Top stats */}
         <section className="ad-statsGrid">
           <div className="ad-statCard">
@@ -124,7 +328,6 @@ const AdminDashboard = () => {
               {t("dashboard.admin.admins") || "Admin"}: {stats.admins}
             </div>
           </div>
-
           <div className="ad-statCard">
             {" "}
             <div className="ad-statLabel">
@@ -134,8 +337,17 @@ const AdminDashboard = () => {
             <div className="ad-statSub">
               {t("dashboard.admin.totalManuals") || "Total manuals in system"}
             </div>
+          </div>{" "}
+          <div className="ad-statCard ad-statAccent">
+            {" "}
+            <div className="ad-statLabel">
+              {t("dashboard.admin.pendingManuals") || "Pending manuals"}
+            </div>
+            <div className="ad-statValue">{stats.pendingManuals || 0}</div>
+            <div className="ad-statSub">
+              {t("dashboard.admin.awaitingApproval") || "Awaiting approval"}
+            </div>
           </div>
-
           <div className="ad-statCard ad-statAccent">
             {" "}
             <div className="ad-statLabel">
@@ -162,20 +374,30 @@ const AdminDashboard = () => {
               </span>
             </div>
             <div className="ad-requestList">
+              {" "}
               {creatorRequests.map((r) => (
                 <div key={r.id} className="ad-requestItem">
                   <div className="ad-requestMain">
-                    <div className="ad-requestName">{r.name}</div>
+                    <div className="ad-requestName">{r.username}</div>
                     <div className="ad-requestMeta">
-                      {r.department} • requested {r.createdAt}
+                      {r.team} • requested{" "}
+                      {new Date(r.createdAt).toLocaleDateString()}
                     </div>
                     <div className="ad-requestReason">{r.reason}</div>
-                  </div>
+                  </div>{" "}
                   <div className="ad-requestActions">
                     {" "}
                     <button
                       className="ad-btn ghost"
-                      onClick={() => alert(`View details for request #${r.id}`)}
+                      onClick={() =>
+                        showAlert(
+                          `Types: ${r.types?.join(", ") || "N/A"}\n\nReason: ${
+                            r.reason
+                          }`,
+                          "info",
+                          "Request Details"
+                        )
+                      }
                     >
                       {t("dashboard.admin.view") || "View"}
                     </button>
@@ -184,20 +406,69 @@ const AdminDashboard = () => {
                       onClick={() => {
                         if (
                           window.confirm(
-                            `Approve creator request for ${r.name}?`
+                            `Approve creator request for ${r.username}?`
                           )
                         ) {
-                          // In a real app, this would call an API
-                          // Here we'll simulate it by updating local storage or just removing from list
-                          setCreatorRequests((prev) =>
-                            prev.filter((req) => req.id !== r.id)
-                          );
-                          setStats((prev) => ({
-                            ...prev,
-                            pendingRequests: prev.pendingRequests - 1,
-                            creators: prev.creators + 1,
-                          }));
-                          alert(`Approved ${r.name} as a creator.`);
+                          try {
+                            // Update request status
+                            updateRequestStatus(r.id, {
+                              status: "approved",
+                              reviewerId: user.id,
+                              note: "Request approved by admin",
+                            });
+
+                            // Update user role in quickhelp_users
+                            const allUsers = getAllUsers();
+                            const updatedUsers = allUsers.map((u) =>
+                              u.id === r.userId ? { ...u, role: "creator" } : u
+                            );
+                            localStorage.setItem(
+                              "quickhelp_users",
+                              JSON.stringify(updatedUsers)
+                            );
+
+                            // If this is the currently logged-in user, update userData
+                            const currentUserData =
+                              localStorage.getItem("userData");
+                            if (currentUserData) {
+                              const currentUser = JSON.parse(currentUserData);
+                              if (currentUser.id === r.userId) {
+                                currentUser.role = "creator";
+                                localStorage.setItem(
+                                  "userData",
+                                  JSON.stringify(currentUser)
+                                );
+                                window.dispatchEvent(
+                                  new Event("authStateChanged")
+                                );
+                              }
+                            }
+
+                            // Send notification
+                            addNotification({
+                              userId: r.userId,
+                              message:
+                                "Your creator request has been approved! You can now create manuals.",
+                              type: "success",
+                              link: "/creator-dashboard",
+                            }); // Update state
+                            setCreatorRequests((prev) =>
+                              prev.filter((req) => req.id !== r.id)
+                            );
+                            setStats((prev) => ({
+                              ...prev,
+                              pendingRequests: prev.pendingRequests - 1,
+                              creators: prev.creators + 1,
+                            }));
+
+                            showAlert(
+                              `Approved ${r.username} as a creator.`,
+                              "success"
+                            );
+                          } catch (error) {
+                            console.error("Error approving request:", error);
+                            showAlert("Failed to approve request", "error");
+                          }
                         }
                       }}
                     >
@@ -208,17 +479,41 @@ const AdminDashboard = () => {
                       onClick={() => {
                         if (
                           window.confirm(
-                            `Reject creator request for ${r.name}?`
+                            `Reject creator request for ${r.username}?`
                           )
                         ) {
-                          setCreatorRequests((prev) =>
-                            prev.filter((req) => req.id !== r.id)
-                          );
-                          setStats((prev) => ({
-                            ...prev,
-                            pendingRequests: prev.pendingRequests - 1,
-                          }));
-                          alert(`Rejected request for ${r.name}.`);
+                          try {
+                            // Update request status
+                            updateRequestStatus(r.id, {
+                              status: "rejected",
+                              reviewerId: user.id,
+                              note: "Request rejected by admin",
+                            });
+
+                            // Send notification
+                            addNotification({
+                              userId: r.userId,
+                              message:
+                                "Your creator request was not approved at this time.",
+                              type: "warning",
+                              link: "/creator-request",
+                            }); // Update state
+                            setCreatorRequests((prev) =>
+                              prev.filter((req) => req.id !== r.id)
+                            );
+                            setStats((prev) => ({
+                              ...prev,
+                              pendingRequests: prev.pendingRequests - 1,
+                            }));
+
+                            showAlert(
+                              `Rejected request for ${r.username}.`,
+                              "success"
+                            );
+                          } catch (error) {
+                            console.error("Error rejecting request:", error);
+                            showAlert("Failed to reject request", "error");
+                          }
                         }
                       }}
                     >
@@ -234,85 +529,201 @@ const AdminDashboard = () => {
                 </div>
               )}
             </div>
-          </section>
-
-          {/* Manual overview & user snapshot */}
+          </section>{" "}
+          {/* Pending Manuals Section */}
           <section className="ad-card">
-            {" "}
             <div className="ad-cardHeader">
               <h2 className="ad-cardTitle">
-                {t("dashboard.admin.manageManuals") || "Manage Manuals"}
+                {t("dashboard.admin.pendingManuals") || "Pending Manuals"}
               </h2>
+              <span className="ad-cardMeta">
+                {stats.pendingManuals || 0}{" "}
+                {t("dashboard.admin.pending") || "pending"}
+              </span>
             </div>
             <div className="ad-table">
               <div className="ad-tableHead">
                 <span>{t("dashboard.admin.title") || "Title"}</span>
                 <span>{t("dashboard.admin.author") || "Author"}</span>
                 <span>{t("dashboard.admin.category") || "Category"}</span>
-                <span>{t("dashboard.admin.status") || "Status"}</span>
+                <span>{t("dashboard.admin.submitted") || "Submitted"}</span>
                 <span>{t("dashboard.admin.actions") || "Actions"}</span>
               </div>
 
-              {recentManuals.map((m) => (
-                <div key={m.id} className="ad-tableRow">
-                  <span className="ad-tableTitle">{m.title}</span>
-                  <span className="ad-tableAuthor">{m.author}</span>
-                  <span className="ad-tableCategory">{m.category}</span>
-                  <span className={`ad-statusPill ad-${m.status}`}>
-                    {m.status}
-                  </span>
-                  <div className="ad-tableActions">
-                    <button
-                      className="ad-btn ghost small"
-                      onClick={() => navigate(`/manual/${m.id}`)}
-                      title="View"
-                    >
-                      👁️
-                    </button>
-                    <button
-                      className="ad-btn reject small"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        if (window.confirm(`Delete manual "${m.title}"?`)) {
-                          // Delete logic
-                          try {
-                            const localManuals = JSON.parse(
-                              localStorage.getItem("customManuals") || "[]"
-                            );
-                            const newLocalManuals = localManuals.filter(
-                              (manual) => manual.id !== m.id
-                            );
-                            localStorage.setItem(
-                              "customManuals",
-                              JSON.stringify(newLocalManuals)
-                            );
-
-                            // Update state
-                            setRecentManuals((prev) =>
-                              prev.filter((manual) => manual.id !== m.id)
-                            );
-                            setStats((prev) => ({
-                              ...prev,
-                              manuals: prev.manuals - 1,
-                            }));
-                            alert("Manual deleted successfully");
-                          } catch (err) {
-                            console.error(err);
-                            alert("Failed to delete manual");
+              {recentManuals
+                .filter((m) => m.status === "pending")
+                .map((m) => (
+                  <div key={m.id} className="ad-tableRow">
+                    <span className="ad-tableTitle">{m.title}</span>
+                    <span className="ad-tableAuthor">{m.author}</span>
+                    <span className="ad-tableCategory">{m.category}</span>
+                    <span className="ad-tableDate">{m.createdAt}</span>
+                    <div className="ad-tableActions">
+                      <button
+                        className="ad-btn ghost small"
+                        onClick={() => navigate(`/manual/${m.id}`)}
+                        title="View"
+                      >
+                        👁️
+                      </button>
+                      <button
+                        className="ad-btn approve small"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (
+                            window.confirm(
+                              `Approve and publish manual "${m.title}"?`
+                            )
+                          ) {
+                            approveManual(m.id);
                           }
-                        }
-                      }}
-                      title="Delete"
-                    >
-                      🗑️
-                    </button>
+                        }}
+                        title="Approve"
+                      >
+                        ✅
+                      </button>
+                      <button
+                        className="ad-btn reject small"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          rejectManual(m.id, m.title);
+                        }}
+                        title="Reject"
+                      >
+                        ❌
+                      </button>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
 
-              {recentManuals.length === 0 && (
+              {recentManuals.filter((m) => m.status === "pending").length ===
+                0 && (
                 <div className="ad-empty">
-                  {t("dashboard.admin.noRecentManuals") || "No manuals found"}
+                  {t("dashboard.admin.noPendingManuals") ||
+                    "No pending manuals. All manuals have been reviewed."}
+                </div>
+              )}
+            </div>
+          </section>
+          {/* Draft Manuals Section */}
+          <section className="ad-card">
+            <div className="ad-cardHeader">
+              <h2 className="ad-cardTitle">
+                {t("dashboard.admin.draftManuals") || "Draft Manuals"}
+              </h2>
+              <span className="ad-cardMeta">
+                {stats.draftManuals || 0}{" "}
+                {t("dashboard.admin.drafts") || "drafts"}
+              </span>
+            </div>
+            <div className="ad-table">
+              <div className="ad-tableHead">
+                <span>{t("dashboard.admin.title") || "Title"}</span>
+                <span>{t("dashboard.admin.author") || "Author"}</span>
+                <span>{t("dashboard.admin.category") || "Category"}</span>
+                <span>{t("dashboard.admin.created") || "Created"}</span>
+                <span>{t("dashboard.admin.actions") || "Actions"}</span>
+              </div>
+
+              {recentManuals
+                .filter((m) => m.status === "draft")
+                .map((m) => (
+                  <div key={m.id} className="ad-tableRow">
+                    <span className="ad-tableTitle">{m.title}</span>
+                    <span className="ad-tableAuthor">{m.author}</span>
+                    <span className="ad-tableCategory">{m.category}</span>
+                    <span className="ad-tableDate">{m.createdAt}</span>
+                    <div className="ad-tableActions">
+                      <button
+                        className="ad-btn ghost small"
+                        onClick={() => navigate(`/edit-manual/${m.id}`)}
+                        title="Edit"
+                      >
+                        ✏️
+                      </button>
+                      <button
+                        className="ad-btn reject small"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          deleteDraft(m.id, m.title);
+                        }}
+                        title="Delete"
+                      >
+                        🗑️
+                      </button>
+                    </div>
+                  </div>
+                ))}
+
+              {recentManuals.filter((m) => m.status === "draft").length ===
+                0 && (
+                <div className="ad-empty">
+                  {t("dashboard.admin.noDrafts") || "No draft manuals found."}
+                </div>
+              )}
+            </div>
+          </section>{" "}
+          {/* Published Manuals */}
+          <section className="ad-card">
+            {" "}
+            <div className="ad-cardHeader">
+              <h2 className="ad-cardTitle">
+                {t("dashboard.admin.publishedManuals") || "Published Manuals"}
+              </h2>
+              <span className="ad-cardMeta">
+                {recentManuals.filter((m) => m.status === "published").length}{" "}
+                {t("dashboard.admin.published") || "published"}
+              </span>
+            </div>
+            <div className="ad-table">
+              <div className="ad-tableHead">
+                <span>{t("dashboard.admin.title") || "Title"}</span>
+                <span>{t("dashboard.admin.author") || "Author"}</span>
+                <span>{t("dashboard.admin.category") || "Category"}</span>
+                <span>{t("dashboard.admin.created") || "Created"}</span>
+                <span>{t("dashboard.admin.actions") || "Actions"}</span>
+              </div>
+              {recentManuals
+                .filter((m) => m.status === "published")
+                .map((m) => (
+                  <div key={m.id} className="ad-tableRow">
+                    <span className="ad-tableTitle">{m.title}</span>
+                    <span className="ad-tableAuthor">{m.author}</span>
+                    <span className="ad-tableCategory">{m.category}</span>
+                    <span className="ad-tableDate">{m.createdAt}</span>
+                    <div className="ad-tableActions">
+                      <button
+                        className="ad-btn ghost small"
+                        onClick={() => navigate(`/manual/${m.id}`)}
+                        title="View"
+                      >
+                        👁️
+                      </button>
+                      <button
+                        className="ad-btn ghost small"
+                        onClick={() => navigate(`/edit-manual/${m.id}`)}
+                        title="Edit"
+                      >
+                        ✏️
+                      </button>
+                      <button
+                        className="ad-btn reject small"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          deleteManual(m.id, m.title);
+                        }}
+                        title="Delete"
+                      >
+                        🗑️
+                      </button>
+                    </div>
+                  </div>
+                ))}{" "}
+              {recentManuals.filter((m) => m.status === "published").length ===
+                0 && (
+                <div className="ad-empty">
+                  {t("dashboard.admin.noPublishedManuals") ||
+                    "No published manuals found"}
                 </div>
               )}
             </div>
@@ -337,10 +748,22 @@ const AdminDashboard = () => {
                 {t("dashboard.admin.newCreators") ||
                   "2 creators added from requests this week"}
               </li>
-            </ul>
+            </ul>{" "}
           </section>
         </div>
       </div>
+
+      {/* Alert Modal */}
+      <AlertModal
+        show={modalState.show}
+        onHide={hideAlert}
+        title={modalState.title}
+        message={modalState.message}
+        variant={modalState.variant}
+        onConfirm={modalState.onConfirm}
+        confirmText={modalState.confirmText}
+        cancelText={modalState.cancelText}
+      />
     </main>
   );
 };

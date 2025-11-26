@@ -1,7 +1,6 @@
 import { useContext } from "react";
 import { LanguageContext } from "../contexts/LanguageContext";
 
-// Translation files for English and Thai
 export const translations = {
   en: {
     // Navigation
@@ -15,6 +14,7 @@ export const translations = {
       settings: "Settings",
       creatorRequest: "Creator Request",
       notifications: "Notifications",
+      createManual: "Create",
     },
 
     // Feed Page
@@ -96,9 +96,11 @@ export const translations = {
       password: "Password",
       confirmPassword: "Confirm Password",
       username: "Username",
+      emailOrUsername: "Email or Username",
       firstName: "First Name",
       lastName: "Last Name",
       emailPlaceholder: "Enter your email",
+      emailOrUsernamePlaceholder: "Enter your email or username",
       passwordPlaceholder: "Enter your password",
       confirmPasswordPlaceholder: "Confirm your password",
       usernamePlaceholder: "Choose a username",
@@ -273,6 +275,8 @@ export const translations = {
       subtitle: "Update your manual content and settings",
       backToDashboard: "Back to Dashboard",
       updateManual: "Update Manual",
+      saveAsDraft: "Save as Draft",
+      publishDraft: "Publish",
       saveDraft: "Save as Draft",
       success: "Manual updated successfully!",
       error: "Failed to update manual. Please try again.",
@@ -281,7 +285,28 @@ export const translations = {
       loading: "Loading manual...",
       updated: "Manual has been updated!",
       draftSaved: "Draft saved successfully!",
-    }, // Common
+    },
+
+    editDraft: {
+      title: "Edit Draft",
+      draftDetails: "Draft Details",
+      draftCaption: "Configure your draft before publishing",
+      updateDraft: "Update Draft",
+      publishDraft: "Publish",
+      titleRequired: "Please enter a manual title",
+      minBlockWarning: "You must have at least one block in your manual.",
+      draftUpdated: "Draft updated successfully! Redirecting to dashboard...",
+      publishSuccess:
+        "Draft published successfully! Waiting for admin approval...",
+      updateError: "Failed to update draft",
+      publishError: "Failed to publish draft",
+      notFound: "Draft not found",
+      noPermission: "You don't have permission to edit this draft!",
+      loading: "Loading draft...",
+      backToDashboard: "Back to Dashboard",
+    },
+
+    // Common
     common: {
       search: "Search",
       download: "Download",
@@ -302,9 +327,7 @@ export const translations = {
       next: "Next",
       previous: "Previous",
       or: "or",
-    },
-
-    // Dashboard
+    }, // Dashboard
     dashboard: {
       admin: {
         title: "Admin Dashboard",
@@ -325,10 +348,23 @@ export const translations = {
         noRequests:
           "No pending requests. Approved requests are recorded in the system.",
         manageManuals: "Manage Manuals",
+        pendingManuals: "Pending Manuals",
+        draftManuals: "Draft Manuals",
+        publishedManuals: "Published Manuals",
+        awaitingApproval: "Awaiting approval",
+        savedDrafts: "Saved as drafts",
+        noPendingManuals: "No pending manuals. All manuals have been reviewed.",
+        noDrafts: "No draft manuals found.",
+        noPublishedManuals: "No published manuals found",
+        drafts: "drafts",
+        published: "published",
         author: "Author",
         category: "Category",
         status: "Status",
         actions: "Actions",
+        title: "Title",
+        submitted: "Submitted",
+        created: "Created",
         noRecentManuals: "No manuals found",
         userSnapshot: "User snapshot",
         newUsers: "8 new users this week",
@@ -341,23 +377,36 @@ export const translations = {
         createManual: "Create manual",
         publishedManuals: "Published manuals",
         publishedDesc: "Manuals that are live and searchable",
+        pendingManuals: "Pending approval",
+        pendingDesc: "Manuals awaiting admin approval",
+        draftManuals: "Draft Manuals",
         drafts: "Drafts",
-        draftsDesc: "Unpublished manuals saved as drafts",
+        draftsDesc: "Unpublished manuals you can continue editing",
         totalViews: "Total views",
-        viewsDesc: "Cumulative views across all your manuals",
+        viewsDesc: "Total views across all your manuals",
         myManuals: "My manuals",
         published: "published",
+        pending: "pending",
         category: "Category",
+        status: "Status",
         lastUpdated: "Last updated",
         views: "Views",
         actions: "Actions",
-        noManuals: "No manuals found. Create your first manual to get started.",
+        noManuals: "No manuals yet. Try creating your first manual!",
         draft: "draft",
+        draftsAndPending: "Drafts & Pending",
         lastEdited: "last edited",
+        submitted: "submitted",
         continue: "Continue",
+        publish: "Publish",
+        edit: "Edit",
         noDrafts:
-          "No drafts found. When you save as draft, it will appear here.",
+          "No drafts or pending manuals. When you save as draft or submit for approval, they will appear here.",
+        noDraftsMessage:
+          "No draft manuals. When you save as draft, they will appear here.",
         recentActivity: "Recent activity",
+        noActivity:
+          "No recent activity. Create your first manual to get started!",
         newComment: "New comment on",
         updatedVersion: "You updated version",
       },
@@ -376,6 +425,7 @@ export const translations = {
       settings: "ตั้งค่า",
       creatorRequest: "ขอสิทธิ์ Creator",
       notifications: "แจ้งเตือน",
+      createManual: "สร้าง",
     },
 
     // Feed Page
@@ -457,9 +507,11 @@ export const translations = {
       password: "รหัสผ่าน",
       confirmPassword: "ยืนยันรหัสผ่าน",
       username: "ชื่อผู้ใช้",
+      emailOrUsername: "อีเมลหรือชื่อผู้ใช้",
       firstName: "ชื่อ",
       lastName: "นามสกุล",
       emailPlaceholder: "กรอกอีเมลของคุณ",
+      emailOrUsernamePlaceholder: "กรอกอีเมลหรือชื่อผู้ใช้",
       passwordPlaceholder: "กรอกรหัสผ่าน",
       confirmPasswordPlaceholder: "ยืนยันรหัสผ่าน",
       usernamePlaceholder: "เลือกชื่อผู้ใช้",
@@ -632,6 +684,8 @@ export const translations = {
       subtitle: "อัปเดตเนื้อหาและการตั้งค่าคู่มือของคุณ",
       backToDashboard: "กลับไปที่แดชบอร์ด",
       updateManual: "อัปเดตคู่มือ",
+      saveAsDraft: "บันทึกร่าง",
+      publishDraft: "เผยแพร่",
       saveDraft: "บันทึกร่าง",
       success: "อัปเดตคู่มือสำเร็จ!",
       error: "การอัปเดตคู่มือไม่สำเร็จ กรุณาลองใหม่อีกครั้ง",
@@ -640,6 +694,24 @@ export const translations = {
       loading: "กำลังโหลดคู่มือ...",
       updated: "คู่มือได้รับการอัปเดตแล้ว!",
       draftSaved: "บันทึกร่างสำเร็จ!",
+    },
+
+    editDraft: {
+      title: "แก้ไขร่าง",
+      draftDetails: "รายละเอียดร่าง",
+      draftCaption: "ตั้งค่าร่างของคุณก่อนเผยแพร่",
+      updateDraft: "อัปเดตร่าง",
+      publishDraft: "เผยแพร่",
+      titleRequired: "กรุณาใส่ชื่อคู่มือ",
+      minBlockWarning: "คุณต้องมีอย่างน้อยหนึ่งบล็อกในคู่มือ",
+      draftUpdated: "อัปเดตร่างสำเร็จ! กำลังกลับไปที่แดชบอร์ด...",
+      publishSuccess: "เผยแพร่ร่างสำเร็จ! รอการอนุมัติจากผู้ดูแล...",
+      updateError: "การอัปเดตร่างไม่สำเร็จ",
+      publishError: "การเผยแพร่ร่างไม่สำเร็จ",
+      notFound: "ไม่พบร่าง",
+      noPermission: "คุณไม่มีสิทธิ์แก้ไขร่างนี้!",
+      loading: "กำลังโหลดร่าง...",
+      backToDashboard: "กลับไปที่แดชบอร์ด",
     },
 
     // Common
@@ -684,10 +756,23 @@ export const translations = {
         reject: "ปฏิเสธ",
         noRequests: "ไม่มีคำขอที่รอดำเนินการ คำขอที่อนุมัติแล้วถูกบันทึกในระบบ",
         manageManuals: "จัดการคู่มือ",
+        pendingManuals: "คู่มือรอการอนุมัติ",
+        draftManuals: "คู่มือร่าง",
+        publishedManuals: "คู่มือที่เผยแพร่แล้ว",
+        awaitingApproval: "รอการอนุมัติ",
+        savedDrafts: "บันทึกเป็นร่าง",
+        noPendingManuals: "ไม่มีคู่มือที่รอการอนุมัติ ตรวจสอบคู่มือทั้งหมดแล้ว",
+        noDrafts: "ไม่พบคู่มือร่าง",
+        noPublishedManuals: "ไม่พบคู่มือที่เผยแพร่",
+        drafts: "ร่าง",
+        published: "เผยแพร่แล้ว",
         author: "ผู้เขียน",
         category: "หมวดหมู่",
         status: "สถานะ",
         actions: "การดำเนินการ",
+        title: "ชื่อเรื่อง",
+        submitted: "ส่งแล้ว",
+        created: "สร้างเมื่อ",
         noRecentManuals: "ไม่พบคู่มือ",
         userSnapshot: "ภาพรวมผู้ใช้",
         newUsers: "ผู้ใช้ใหม่ 8 คนในสัปดาห์นี้",
@@ -700,22 +785,34 @@ export const translations = {
         createManual: "สร้างคู่มือ",
         publishedManuals: "คู่มือที่เผยแพร่",
         publishedDesc: "คู่มือที่เผยแพร่และค้นหาได้",
+        pendingManuals: "รอการอนุมัติ",
+        pendingDesc: "คู่มือที่รอการอนุมัติจากผู้ดูแล",
+        draftManuals: "คู่มือร่าง",
         drafts: "ร่าง",
-        draftsDesc: "คู่มือที่ยังไม่ได้เผยแพร่และบันทึกเป็นร่าง",
+        draftsDesc: "คู่มือที่ยังไม่เผยแพร่และคุณสามารถแก้ไขต่อได้",
         totalViews: "การดูทั้งหมด",
-        viewsDesc: "การดูสะสมในคู่มือทั้งหมดของคุณ",
+        viewsDesc: "การดูรวมในคู่มือทั้งหมดของคุณ",
         myManuals: "คู่มือของฉัน",
         published: "เผยแพร่แล้ว",
+        pending: "รอดำเนินการ",
         category: "หมวดหมู่",
+        status: "สถานะ",
         lastUpdated: "อัปเดตล่าสุด",
         views: "การดู",
         actions: "การดำเนินการ",
-        noManuals: "ไม่พบคู่มือ สร้างคู่มือแรกของคุณเพื่อเริ่มต้น",
+        noManuals: "ยังไม่มีคู่มือ ลองสร้างคู่มือแรกของคุณ!",
         draft: "ร่าง",
+        draftsAndPending: "ร่างและรอดำเนินการ",
         lastEdited: "แก้ไขล่าสุด",
+        submitted: "ส่งแล้ว",
         continue: "ดำเนินการต่อ",
-        noDrafts: "ไม่พบร่าง เมื่อคุณบันทึกเป็นร่าง จะปรากฏที่นี่",
+        publish: "เผยแพร่",
+        edit: "แก้ไข",
+        noDrafts:
+          "ไม่มีร่างหรือคู่มือรอดำเนินการ เมื่อคุณบันทึกเป็นร่างหรือส่งเพื่อขออนุมัติ จะปรากฏที่นี่",
+        noDraftsMessage: "ไม่มีคู่มือร่าง เมื่อคุณบันทึกเป็นร่าง จะปรากฏที่นี่",
         recentActivity: "กิจกรรมล่าสุด",
+        noActivity: "ไม่มีกิจกรรมล่าสุด สร้างคู่มือแรกของคุณเพื่อเริ่มต้น!",
         newComment: "ความคิดเห็นใหม่ใน",
         updatedVersion: "คุณได้อัปเดตเวอร์ชัน",
       },
@@ -723,23 +820,44 @@ export const translations = {
   },
 };
 
-// Hook to get translated text
+// Enhanced translation hook with error handling
 export const useTranslation = () => {
-  const { language } = useContext(LanguageContext);
+  const context = useContext(LanguageContext);
+  if (!context) {
+    console.warn("useTranslation must be used within a LanguageProvider");
+    return { t: (key) => key }; // Fallback function
+  }
 
-  const t = (key) => {
-    const keys = key.split(".");
-    let value = translations[language];
+  const { language } = context;
 
-    for (const k of keys) {
-      if (value && typeof value === "object") {
-        value = value[k];
-      } else {
-        return key; // Return the key if translation not found
+  const t = (key, defaultValue = key) => {
+    try {
+      const keys = key.split(".");
+      let value = translations[language];
+
+      for (const k of keys) {
+        if (value && typeof value === "object" && k in value) {
+          value = value[k];
+        } else {
+          // Fallback to English if key not found in current language
+          value = translations.en;
+          for (const k of keys) {
+            if (value && typeof value === "object" && k in value) {
+              value = value[k];
+            } else {
+              return defaultValue;
+            }
+          }
+          break;
+        }
       }
-    }
 
-    return value || key;
+      return typeof value === "string" ? value : defaultValue;
+    } catch (error) {
+      console.warn(`Translation error for key "${key}":`, error);
+      return defaultValue;
+    }
   };
+
   return { t, language };
 };

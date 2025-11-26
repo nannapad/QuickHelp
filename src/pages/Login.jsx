@@ -15,18 +15,19 @@ import {
 import "./css/Login.css";
 import { useTranslation } from "../utils/translations";
 import { authenticateUser } from "../data/UserData";
+import { useAuth } from "../contexts/AuthContext";
 
 const Login = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { login, logout } = useAuth();
 
   const [activeTab, setActiveTab] = useState("login");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-
   const [loginData, setLoginData] = useState({
-    email: "",
+    emailOrUsername: "",
     password: "",
   });
 
@@ -56,7 +57,7 @@ const Login = () => {
     setSuccess("");
 
     try {
-      if (!loginData.email || !loginData.password) {
+      if (!loginData.emailOrUsername || !loginData.password) {
         setError(t("login.fillAllFields"));
         setLoading(false);
         return;
@@ -65,13 +66,19 @@ const Login = () => {
       // Simulate API call delay
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      // Use mock authentication
-      const authResult = authenticateUser(loginData.email, loginData.password);
+      console.log("Attempting login with:", loginData.emailOrUsername);
+
+      // Use mock authentication - now supports both email and username
+      const authResult = authenticateUser(
+        loginData.emailOrUsername,
+        loginData.password
+      );
+
+      console.log("Auth result:", authResult);
 
       if (authResult.success) {
-        // Store user data and auth token
-        localStorage.setItem("userData", JSON.stringify(authResult.user));
-        localStorage.setItem("authToken", authResult.token);
+        // Use AuthContext login function to update state properly
+        login(authResult.user, authResult.token);
 
         // Dispatch custom event for navbar to listen
         window.dispatchEvent(new Event("authStateChanged"));
@@ -79,12 +86,12 @@ const Login = () => {
         setSuccess(t("login.welcomeBack"));
 
         // Clear form
-        setLoginData({ email: "", password: "" });
+        setLoginData({ emailOrUsername: "", password: "" });
 
         // Redirect based on user role
         setTimeout(() => {
           if (authResult.user.role === "admin") {
-            navigate("/admin");
+            navigate("/admin-dashboard");
           } else if (authResult.user.role === "creator") {
             navigate("/creator-dashboard");
           } else {
@@ -92,6 +99,7 @@ const Login = () => {
           }
         }, 800);
       } else {
+        console.error("Login failed:", authResult.message);
         setError(t("login.invalidCredentials"));
       }
     } catch (err) {
@@ -144,9 +152,7 @@ const Login = () => {
       }
 
       // Simulate API call delay
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      // Mock registration logic
+      await new Promise((resolve) => setTimeout(resolve, 1500)); // Mock registration logic
       const newUser = {
         id: Date.now(),
         username,
@@ -175,6 +181,13 @@ const Login = () => {
         permissions: ["view_manuals"],
       };
 
+      // Add user to quickhelp_users in localStorage
+      const existingUsers = JSON.parse(
+        localStorage.getItem("quickhelp_users") || "[]"
+      );
+      existingUsers.push(newUser);
+      localStorage.setItem("quickhelp_users", JSON.stringify(existingUsers));
+
       // Store user data and auth token
       localStorage.setItem("userData", JSON.stringify(newUser));
       localStorage.setItem("authToken", "mock_token_" + Date.now());
@@ -202,18 +215,16 @@ const Login = () => {
     }
   };
   const handleContinueAsGuest = () => {
-    // Clear any existing auth
-    localStorage.removeItem("userData");
-    localStorage.removeItem("authToken");
+    // Use AuthContext logout to clear auth state properly
+    logout();
     navigate("/");
   };
 
   // ---------- UI ----------
-
   return (
     <div className="login-page">
-      <Container className="d-flex align-items-center justify-content-center">
-        <Row className="w-100 justify-content-center">
+      <Container>
+        <Row className="justify-content-center">
           <Col xs={12} sm={10} md={8} lg={6} xl={5}>
             <div className="text-center mb-4">
               <h1 className="login-title">{t("login.title")}</h1>
@@ -249,15 +260,16 @@ const Login = () => {
                       </span>
                     }
                   >
+                    {" "}
                     {activeTab === "login" && (
                       <Form onSubmit={handleLogin} className="mt-3">
                         <Form.Group className="mb-3">
-                          <Form.Label>{t("login.email")}</Form.Label>
+                          <Form.Label>{t("login.emailOrUsername")}</Form.Label>
                           <Form.Control
-                            type="email"
-                            name="email"
-                            placeholder={t("login.emailPlaceholder")}
-                            value={loginData.email}
+                            type="text"
+                            name="emailOrUsername"
+                            placeholder={t("login.emailOrUsernamePlaceholder")}
+                            value={loginData.emailOrUsername}
                             onChange={(e) => handleInputChange(e, "login")}
                             required
                           />
@@ -425,10 +437,34 @@ const Login = () => {
                     {t("login.continueAsGuest")}
                   </Button>
                 </div>
-              </Card.Body>
+              </Card.Body>{" "}
             </Card>
 
+            {/* Demo Credentials Info */}
             <div className="text-center mt-4">
+              <div className="demo-credentials-box">
+                <small className="text-muted d-block mb-2">
+                  <strong>📝 Demo Login Credentials:</strong>
+                </small>
+                <div className="demo-creds-grid">
+                  <small className="text-muted">
+                    <strong>Admin:</strong> admin / admin@company.com
+                  </small>
+                  <small className="text-muted">
+                    <strong>Creator:</strong> mariagarcia /
+                    maria.garcia@company.com
+                  </small>
+                  <small className="text-muted">
+                    <strong>User:</strong> johndoe / john.doe@company.com
+                  </small>
+                </div>
+                <small className="text-muted d-block mt-2">
+                  <em>Password: any text (demo mode)</em>
+                </small>
+              </div>
+            </div>
+
+            <div className="text-center mt-3">
               <small className="text-muted">
                 <Link to="/about" className="text-decoration-none">
                   {t("nav.about")}

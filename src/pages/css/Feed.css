@@ -133,7 +133,8 @@
   margin-bottom: 10px;
   gap: 12px;
   flex-wrap: wrap;
-  position: static;
+  position: relative;
+  z-index: 1;
 }
 
 .feed-mainTitle {

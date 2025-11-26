@@ -19,6 +19,8 @@
   gap: 12px;
   margin-bottom: 18px;
   flex-wrap: wrap;
+  position: relative;
+  z-index: 1;
 }
 
 .ad-title {
@@ -72,12 +74,18 @@
 
 .ad-statsGrid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 12px;
   margin-bottom: 16px;
 }
 
 @media (max-width: 880px) {
+  .ad-statsGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 480px) {
   .ad-statsGrid {
     grid-template-columns: minmax(0, 1fr);
   }
@@ -259,6 +267,41 @@
 .ad-review {
   background: rgba(249, 115, 22, 0.1);
   color: #c2410c;
+}
+
+/* status pills ---------------------------------------------- */
+
+.ad-statusPill {
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.ad-statusPill.ad-published {
+  background: rgba(34, 197, 94, 0.1);
+  color: #16a34a;
+  border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.ad-statusPill.ad-pending {
+  background: rgba(251, 191, 36, 0.1);
+  color: #d97706;
+  border: 1px solid rgba(251, 191, 36, 0.2);
+}
+
+.ad-statusPill.ad-draft {
+  background: rgba(107, 114, 128, 0.1);
+  color: #6b7280;
+  border: 1px solid rgba(107, 114, 128, 0.2);
+}
+
+.ad-statusPill.ad-review {
+  background: rgba(139, 92, 246, 0.1);
+  color: #8b5cf6;
+  border: 1px solid rgba(139, 92, 246, 0.2);
 }
 
 /* list snapshot ---------------------------------------------- */

@@ -1,16 +1,21 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useTranslation } from "../utils/translations";
 import { useAlertModal } from "../hooks/useAlertModal";
 import AlertModal from "../components/AlertModal";
-import { addNotification } from "../utils/notifications";
-import { getAllUsers } from "../data/UserData";
-import "./css/CreateManual.css";
+import manuals from "../data/ManualData";
+import "./css/EditManual.css";
 
-const CreateManual = () => {
+const EditDraft = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { id } = useParams();
+  const [searchParams] = useSearchParams();
+  const editId = id || searchParams.get("edit");
   const { modalState, showAlert, hideAlert } = useAlertModal();
+
+  const [isLoading, setIsLoading] = useState(true);
+  const [manual, setManual] = useState(null);
 
   // Form states
   const [title, setTitle] = useState("");
@@ -27,10 +32,138 @@ const CreateManual = () => {
   const [language, setLanguage] = useState("EN");
   const [tags, setTags] = useState([]);
 
-  const addBlock = (type = "text") => {
-    // Generate a unique ID based on current timestamp + random number
-    const newId = Date.now() + Math.floor(Math.random() * 1000);
+  // Load draft manual data
+  useEffect(() => {
+    const loadDraft = () => {
+      try {
+        const userData = localStorage.getItem("userData");
+        const authToken = localStorage.getItem("authToken");
 
+        if (!userData || !authToken) {
+          navigate("/login");
+          return;
+        }
+
+        const currentUser = JSON.parse(userData);
+
+        if (currentUser.role !== "creator" && currentUser.role !== "admin") {
+          navigate("/");
+          return;
+        }
+
+        if (!editId) {
+          navigate("/creator-dashboard");
+          return;
+        }
+
+        const customManuals = JSON.parse(
+          localStorage.getItem("customManuals") || "[]"
+        );
+        const allManuals = [...customManuals, ...manuals];
+
+        const draftToEdit = allManuals.find((m) => {
+          return String(m.id) === String(editId) || m.id === parseInt(editId);
+        });
+
+        if (!draftToEdit) {
+          showAlert(t("editDraft.notFound") || "Draft not found!", "error");
+          setTimeout(() => navigate("/creator-dashboard"), 1500);
+          return;
+        }
+
+        // Check if it's actually a draft
+        if (draftToEdit.status !== "draft") {
+          // Redirect to regular edit page if not a draft
+          navigate(`/edit-manual/${editId}`);
+          return;
+        }
+
+        // Check permission
+        const userFullName = `${currentUser.firstName} ${currentUser.lastName}`;
+        if (
+          currentUser.role !== "admin" &&
+          draftToEdit.author !== userFullName &&
+          draftToEdit.author !== currentUser.username
+        ) {
+          showAlert(
+            t("editDraft.noPermission") ||
+              "You don't have permission to edit this draft!",
+            "error"
+          );
+          setTimeout(() => navigate("/creator-dashboard"), 1500);
+          return;
+        }
+
+        // Pre-populate form
+        setManual(draftToEdit);
+        setTitle(draftToEdit.title || "");
+        setDesc(draftToEdit.description || "");
+        setCategory(draftToEdit.category || "IT");
+        setTags(draftToEdit.tags || []);
+
+        if (draftToEdit.thumbnail) {
+          setThumbnailUrl(draftToEdit.thumbnail);
+          const urlParts = draftToEdit.thumbnail.split("/");
+          setThumbName(urlParts[urlParts.length - 1]);
+        }
+
+        let extractedVersion = "1.0";
+        if (draftToEdit.meta) {
+          const versionMatch = draftToEdit.meta.match(/v(\d+\.\d+)/);
+          if (versionMatch) {
+            extractedVersion = versionMatch[1];
+          }
+        } else if (draftToEdit.version) {
+          extractedVersion = draftToEdit.version;
+        }
+        setVersion(extractedVersion);
+
+        // Initialize blocks
+        let initialBlocks = [];
+        if (draftToEdit.blocks && draftToEdit.blocks.length > 0) {
+          initialBlocks = draftToEdit.blocks;
+        } else if (draftToEdit.sections && draftToEdit.sections.length > 0) {
+          let blockIdCounter = 1;
+          initialBlocks = draftToEdit.sections.flatMap((section) => [
+            {
+              id: blockIdCounter++,
+              type: "heading",
+              value: section.title,
+              showToolbar: false,
+            },
+            {
+              id: blockIdCounter++,
+              type: "text",
+              value: section.content,
+              showToolbar: false,
+            },
+          ]);
+        } else {
+          initialBlocks = [
+            {
+              id: 1,
+              type: "text",
+              value: draftToEdit.description || "",
+              showToolbar: false,
+            },
+          ];
+        }
+        setBlocks(initialBlocks);
+      } catch (error) {
+        console.error("Error loading draft:", error);
+        navigate("/creator-dashboard");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadDraft();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editId]);
+
+  // Block management functions
+  const addBlock = (type = "text") => {
+    const newId = Date.now() + Math.floor(Math.random() * 1000);
     setBlocks((prev) => [
       ...prev,
       {
@@ -57,20 +190,25 @@ const CreateManual = () => {
       )
     );
   };
+
   const changeBlockValue = (id, value) => {
     setBlocks((prev) => prev.map((b) => (b.id === id ? { ...b, value } : b)));
   };
+
   const deleteBlock = (id) => {
-    // Don't allow deleting if only one block remains
     if (blocks.length <= 1) {
-      showAlert("You must have at least one block in your manual.", "warning");
+      showAlert(
+        t("editDraft.minBlockWarning") ||
+          "You must have at least one block in your manual.",
+        "warning"
+      );
       return;
     }
     setBlocks((prev) => prev.filter((b) => b.id !== id));
   };
+
   const handleImageUpload = (id, file) => {
     if (file) {
-      // Convert to data URI for persistence instead of blob URL
       const reader = new FileReader();
       reader.onloadend = () => {
         setBlocks((prev) =>
@@ -95,13 +233,13 @@ const CreateManual = () => {
       prev.map((b) => (b.id === id ? { ...b, imageUrl: url, value: url } : b))
     );
   };
+
   const handleThumbnailChange = (e) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       setThumbName(file.name);
       setThumbnailFile(file);
 
-      // Convert to data URI for persistence instead of blob URL
       const reader = new FileReader();
       reader.onloadend = () => {
         setThumbnailUrl(reader.result);
@@ -109,25 +247,10 @@ const CreateManual = () => {
       reader.readAsDataURL(file);
     }
   };
+
   const handleManualFileChange = (e) => {
     if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      setManualFileName(file.name);
-
-      // Convert file to data URL for storage
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        // Store file info including data URL
-        const fileInfo = {
-          name: file.name,
-          size: file.size,
-          type: file.type,
-          dataUrl: reader.result,
-        };
-        // We'll store this in the manual object
-        setManualFileName(fileInfo);
-      };
-      reader.readAsDataURL(file);
+      setManualFileName(e.target.files[0].name);
     }
   };
 
@@ -141,179 +264,160 @@ const CreateManual = () => {
       }
     }
   };
+
   const removeTag = (tagToRemove) => {
     setTags(tags.filter((tag) => tag !== tagToRemove));
   };
-  const handleSaveDraft = () => {
+
+  // Update draft (save changes without publishing)
+  const handleUpdateDraft = () => {
     if (!title.trim()) {
-      showAlert("Please enter a manual title", "warning");
+      showAlert(
+        t("editDraft.titleRequired") || "Please enter a manual title",
+        "warning"
+      );
       return;
     }
 
-    // Get current user info
     let authorName = "Anonymous";
-    let currentUser = null;
     try {
       const userData = JSON.parse(localStorage.getItem("userData"));
       if (userData) {
-        currentUser = userData;
         authorName = `${userData.firstName} ${userData.lastName}`;
       }
     } catch (e) {
       console.error("Error getting user data", e);
     }
-    const newManual = {
-      id: Date.now(),
+
+    const updatedDraft = {
+      ...manual,
       title,
       description: desc,
       category,
       meta: `${category} • ${version || "v1.0"}`,
       tags,
-      views: 0,
-      likes: 0,
-      downloads: 0,
       author: authorName,
-      createdAt: new Date().toISOString().split("T")[0],
       updatedAt: new Date().toISOString().split("T")[0],
-      difficulty: "Beginner",
-      estimatedTime: "10 min",
-      thumbnail: thumbnailUrl,
+      difficulty: manual.difficulty || "Beginner",
+      estimatedTime: manual.estimatedTime || "10 min",
+      thumbnail: thumbnailUrl || manual.thumbnail,
       blocks,
-      fileInfo: manualFileName, // Store file information
-      status: "draft",
+      status: "draft", // Keep as draft
     };
 
     try {
-      const existingManuals = JSON.parse(
+      const customManuals = JSON.parse(
         localStorage.getItem("customManuals") || "[]"
       );
-      const updatedManuals = [...existingManuals, newManual];
-      localStorage.setItem("customManuals", JSON.stringify(updatedManuals));
+      const customIndex = customManuals.findIndex(
+        (m) => String(m.id) === String(editId) || m.id === parseInt(editId)
+      );
 
-      console.log("Manual saved as draft:", newManual); // Dispatch custom event to notify other components
+      if (customIndex !== -1) {
+        customManuals[customIndex] = updatedDraft;
+      } else {
+        customManuals.push(updatedDraft);
+      }
+
+      localStorage.setItem("customManuals", JSON.stringify(customManuals));
       window.dispatchEvent(new Event("manualUpdated"));
 
       showAlert(
-        "Manual saved as draft! Redirecting to dashboard...",
+        t("editDraft.draftUpdated") ||
+          "Draft updated successfully! Redirecting to dashboard...",
         "success"
       );
-
       setTimeout(() => {
         navigate("/creator-dashboard");
       }, 1000);
     } catch (error) {
-      console.error("Error saving manual:", error);
-      showAlert("Failed to save manual", "error");
+      console.error("Error updating draft:", error);
+      showAlert(
+        t("editDraft.updateError") || "Failed to update draft",
+        "error"
+      );
     }
   };
 
-  const handleSubmit = () => {
+  // Publish draft (change status to pending)
+  const handlePublishDraft = () => {
     if (!title.trim()) {
-      showAlert("Please enter a manual title", "warning");
+      showAlert(
+        t("editDraft.titleRequired") || "Please enter a manual title",
+        "warning"
+      );
       return;
     }
 
-    // Get current user info
     let authorName = "Anonymous";
-    let currentUser = null;
     try {
       const userData = JSON.parse(localStorage.getItem("userData"));
       if (userData) {
-        currentUser = userData;
         authorName = `${userData.firstName} ${userData.lastName}`;
       }
     } catch (e) {
       console.error("Error getting user data", e);
     }
 
-    // Determine manual status based on user role
-    const manualStatus =
-      currentUser?.role === "admin" ? "published" : "pending";
-    const newManual = {
-      id: Date.now(), // Generate a unique ID
+    const publishedManual = {
+      ...manual,
       title,
       description: desc,
       category,
       meta: `${category} • ${version || "v1.0"}`,
       tags,
-      views: 0,
-      likes: 0,
-      downloads: 0,
       author: authorName,
-      createdAt: new Date().toISOString().split("T")[0],
       updatedAt: new Date().toISOString().split("T")[0],
-      difficulty: "Beginner", // Default
-      estimatedTime: "10 min", // Default
-      thumbnail: thumbnailUrl, // Add thumbnail URL
-      blocks, // Save blocks directly
-      fileInfo: manualFileName, // Store file information
-      status: manualStatus, // Set status based on user role
+      difficulty: manual.difficulty || "Beginner",
+      estimatedTime: manual.estimatedTime || "10 min",
+      thumbnail: thumbnailUrl || manual.thumbnail,
+      blocks,
+      status: "pending", // Change to pending for admin approval
     };
 
-    // Save to LocalStorage
     try {
-      const existingManuals = JSON.parse(
+      const customManuals = JSON.parse(
         localStorage.getItem("customManuals") || "[]"
       );
-      const updatedManuals = [...existingManuals, newManual];
-      localStorage.setItem("customManuals", JSON.stringify(updatedManuals));
+      const customIndex = customManuals.findIndex(
+        (m) => String(m.id) === String(editId) || m.id === parseInt(editId)
+      );
 
-      console.log("Manual saved:", newManual);
+      if (customIndex !== -1) {
+        customManuals[customIndex] = publishedManual;
+      } else {
+        customManuals.push(publishedManual);
+      }
 
-      // Dispatch custom event to notify other components
+      localStorage.setItem("customManuals", JSON.stringify(customManuals));
       window.dispatchEvent(new Event("manualUpdated"));
 
-      // Notify admins if manual is pending
-      if (manualStatus === "pending") {
-        const allUsers = getAllUsers();
-        const admins = allUsers.filter((u) => u.role === "admin");
-        admins.forEach((admin) => {
-          addNotification({
-            userId: admin.id,
-            message: `New manual pending approval: "${title}" by ${authorName}`,
-            type: "info",
-            link: "/admin-dashboard",
-          });
-        });
-      }
-
-      // Role-based navigation
-      if (currentUser?.role === "admin") {
-        showAlert(
-          "Manual published successfully! Redirecting to manual page...",
-          "success"
-        );
-        setTimeout(() => {
-          navigate(`/manual/${newManual.id}`);
-        }, 1000);
-      } else {
-        showAlert(
-          "Manual created successfully and submitted for approval! Redirecting to dashboard...",
-          "success"
-        );
-        setTimeout(() => {
-          navigate("/creator-dashboard");
-        }, 1000);
-      }
+      showAlert(
+        t("editDraft.publishSuccess") ||
+          "Draft published successfully! Waiting for admin approval...",
+        "success"
+      );
+      setTimeout(() => {
+        navigate("/creator-dashboard");
+      }, 1000);
     } catch (error) {
-      console.error("Error saving manual:", error);
-      showAlert("Failed to save manual", "error");
+      console.error("Error publishing draft:", error);
+      showAlert(
+        t("editDraft.publishError") || "Failed to publish draft",
+        "error"
+      );
     }
   };
 
   const getBlockTextareaClass = (block) => {
     let classes = "block-input";
-    if (block.type === "heading") {
-      classes += " block-heading";
-    } else if (block.type === "quote") {
-      classes += " block-quote";
-    } else if (block.type === "code") {
-      classes += " block-code";
-    }
+    if (block.type === "heading") classes += " block-heading";
+    else if (block.type === "quote") classes += " block-quote";
+    else if (block.type === "code") classes += " block-code";
     return classes;
   };
+
   const renderImageBlock = (block) => {
-    // Check if imageUrl is valid (not a stale blob URL)
     const isValidUrl =
       block.imageUrl &&
       (block.imageUrl.startsWith("data:") ||
@@ -329,9 +433,7 @@ const CreateManual = () => {
               alt="Preview"
               className="image-preview-img"
               onError={(e) => {
-                // Handle broken image gracefully
                 e.target.style.display = "none";
-                console.warn("Failed to load image:", block.imageUrl);
               }}
             />
             <div className="image-controls">
@@ -395,6 +497,33 @@ const CreateManual = () => {
     );
   };
 
+  if (isLoading) {
+    return (
+      <div className="root">
+        <div className="page">
+          <div className="loading-state">
+            <h2>{t("editDraft.loading") || "Loading draft..."}</h2>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!manual) {
+    return (
+      <div className="root">
+        <div className="page">
+          <div className="error-state">
+            <h2>{t("editDraft.notFound") || "Draft not found"}</h2>
+            <button onClick={() => navigate("/creator-dashboard")}>
+              {t("editDraft.backToDashboard") || "Back to Dashboard"}
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="root">
       <div className="page">
@@ -422,7 +551,6 @@ const CreateManual = () => {
                   block.showToolbar ? "block-show-toolbar" : ""
                 }`}
               >
-                {/* plus button */}
                 <button
                   type="button"
                   className="block-plus"
@@ -431,7 +559,6 @@ const CreateManual = () => {
                   +
                 </button>
 
-                {/* toolbar */}
                 <div className="block-toolbar">
                   <button
                     type="button"
@@ -468,7 +595,7 @@ const CreateManual = () => {
                     onClick={() => changeBlockType(block.id, "code")}
                   >
                     {"{ }"}
-                  </button>{" "}
+                  </button>
                   <button
                     type="button"
                     className={`toolbar-btn ${
@@ -493,7 +620,6 @@ const CreateManual = () => {
                   </button>
                 </div>
 
-                {/* textarea */}
                 {block.type === "image" ? (
                   renderImageBlock(block)
                 ) : (
@@ -527,10 +653,14 @@ const CreateManual = () => {
         {/* RIGHT: META PANEL */}
         <aside className="meta-panel">
           <div className="meta-card">
-            <div className="meta-title">Manual details</div>
-            <div className="meta-caption">
-              กำหนดหมวดใหญ่ แท็ก และไฟล์คู่มือจริง
+            <div className="meta-title">
+              {t("editDraft.draftDetails") || "Draft Details"}
             </div>
+            <div className="meta-caption">
+              {t("editDraft.draftCaption") ||
+                "Configure your draft before publishing"}
+            </div>
+
             {/* Thumbnail */}
             <div className="meta-field-label">Thumbnail</div>
             {thumbnailUrl && (
@@ -557,6 +687,7 @@ const CreateManual = () => {
               />
               {thumbName ? thumbName : "Click to upload thumbnail"}
             </label>
+
             {/* Category */}
             <div className="meta-field-label">Category (หมวดใหญ่)</div>
             <select
@@ -571,6 +702,7 @@ const CreateManual = () => {
               <option>Operations</option>
               <option>Customer Support</option>
             </select>
+
             {/* Tags */}
             <div className="meta-field-label">Tags</div>
             <input
@@ -595,6 +727,7 @@ const CreateManual = () => {
                 </span>
               )}
             </div>
+
             {/* Version + Language */}
             <div className="meta-row">
               <div>
@@ -618,6 +751,7 @@ const CreateManual = () => {
                 </select>
               </div>
             </div>
+
             {/* Manual file upload */}
             <div className="meta-field-label" style={{ marginTop: 10 }}>
               Manual file (PDF / DOCX / ZIP)
@@ -630,47 +764,56 @@ const CreateManual = () => {
                 onChange={handleManualFileChange}
               />
               {manualFileName
-                ? `📎 ${
-                    typeof manualFileName === "object"
-                      ? manualFileName.name
-                      : manualFileName
-                  }`
+                ? `📎 ${manualFileName}`
                 : "📎 Upload manual file"}
-            </label>{" "}
-            {manualFileName && typeof manualFileName === "object" && (
-              <div
-                style={{
-                  fontSize: "11px",
-                  color: "var(--text-muted)",
-                  marginTop: "4px",
-                }}
-              >
-                {(manualFileName.size / 1024).toFixed(1)} KB •{" "}
-                {manualFileName.type || "Unknown type"}
-              </div>
-            )}
+            </label>
+
             <p className="meta-note">
               เนื้อหาในหน้านี้เป็นเพียงเกริ่นนำและตัวอย่างบางส่วน
               ผู้ใช้สามารถกดดาวน์โหลดไฟล์ด้านบนเพื่ออ่านคู่มือฉบับเต็มได้
             </p>
+
+            {/* Action Buttons for Draft */}
             <div style={{ display: "flex", gap: "8px", marginTop: "16px" }}>
               <button
                 type="button"
                 className="draft-btn"
-                onClick={handleSaveDraft}
+                onClick={handleUpdateDraft}
+                style={{
+                  flex: 1,
+                  padding: "10px 16px",
+                  borderRadius: "8px",
+                  border: "1px solid var(--border)",
+                  background: "transparent",
+                  color: "var(--text)",
+                  cursor: "pointer",
+                  fontSize: "14px",
+                  fontWeight: 500,
+                }}
               >
-                💾 Draft
+                💾 {t("editDraft.updateDraft") || "Update Draft"}
               </button>
               <button
                 type="button"
                 className="publish-btn"
-                onClick={handleSubmit}
-                style={{ flex: 1 }}
+                onClick={handlePublishDraft}
+                style={{
+                  flex: 1,
+                  padding: "10px 16px",
+                  borderRadius: "8px",
+                  background: "linear-gradient(135deg, #10b981, #059669)",
+                  color: "#ffffff",
+                  border: "none",
+                  cursor: "pointer",
+                  fontSize: "14px",
+                  fontWeight: 600,
+                  boxShadow: "0 4px 12px rgba(16, 185, 129, 0.3)",
+                }}
               >
-                Publish
+                📤 {t("editDraft.publishDraft") || "Publish"}
               </button>
             </div>
-          </div>{" "}
+          </div>
         </aside>
       </div>
 
@@ -686,4 +829,4 @@ const CreateManual = () => {
   );
 };
 
-export default CreateManual;
+export default EditDraft;

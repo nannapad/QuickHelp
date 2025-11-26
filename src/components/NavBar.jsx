@@ -4,13 +4,18 @@ import { useState, useEffect } from "react";
 import "./css/NavBar.css";
 import Logo from "../assets/logo.svg";
 import LanguageSwitcher from "./LanguageSwitcher";
+import NotificationDropdown from "./NotificationDropdown";
+import ProfileAvatar from "./ProfileAvatar";
 import { useTranslation } from "../utils/translations";
+import { getUnreadCountForUser } from "../utils/notifications";
 
 const NavBar = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState(null);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [showSidebar, setShowSidebar] = useState(false);
   const { t } = useTranslation();
   const navigate = useNavigate(); // Check authentication status on component mount and when auth changes
   useEffect(() => {
@@ -45,24 +50,19 @@ const NavBar = () => {
       window.removeEventListener("authStateChanged", handleAuthChange);
     };
   }, []);
-
   // Notification count effect
   useEffect(() => {
     const updateUnread = () => {
       try {
-        if (!user) {
+        if (!user || !user.id) {
           setUnreadCount(0);
           return;
         }
-        // Get notifications from localStorage (for now)
-        const itemsRaw = localStorage.getItem("quickhelp_notifications");
-        const items = itemsRaw ? JSON.parse(itemsRaw) : [];
-        const count = items.filter(
-          (n) =>
-            n.toRoles.includes(user.role) && !(n.readBy || []).includes(user.id)
-        ).length;
+        // Use the notification utility to get unread count
+        const count = getUnreadCountForUser(user.id);
         setUnreadCount(count);
       } catch (err) {
+        console.error("Error updating notification count:", err);
         setUnreadCount(0);
       }
     };
@@ -102,6 +102,7 @@ const NavBar = () => {
       // Update state
       setIsLoggedIn(false);
       setUser(null);
+      setShowSidebar(false); // Close sidebar on logout
 
       // Dispatch custom event to notify other components
       window.dispatchEvent(new Event("authStateChanged"));
@@ -115,16 +116,142 @@ const NavBar = () => {
       localStorage.removeItem("authToken");
       setIsLoggedIn(false);
       setUser(null);
+      setShowSidebar(false);
       navigate("/");
     }
   };
 
+  const closeSidebar = () => {
+    setShowSidebar(false);
+  };
+
   return (
     <header className="nav">
+      {/* Mobile Hamburger Menu */}
+      <button
+        className="hamburger-menu"
+        onClick={() => setShowSidebar(!showSidebar)}
+        aria-label="Toggle menu"
+      >
+        <span className="hamburger-line"></span>
+        <span className="hamburger-line"></span>
+        <span className="hamburger-line"></span>
+      </button>
+      {/* Sidebar Overlay */}
+      {showSidebar && (
+        <div className="sidebar-overlay" onClick={closeSidebar}></div>
+      )}
+      {/* Mobile Sidebar */}
+      <aside className={`mobile-sidebar ${showSidebar ? "open" : ""}`}>
+        <div className="sidebar-header">
+          <h3 className="sidebar-title">Menu</h3>
+          <button className="sidebar-close" onClick={closeSidebar}>
+            ✕
+          </button>
+        </div>
+
+        <nav className="sidebar-nav">
+          {/* Create Manual Button - First in sidebar for creators/admins */}
+          {isLoggedIn &&
+            user &&
+            (user.role === "admin" || user.role === "creator") && (
+              <Link
+                to="/create-manual"
+                className="sidebar-create-btn"
+                onClick={closeSidebar}
+              >
+                <span className="create-icon">+</span>
+                {t("nav.createManual")}
+              </Link>
+            )}
+
+          {/* Navigation Links */}
+          <Link to="/feed" className="sidebar-link" onClick={closeSidebar}>
+            <span className="sidebar-icon">📰</span>
+            {t("nav.feed")}
+          </Link>
+          <Link to="/about" className="sidebar-link" onClick={closeSidebar}>
+            <span className="sidebar-icon">ℹ️</span>
+            {t("nav.about")}
+          </Link>
+          <Link to="/faq" className="sidebar-link" onClick={closeSidebar}>
+            <span className="sidebar-icon">❓</span>
+            {t("nav.faq")}
+          </Link>
+
+          {/* Separator */}
+          {isLoggedIn && <div className="sidebar-separator"></div>}
+
+          {/* User-specific links */}
+          {isLoggedIn && (
+            <>
+              {user && (user.role === "admin" || user.role === "creator") && (
+                <Link
+                  to="/dashboard"
+                  className="sidebar-link"
+                  onClick={closeSidebar}
+                >
+                  <span className="sidebar-icon">📊</span>
+                  Dashboard
+                </Link>
+              )}
+
+              <Link
+                to="/profile"
+                className="sidebar-link"
+                onClick={closeSidebar}
+              >
+                <span className="sidebar-icon">👤</span>
+                {t("nav.profile")}
+              </Link>
+
+              <Link
+                to="/settings"
+                className="sidebar-link"
+                onClick={closeSidebar}
+              >
+                <span className="sidebar-icon">⚙️</span>
+                {t("nav.settings")}
+              </Link>
+
+              {user && user.role !== "admin" && user.role !== "creator" && (
+                <Link
+                  to="/creator-request"
+                  className="sidebar-link"
+                  onClick={closeSidebar}
+                >
+                  <span className="sidebar-icon">✍️</span>
+                  {t("nav.creatorRequest")}
+                </Link>
+              )}
+
+              <div className="sidebar-separator"></div>
+
+              <button
+                onClick={() => {
+                  handleLogout();
+                  closeSidebar();
+                }}
+                className="sidebar-link sidebar-logout"
+              >
+                <span className="sidebar-icon">🚪</span>
+                {t("nav.logout")}
+              </button>
+            </>
+          )}
+
+          {!isLoggedIn && (
+            <Link to="/login" className="sidebar-link" onClick={closeSidebar}>
+              <span className="sidebar-icon">🔐</span>
+              {t("nav.login")}
+            </Link>
+          )}
+        </nav>
+      </aside>
       <div className="nav-left">
         <Link to="/" className="logo">
           <img src={Logo} alt="QuickHelp Logo" className="logo-image" />
-          QuickHelp
+          uickHelp
         </Link>
         <nav className="nav-links">
           <ul>
@@ -145,27 +272,46 @@ const NavBar = () => {
             </li>
           </ul>
         </nav>
-      </div>
-
+      </div>{" "}
       <div className="nav-right">
         <nav className="nav-links">
           <ul>
+            {/* Create manual button for Creator and Admin - visible in navbar */}
+            {isLoggedIn &&
+              user &&
+              (user.role === "admin" || user.role === "creator") && (
+                <li>
+                  <Link to="/create-manual">
+                    <Button className="btn-create-manual">
+                      <span className="create-icon">+</span>
+                      {t("nav.createManual")}
+                    </Button>
+                  </Link>
+                </li>
+              )}
             {/* Only show notifications if user is logged in */}
             {isLoggedIn && (
-              <li>
-                <Button className="notif-btn" title={t("nav.notifications")}>
+              <li className="notif-container">
+                <Button
+                  className="notif-btn"
+                  title={t("nav.notifications")}
+                  onClick={() => setShowNotifications(!showNotifications)}
+                >
                   🔔
                   {unreadCount > 0 && (
                     <span className="notif-badge">{unreadCount}</span>
                   )}
                 </Button>
+                <NotificationDropdown
+                  user={user}
+                  isOpen={showNotifications}
+                  onClose={() => setShowNotifications(false)}
+                />
               </li>
             )}
-
             <li>
               <LanguageSwitcher />
             </li>
-
             <li>
               <Button
                 className="btn-theme"
@@ -174,8 +320,7 @@ const NavBar = () => {
               >
                 {isDarkMode ? "☀️" : "🌙"}
               </Button>
-            </li>
-
+            </li>{" "}
             {/* Show login button or profile based on auth status */}
             {isLoggedIn ? (
               <li className="profile-dropdown">
@@ -183,22 +328,14 @@ const NavBar = () => {
                   className="btn-profile"
                   title={`Profile: ${user?.username || "User"}`}
                 >
-                  👤
-                </Button>
-
+                  <ProfileAvatar user={user} size="small" />
+                </Button>{" "}
                 <div className="profile-menu">
+                  {/* Dashboard link for Creator and Admin */}
                   {user &&
                     (user.role === "admin" || user.role === "creator") && (
                       <Link to="/dashboard" className="profile-menu-item">
                         Dashboard
-                      </Link>
-                    )}
-
-                  {/* Create manual button for Creator and Admin */}
-                  {user &&
-                    (user.role === "admin" || user.role === "creator") && (
-                      <Link to="/create-manual" className="profile-menu-item">
-                        Create Manual
                       </Link>
                     )}
 

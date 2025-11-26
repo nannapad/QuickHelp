@@ -1,63 +1,128 @@
-// src/pages/About.jsx  (หรือจะใส่ไว้โฟลเดอร์ components ก็ได้)
 import React from "react";
-import styles from "./css/About.module.css";
+import "./css/About.css";
 
 const About = () => {
   return (
-    <div className={styles.page}>
-      <div className={styles.card}>
-        <h1 className={styles.title}>About QuickHelp</h1>
+    <div className="page">
+      <div className="container">
+        <header className="header">
+          <h1 className="title">About QuickHelp</h1>{" "}
+          <p className="lead">
+            <strong>QuickHelp</strong> is a first-semester capstone project for{" "}
+            <span className="highlight">
+              Computer Science and Innovation (CSI) Year 2
+            </span>{" "}
+            students, focusing primarily on <strong>Frontend</strong> web
+            development.
+          </p>
+        </header>
 
-        <p className={styles.lead}>
-          <strong>QuickHelp</strong> เป็นโปรเจคจบเทอมแรกของสาขา
-          <span className={styles.highlight}>
+        <div className="grid">
+          <section className="card">
+            <div className="card-icon">🎯</div>
+            <h2 className="card-title">Project Objective</h2>
+            <p className="card-text">
+              This project is designed as a platform to help users quickly find
+              answers, short explanations, and basic user guides. We focus on
+              web structure and user experience (UI/UX) design.
+            </p>{" "}
+          </section>
+
+          <section className="card">
+            <div className="card-icon">🚀</div>
+            <h2 className="card-title">What We Focus On</h2>
+            <ul className="list">
+              <li>Web page layout design</li>
+              <li>React component management</li>
+              <li>CSS Module implementation for modular styling</li>
+              <li>Creating user-friendly and visually appealing interfaces</li>
+              <li>Responsive design for all device sizes</li>
+            </ul>{" "}
+          </section>
+
+          <section className="card">
+            <div className="card-icon">⚡</div>
+            <h2 className="card-title">Key Features</h2>
+            <ul className="list">
+              <li>📚 Manual browsing and searching</li>
+              <li>👤 User authentication and profiles</li>
+              <li>✍️ Content creation for approved users</li>
+              <li>🏷️ Categorization and tagging system</li>
+              <li>🌍 Multi-language support (EN/TH)</li>
+              <li>🌓 Dark/Light theme toggle</li>
+            </ul>{" "}
+          </section>
+
+          <section className="card">
+            <div className="card-icon">🔧</div>
+            <h2 className="card-title">Technology Stack</h2>
+            <div className="tech-stack">
+              <span className="tech">React</span>
+              <span className="tech">CSS Modules</span>
+              <span className="tech">React Router</span>
+              <span className="tech">Local Storage</span>
+              <span className="tech">Responsive Design</span>
+            </div>{" "}
+          </section>
+
+          <section className="card">
+            <div className="card-icon">📋</div>
+            <h2 className="card-title">Project Scope</h2>
+            <p className="card-text">
+              As a first-semester project, we haven't delved deep into{" "}
+              <strong>Backend</strong> development or <strong>Database</strong>{" "}
+              management yet. The system is not connected to a real database.{" "}
+            </p>
+            <p className="card-text">
+              All data displayed on the website is currently{" "}
+              <strong>mock data</strong> used for testing and demonstrating the
+              web functionality.
+            </p>{" "}
+          </section>
+
+          <section className="card">
+            <div className="card-icon">🎓</div>
+            <h2 className="card-title">Learning Goals</h2>
+            <p className="card-text">
+              The main goal of this project is to practice designing and
+              building websites with clear structure, professional appearance,
+              and understanding user flow from a user perspective.
+            </p>
+            <div className="goals">
+              <div className="goal">
+                <span className="goal-icon">✅</span>
+                Master React component architecture
+              </div>
+              <div className="goal">
+                <span className="goal-icon">✅</span>
+                Implement modern CSS techniques
+              </div>
+              <div className="goal">
+                <span className="goal-icon">✅</span>
+                Create responsive user interfaces
+              </div>
+              <div className="goal">
+                <span className="goal-icon">✅</span>
+                Understand user experience principles
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <footer className="footer">
+          <div className="footer-content">
             {" "}
-            Computer Science and Innovation (CSI) ปี 2
-          </span>{" "}
-          ที่เน้นการพัฒนาเว็บฝั่ง <strong>Frontend</strong> เป็นหลัก
-        </p>
-
-        <section className={styles.section}>
-          <h2 className={styles.sectionTitle}>Project Objective</h2>
-          <p className={styles.text}>
-            โปรเจคนี้ออกแบบให้เป็นแพลตฟอร์มสำหรับช่วยผู้ใช้ค้นหา
-            คำตอบ/คำอธิบายแบบสั้น ๆ และอ่านคู่มือการใช้งานเบื้องต้น
-            โดยโฟกัสที่โครงสร้างหน้าเว็บและประสบการณ์ใช้งานของผู้ใช้ (UI/UX)
-          </p>
-        </section>
-
-        <section className={styles.section}>
-          <h2 className={styles.sectionTitle}>What we focus on</h2>
-          <ul className={styles.list}>
-            <li>การออกแบบ Layout ของหน้าเว็บ</li>
-            <li>การจัดการ Component บน React</li>
-            <li>การใช้ CSS Module แยกสไตล์ตามหน้า/คอมโพเนนต์</li>
-            <li>การทำให้หน้าเว็บใช้งานง่ายและอ่านสบายตา</li>
-          </ul>
-        </section>
-
-        <section className={styles.section}>
-          <h2 className={styles.sectionTitle}>Project Scope</h2>
-          <p className={styles.text}>
-            เนื่องจากเป็นโปรเจคช่วงเทอมแรก
-            ที่ยังไม่ได้ลงลึกเรื่องการทำงานฝั่ง <strong>Backend</strong>{" "}
-            หรือการจัดการ <strong>Database</strong>{" "}
-            ระบบจึงยังไม่ได้เชื่อมต่อฐานข้อมูลจริง
-          </p>
-          <p className={styles.text}>
-            ข้อมูลต่าง ๆ ที่แสดงในเว็บไซต์ตอนนี้เป็นเพียง{" "}
-            <strong>mock data</strong> สำหรับใช้ทดสอบและสาธิตการทำงานของหน้าเว็บ
-          </p>
-        </section>
-
-        <section className={styles.section}>
-          <h2 className={styles.sectionTitle}>Goal</h2>
-          <p className={styles.text}>
-            เป้าหมายหลักของโปรเจคนี้คือการฝึกออกแบบและสร้างเว็บไซต์
-            ให้มีโครงสร้างชัดเจน ดูเป็นมืออาชีพ
-            และเข้าใจโฟลว์การใช้งานในมุมมองของผู้ใช้
-          </p>
-        </section>
+            <p className="footer-text">
+              Built with ❤️ by CSI Year 2 students as a learning project
+            </p>
+            <div className="footer-note">
+              <small>
+                This is a demonstration project for educational purposes. All
+                data is simulated for testing functionality.
+              </small>
+            </div>
+          </div>
+        </footer>
       </div>
     </div>
   );

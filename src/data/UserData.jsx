@@ -1,25 +1,3 @@
-// Load users from localStorage or use default data
-const getStoredUsers = () => {
-  try {
-    const stored = localStorage.getItem("quickhelp_users");
-    if (stored) {
-      return JSON.parse(stored);
-    }
-  } catch (error) {
-    console.error("Error loading users from localStorage:", error);
-  }
-  return defaultUsers;
-};
-
-// Save users to localStorage
-const saveUsersToStorage = (updatedUsers) => {
-  try {
-    localStorage.setItem("quickhelp_users", JSON.stringify(updatedUsers));
-  } catch (error) {
-    console.error("Error saving users to localStorage:", error);
-  }
-};
-
 // Default user data for the application
 const defaultUsers = [
   {
@@ -164,6 +142,39 @@ const defaultUsers = [
   },
 ];
 
+// Load users from localStorage or use default data
+const getStoredUsers = () => {
+  try {
+    const stored = localStorage.getItem("quickhelp_users");
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      console.log("Loaded users from localStorage:", parsed.length, "users");
+      return parsed;
+    } else {
+      // First time - save default users to localStorage
+      console.log(
+        "No users in localStorage, initializing with",
+        defaultUsers.length,
+        "default users"
+      );
+      localStorage.setItem("quickhelp_users", JSON.stringify(defaultUsers));
+      return defaultUsers;
+    }
+  } catch (error) {
+    console.error("Error loading users from localStorage:", error);
+    return defaultUsers;
+  }
+};
+
+// Save users to localStorage
+const saveUsersToStorage = (updatedUsers) => {
+  try {
+    localStorage.setItem("quickhelp_users", JSON.stringify(updatedUsers));
+  } catch (error) {
+    console.error("Error saving users to localStorage:", error);
+  }
+};
+
 // Initialize users from localStorage
 let users = getStoredUsers();
 
@@ -299,12 +310,40 @@ export const getUsersByRole = (role) => {
   return users.filter((user) => user.role === role);
 };
 
-// Authentication helper
-export const authenticateUser = (email, password) => {
+// Authentication helper - supports both email and username
+export const authenticateUser = (emailOrUsername, password) => {
   // In a real app, this would check against hashed passwords
   // For demo purposes, we'll accept any password for existing users
-  const user = getUserByEmail(email);
+
+  console.log("Authenticating user:", emailOrUsername);
+  const allUsers = getStoredUsers();
+  console.log("Available users:", allUsers);
+  console.log("Available users count:", allUsers.length);
+  console.log(
+    "User details:",
+    JSON.stringify(
+      allUsers.map((u) => ({
+        id: u.id,
+        username: u.username,
+        email: u.email,
+        isActive: u.isActive,
+      })),
+      null,
+      2
+    )
+  );
+
+  // Try to find user by email first, then by username
+  let user = getUserByEmail(emailOrUsername);
+  console.log("User by email:", user);
+
+  if (!user) {
+    user = getUserByUsername(emailOrUsername);
+    console.log("User by username:", user);
+  }
+
   if (user && user.isActive) {
+    console.log("User found and active:", user.username);
     // Update login stats
     const updatedUser = updateUserLogin(user.id);
     return {
@@ -313,6 +352,10 @@ export const authenticateUser = (email, password) => {
       token: `demo-token-${user.id}-${Date.now()}`,
     };
   }
+
+  console.log("Authentication failed - user not found or inactive");
+  console.log("Searched for:", emailOrUsername);
+  console.log("User object:", user);
   return {
     success: false,
     message: "Invalid credentials or inactive account",
@@ -341,40 +384,17 @@ export const getAllUsers = () => {
   return getStoredUsers();
 };
 
-// Mock data for creator requests
-const defaultCreatorRequests = [
-  {
-    id: 1,
-    userId: 4,
-    name: "Alex Johnson",
-    department: "Marketing",
-    reason: "Need to create manuals for new marketing campaigns",
-    status: "pending",
-    createdAt: "2024-11-20T10:30:00Z",
-  },
-  {
-    id: 2,
-    userId: 5,
-    name: "Sam Smith",
-    department: "Sales",
-    reason: "Documenting sales processes",
-    status: "pending",
-    createdAt: "2024-11-21T14:15:00Z",
-  },
-  {
-    id: 3,
-    userId: 6,
-    name: "Jordan Lee",
-    department: "HR",
-    reason: "Updating employee handbook",
-    status: "approved",
-    createdAt: "2024-11-18T09:00:00Z",
-  },
-];
-
+// Get creator requests from localStorage
 export const getCreatorRequests = () => {
-  // In a real app, this would fetch from an API or database
-  return defaultCreatorRequests;
+  try {
+    const stored = localStorage.getItem("quickhelp_creator_requests");
+    if (stored) {
+      return JSON.parse(stored);
+    }
+  } catch (error) {
+    console.error("Error loading creator requests:", error);
+  }
+  return [];
 };
 
 export default users;

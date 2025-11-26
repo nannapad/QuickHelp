@@ -19,6 +19,8 @@
   gap: 12px;
   margin-bottom: 16px;
   flex-wrap: wrap;
+  position: relative;
+  z-index: 1;
 }
 
 .profile-user {
@@ -404,7 +406,6 @@ body.dark .profile-status.active {
   background: rgba(34, 197, 94, 0.2);
   color: #22c55e;
 }
-
 
 /* Security section */
 .profile-security-row {

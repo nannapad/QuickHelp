@@ -1,23 +1,52 @@
 // src/pages/ManualDetail.jsx
 import React, { useMemo, useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import styles from "./css/ManualDetail.module.css";
+import { useAlertModal } from "../hooks/useAlertModal";
+import AlertModal from "../components/AlertModal";
+import "./css/ManualDetail.css";
+import ErrorBoundary from "../components/ErrorBoundary";
 
 import manuals from "../data/ManualData";
-import commentsData from "../data/CommentData";
+import commentsData from "../data/CommentData.js";
+import { getSafeImageUrl } from "../utils/cleanupBlobUrls";
+import {
+  getEnhancedManual,
+  incrementViews,
+  toggleLike,
+  incrementDownloads,
+  toggleBookmark,
+  getManualStats,
+} from "../utils/manualInteractions";
 
 const ManualDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [liked, setLiked] = useState(false);
   const [bookmarked, setBookmarked] = useState(false);
+  const [manualViews, setManualViews] = useState(0);
+  const [manualLikes, setManualLikes] = useState(0);
   const [selectedVersion, setSelectedVersion] = useState("");
   const [currentUser, setCurrentUser] = useState(null);
+  const [newComment, setNewComment] = useState("");
+  const [isSubmittingComment, setIsSubmittingComment] = useState(false);
+  const [localComments, setLocalComments] = useState([]);
+  const [refreshKey, setRefreshKey] = useState(0);
+  const [editingCommentId, setEditingCommentId] = useState(null);
+  const [editingCommentText, setEditingCommentText] = useState("");
+  const { modalState, showAlert, showConfirm, hideAlert } = useAlertModal();
 
   const manual = useMemo(() => {
     if (!manuals || manuals.length === 0) return null;
-    return manuals.find((m) => String(m.id) === String(id)) || manuals[0];
-  }, [id]);
+
+    // Combine static manuals with custom manuals from localStorage
+    const customManuals = JSON.parse(
+      localStorage.getItem("customManuals") || "[]"
+    );
+    // customManuals first so edited versions override static ones
+    const allManuals = [...customManuals, ...manuals];
+
+    return allManuals.find((m) => String(m.id) === String(id)) || allManuals[0];
+  }, [id, refreshKey]);
 
   // Check if current user can edit this manual
   const canEdit = useMemo(() => {
@@ -36,18 +65,47 @@ const ManualDetail = () => {
 
     return false;
   }, [currentUser, manual]);
-
   useEffect(() => {
     // Get current user from localStorage
     const userData = localStorage.getItem("userData");
     if (userData) {
       try {
-        setCurrentUser(JSON.parse(userData));
+        const user = JSON.parse(userData);
+        setCurrentUser(user);
+
+        // Initialize like and bookmark status for current user
+        if (id) {
+          setLiked(isLikedByUser(id, user.id));
+          setBookmarked(isBookmarkedByUser(id, user.id));
+        }
       } catch (error) {
         console.error("Error parsing user data:", error);
       }
     }
-  }, []);
+
+    // Increment view count once when manual loads
+    if (id) {
+      const viewCount = incrementViews(id);
+      const stats = getManualStats(id);
+      setManualViews(viewCount);
+      setManualLikes(stats.likes || 0);
+    }
+
+    // Listen for localStorage changes to refresh manual data
+    const handleStorageChange = () => {
+      setRefreshKey((prev) => prev + 1);
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+    // Also listen for custom event when editing in the same tab
+    window.addEventListener("manualUpdated", handleStorageChange);
+
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+      window.removeEventListener("manualUpdated", handleStorageChange);
+    };
+  }, [id]);
+
   useEffect(() => {
     if (manual && manual.versions && manual.versions.length > 0) {
       // Default to the first version (usually latest) if not set
@@ -60,10 +118,17 @@ const ManualDetail = () => {
       setSelectedVersion(manual.version);
     }
   }, [manual]);
-
   const relatedManuals = useMemo(() => {
     if (!manuals || !manual) return [];
-    return manuals
+
+    // Combine static manuals with custom manuals from localStorage
+    const customManuals = JSON.parse(
+      localStorage.getItem("customManuals") || "[]"
+    );
+    // customManuals first so edited versions override static ones
+    const allManuals = [...customManuals, ...manuals];
+
+    return allManuals
       .filter(
         (m) =>
           m.id !== manual.id &&
@@ -71,25 +136,39 @@ const ManualDetail = () => {
             m.tags?.some((t) => manual.tags?.includes(t)))
       )
       .slice(0, 3);
-  }, [manual]);
-
+  }, [manual, refreshKey]);
   const comments = useMemo(() => {
-    if (!commentsData || !manual) return [];
-    return commentsData.filter((c) => String(c.manualId) === String(manual.id));
-  }, [manual]);
-  const handleLike = () => {
-    setLiked(!liked);
-    // In a real app, this would make an API call
-  };
+    if (!manual) return localComments;
 
+    // Handle case where commentsData might not be loaded
+    const originalComments = commentsData
+      ? commentsData.filter((c) => String(c.manualId) === String(manual.id))
+      : [];
+
+    // Combine original comments with local comments
+    return [...originalComments, ...localComments].sort(
+      (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+    );
+  }, [manual, localComments]);
+
+  const handleLike = () => {
+    if (!currentUser) return;
+    const { isLiked, likes } = toggleLike(id, currentUser.id);
+    setLiked(isLiked);
+    setManualLikes(likes);
+  };
   const handleBookmark = () => {
-    const newState = !bookmarked;
+    if (!currentUser) return;
+    const newState = toggleBookmark(id, currentUser.id);
     setBookmarked(newState);
     if (newState) {
-      alert("Bookmarked! You will be notified when this manual is updated.");
+      showAlert(
+        "Bookmarked! You will be notified when this manual is updated.",
+        "success",
+        "Bookmark Added"
+      );
     }
   };
-
   const handleShare = async () => {
     try {
       if (navigator.share) {
@@ -101,13 +180,14 @@ const ManualDetail = () => {
       } else {
         // Fallback for browsers that don't support Web Share API
         await navigator.clipboard.writeText(window.location.href);
-        alert("Share link copied to clipboard!");
+        showAlert("Share link copied to clipboard!", "success", "Link Copied");
       }
     } catch (error) {
       console.error("Error sharing:", error);
-      alert("Share link copied to clipboard!");
+      showAlert("Share link copied to clipboard!", "success", "Link Copied");
     }
   };
+
   const handleVersionChange = (e) => {
     setSelectedVersion(e.target.value);
     // In a real app, this would likely navigate to a different URL or fetch different data
@@ -120,10 +200,112 @@ const ManualDetail = () => {
     }
   };
 
+  // Helper function to calculate time ago
+  const getTimeAgo = (dateString) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffTime = Math.abs(now - date);
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    const diffHours = Math.floor(diffTime / (1000 * 60 * 60));
+    const diffMinutes = Math.floor(diffTime / (1000 * 60 * 60));
+
+    if (diffDays > 0) {
+      return diffDays === 1 ? "1d ago" : `${diffDays}d ago`;
+    } else if (diffHours > 0) {
+      return diffHours === 1 ? "1h ago" : `${diffHours}h ago`;
+    } else if (diffMinutes > 0) {
+      return diffMinutes === 1 ? "1m ago" : `${diffMinutes}m ago`;
+    } else {
+      return "Just now";
+    }
+  };
+
+  const handleCommentSubmit = async () => {
+    if (!newComment.trim() || !currentUser) return;
+
+    setIsSubmittingComment(true);
+
+    try {
+      // Create new comment object
+      const newCommentObj = {
+        id: Date.now(), // Simple ID generation for demo
+        manualId: parseInt(id),
+        userId: currentUser.id,
+        author: `${currentUser.firstName} ${currentUser.lastName}`,
+        text: newComment.trim(),
+        createdAt: new Date().toISOString().split("T")[0],
+      }; // Add to local comments state
+      setLocalComments((prev) => [newCommentObj, ...prev]);
+      setNewComment("");
+
+      // Show success feedback
+      setTimeout(() => {
+        showAlert("Comment posted successfully!", "success", "Comment Posted");
+      }, 100);
+    } catch (error) {
+      console.error("Error posting comment:", error);
+      showAlert("Failed to post comment. Please try again.", "error", "Error");
+    } finally {
+      setIsSubmittingComment(false);
+    }
+  };
+
+  const handleCommentKeyPress = (e) => {
+    if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
+      handleCommentSubmit();
+    }
+  };
+
+  const handleEditComment = (comment) => {
+    setEditingCommentId(comment.id);
+    setEditingCommentText(comment.text);
+  };
+
+  const handleSaveEdit = (commentId) => {
+    if (!editingCommentText.trim()) {
+      showAlert("Comment cannot be empty", "error", "Error");
+      return;
+    }
+
+    // Update local comments
+    setLocalComments((prev) =>
+      prev.map((c) =>
+        c.id === commentId
+          ? { ...c, text: editingCommentText.trim(), edited: true }
+          : c
+      )
+    );
+
+    setEditingCommentId(null);
+    setEditingCommentText("");
+    showAlert("Comment updated successfully!", "success", "Updated");
+  };
+
+  const handleCancelEdit = () => {
+    setEditingCommentId(null);
+    setEditingCommentText("");
+  };
+
+  const handleDeleteComment = (comment) => {
+    showConfirm(
+      `Delete this comment? This action cannot be undone.`,
+      () => performDeleteComment(comment.id),
+      "danger",
+      "Confirm Deletion",
+      "Delete",
+      "Cancel"
+    );
+  };
+
+  const performDeleteComment = (commentId) => {
+    setLocalComments((prev) => prev.filter((c) => c.id !== commentId));
+    showAlert("Comment deleted successfully!", "success", "Deleted");
+  };
+
   if (!manual) {
     return (
-      <main className={styles.manualPage}>
-        <div className={styles.manualPageInner}>
+      <main className="manualPage">
+        <div className="manualPageInner">
           <p>Manual not found.</p>
         </div>
       </main>
@@ -131,39 +313,38 @@ const ManualDetail = () => {
   }
 
   return (
-    <main className={styles.manualPage}>
-      <div className={styles.manualPageInner}>
+    <main className="manualPage">
+      <div className="manualPageInner">
         {/* BREADCRUMB */}
-        <div className={styles.breadcrumbRow}>
+        <div className="breadcrumbRow">
           <button
-            className={styles.backLink}
+            className="backLink"
             type="button"
             onClick={() => navigate(-1)}
           >
             ← Back
           </button>
 
-          <div className={styles.breadcrumb}>
+          <div className="breadcrumb">
             {manual.category}
             {manual.subCategory ? ` • ${manual.subCategory}` : ""}
             {` • ${manual.title}`}
           </div>
         </div>
 
-        <div className={styles.grid}>
+        <div className="grid">
           {/* LEFT CONTENT */}
-          <article className={styles.left}>
-            {" "}
-            <header className={styles.header}>
-              <div className={styles.topRow}>
-                <h1 className={styles.title}>{manual.title}</h1>
+          <article className="left">
+            <header className="header">
+              <div className="topRow">
+                <h1 className="title">{manual.title}</h1>
 
                 {manual.versions && (
-                  <div className={styles.versionRow}>
-                    <div className={styles.versionWrapper}>
-                      <span className={styles.versionLabel}>Version</span>
+                  <div className="versionRow">
+                    <div className="versionWrapper">
+                      <span className="versionLabel">Version</span>
                       <select
-                        className={styles.versionSelect}
+                        className="versionSelect"
                         value={selectedVersion}
                         onChange={handleVersionChange}
                         aria-label="Select version"
@@ -175,36 +356,33 @@ const ManualDetail = () => {
                         ))}
                       </select>
                     </div>
-                    <div className={styles.versionLine}></div>
+                    <div className="versionLine"></div>
                   </div>
                 )}
               </div>
 
-              <div className={styles.bottomRow}>
-                <div className={styles.authorMetaRow}>
-                  <div className={styles.authorAvatar} title={manual.author}>
+              <div className="bottomRow">
+                <div className="authorMetaRow">
+                  <div className="authorAvatar" title={manual.author}>
                     {manual.author.charAt(0).toUpperCase()}
                   </div>
-                  <div className={styles.authorDetails}>
-                    <div className={styles.authorTop}>
-                      <span className={styles.authorName}>{manual.author}</span>
-                      <span className={styles.metaSeparator}>•</span>
-                      <span className={styles.categoryBadge}>
-                        {manual.category}
-                      </span>
+                  <div className="authorDetails">
+                    <div className="authorTop">
+                      <span className="authorName">{manual.author}</span>
+                      <span className="metaSeparator">•</span>
+                      <span className="categoryBadge">{manual.category}</span>
                     </div>
-                    <div className={styles.authorBottom}>
-                      <span className={styles.metaText}>
+                    <div className="authorBottom">
+                      <span className="metaText">
                         Updated {manual.updatedAt}
                       </span>
                     </div>
                   </div>
-                </div>{" "}
-                <div className={styles.headerActions}>
-                  {" "}
+                </div>
+                <div className="headerActions">
                   {canEdit && (
                     <button
-                      className={`${styles.actionBtn} ${styles.editBtn}`}
+                      className="actionBtn editBtn"
                       onClick={() => navigate(`/edit-manual/${manual.id}`)}
                       title="Edit this manual"
                     >
@@ -212,9 +390,7 @@ const ManualDetail = () => {
                     </button>
                   )}
                   <button
-                    className={`${styles.actionBtn} ${
-                      liked ? styles.liked : ""
-                    }`}
+                    className={`actionBtn ${liked ? "liked" : ""}`}
                     onClick={handleLike}
                     aria-pressed={liked}
                     title={liked ? "Unlike this manual" : "Like this manual"}
@@ -222,9 +398,7 @@ const ManualDetail = () => {
                     {liked ? "Liked" : "Like"}
                   </button>
                   <button
-                    className={`${styles.actionBtn} ${
-                      bookmarked ? styles.bookmarked : ""
-                    }`}
+                    className={`actionBtn ${bookmarked ? "bookmarked" : ""}`}
                     onClick={handleBookmark}
                     aria-pressed={bookmarked}
                     title={
@@ -234,7 +408,7 @@ const ManualDetail = () => {
                     {bookmarked ? "Bookmarked" : "Bookmark"}
                   </button>
                   <button
-                    className={styles.actionBtn}
+                    className="actionBtn"
                     onClick={handleShare}
                     title="Share this manual"
                   >
@@ -243,25 +417,29 @@ const ManualDetail = () => {
                 </div>
               </div>
             </header>
+
             {/* HERO */}
-            <div className={styles.hero}>
-              <div className={styles.heroContent}>
-                <div className={styles.heroTitle}>{manual.description}</div>
-                <div className={styles.heroStats}>
+            <div className="hero">
+              <div className="heroContent">
+                <div className="heroTitle">{manual.description}</div>
+                <div className="heroStats">
                   <span>⏱ {manual.estimatedTime || "10 min"} read</span>
                   <span>•</span>
-                  <span>👁 {manual.views} views</span>
+                  <span>👁 {manualViews} views</span>
                   <span>•</span>
                   <span>★ {manual.difficulty || "Beginner"}</span>
+                  <span>•</span>
+                  <span>👍 {manualLikes} likes</span>
                 </div>
               </div>
             </div>
+
             {/* TOC */}
             {(manual.sections?.length > 0 ||
               manual.blocks?.some((b) => b.type === "heading")) && (
-              <div className={styles.tocContainer}>
-                <h3 className={styles.tocTitle}>Table of Contents</h3>
-                <ul className={styles.tocList}>
+              <div className="tocContainer">
+                <h3 className="tocTitle">Table of Contents</h3>
+                <ul className="tocList">
                   {manual.blocks
                     ? manual.blocks
                         .filter((b) => b.type === "heading")
@@ -282,38 +460,58 @@ const ManualDetail = () => {
                 </ul>
               </div>
             )}
+
             {/* CONTENT SECTIONS */}
-            <div className={styles.contentBody}>
+            <div className="contentBody">
               {manual.blocks ? (
                 manual.blocks.map((block, index) => (
                   <div
                     key={block.id || index}
                     id={`section-${index}`}
-                    className={styles.blockWrapper}
+                    className="blockWrapper"
                   >
                     {block.type === "heading" && (
-                      <h2 className={styles.sectionTitle}>{block.value}</h2>
+                      <h2 className="sectionTitle">{block.value}</h2>
                     )}
                     {block.type === "text" && (
-                      <p className={styles.text}>{block.value}</p>
+                      <p className="text">{block.value}</p>
                     )}
                     {block.type === "quote" && (
-                      <blockquote className={styles.quote}>
-                        {block.value}
-                      </blockquote>
+                      <blockquote className="quote">{block.value}</blockquote>
                     )}
                     {block.type === "code" && (
-                      <pre className={styles.codeBlock}>
+                      <pre className="codeBlock">
                         <code>{block.value}</code>
                       </pre>
-                    )}
+                    )}{" "}
                     {block.type === "image" && (
-                      <div className={styles.imageWrapper}>
-                        <img
-                          src={block.imageUrl || block.value}
-                          alt="Manual content"
-                          className={styles.contentImage}
-                        />
+                      <div className="imageWrapper">
+                        {getSafeImageUrl(block.imageUrl || block.value) ? (
+                          <img
+                            src={getSafeImageUrl(block.imageUrl || block.value)}
+                            alt="Manual content"
+                            className="contentImage"
+                            onError={(e) => {
+                              e.target.style.display = "none";
+                              console.warn(
+                                "Failed to load image:",
+                                block.imageUrl || block.value
+                              );
+                            }}
+                          />
+                        ) : (
+                          <div
+                            style={{
+                              padding: "2rem",
+                              textAlign: "center",
+                              background: "var(--bg-secondary)",
+                              borderRadius: "8px",
+                              color: "var(--text-muted)",
+                            }}
+                          >
+                            📷 Image not available
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
@@ -323,15 +521,15 @@ const ManualDetail = () => {
                   <section
                     key={index}
                     id={`section-${index}`}
-                    className={styles.section}
+                    className="section"
                   >
-                    <h2 className={styles.sectionTitle}>{section.title}</h2>
-                    <p className={styles.text}>{section.content}</p>
+                    <h2 className="sectionTitle">{section.title}</h2>
+                    <p className="text">{section.content}</p>
                   </section>
                 ))
               ) : (
-                <section className={styles.section}>
-                  <p className={styles.text}>
+                <section className="section">
+                  <p className="text">
                     {manual.intro || "No content available for this manual."}
                   </p>
                 </section>
@@ -340,97 +538,228 @@ const ManualDetail = () => {
           </article>
 
           {/* RIGHT SIDEBAR */}
-          <aside className={styles.right}>
+          <aside className="right">
+            {" "}
             {/* DOWNLOAD */}
-            <section className={styles.card}>
-              <h3 className={styles.cardTitle}>Download</h3>
-              <p className={styles.cardDesc}>
-                Get the full PDF version for offline reading.
+            <section className="card">
+              <h3 className="cardTitle">Download</h3>
+              <p className="cardDesc">
+                Get the full {manual.fileInfo ? "version" : "PDF version"} for
+                offline reading.
               </p>
 
               <button
                 type="button"
-                className={`${styles.btn} ${styles.primary} ${styles.full}`}
+                className="btn primary full"
+                onClick={() => {
+                  if (
+                    manual.fileInfo &&
+                    typeof manual.fileInfo === "object" &&
+                    manual.fileInfo.dataUrl
+                  ) {
+                    // Download the actual uploaded file
+                    const link = document.createElement("a");
+                    link.href = manual.fileInfo.dataUrl;
+                    link.download = manual.fileInfo.name;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    showAlert("Download started!", "success", "Downloading");
+                  } else {
+                    showAlert(
+                      "File not available for download",
+                      "warning",
+                      "No File"
+                    );
+                  }
+                }}
               >
-                Download PDF
+                {manual.fileInfo ? "Download File" : "Download PDF"}
               </button>
 
-              <div className={styles.fileInfo}>
-                <span>PDF • 2.4 MB</span>
-                <span>v{selectedVersion || manual.version || "1.0"}</span>
+              <div className="fileInfo">
+                {manual.fileInfo && typeof manual.fileInfo === "object" ? (
+                  <>
+                    <span>
+                      {manual.fileInfo.type?.split("/")[1]?.toUpperCase() ||
+                        "FILE"}{" "}
+                      • {(manual.fileInfo.size / 1024).toFixed(1)} KB
+                    </span>
+                    <span>{manual.fileInfo.name}</span>
+                  </>
+                ) : manual.fileInfo ? (
+                  <>
+                    <span>FILE</span>
+                    <span>{manual.fileInfo}</span>
+                  </>
+                ) : (
+                  <>
+                    <span>PDF • 2.4 MB</span>
+                    <span>v{selectedVersion || manual.version || "1.0"}</span>
+                  </>
+                )}
               </div>
             </section>
-
             {/* TAGS */}
-            <section className={styles.card}>
-              <h3 className={styles.cardTitle}>Tags</h3>
-              <div className={styles.tagsRow}>
+            <section className="card">
+              <h3 className="cardTitle">Tags</h3>
+              <div className="tagsRow">
                 {(manual.tags || []).map((tag) => (
-                  <span key={tag} className={styles.tagChip}>
+                  <span key={tag} className="tagChip">
                     {tag}
                   </span>
                 ))}
               </div>
             </section>
-
             {/* RELATED */}
-            <section className={styles.card}>
-              <h3 className={styles.cardTitle}>Related Manuals</h3>
-              <div className={styles.relatedList}>
+            <section className="card">
+              <h3 className="cardTitle">Related Manuals</h3>
+              <div className="relatedList">
                 {relatedManuals.map((m) => (
                   <button
                     key={m.id}
-                    className={styles.relatedItem}
+                    className="relatedItem"
                     onClick={() => navigate(`/manual/${m.id}`)}
                   >
-                    <div className={styles.relatedTitle}>{m.title}</div>
-                    <div className={styles.relatedMeta}>
+                    <div className="relatedTitle">{m.title}</div>
+                    <div className="relatedMeta">
                       {m.category} • {m.views} views
                     </div>
                   </button>
                 ))}
                 {relatedManuals.length === 0 && (
-                  <div className={styles.empty}>No related manuals found</div>
+                  <div className="empty">No related manuals found</div>
                 )}
               </div>
             </section>
-
             {/* COMMENTS */}
-            <section className={styles.card}>
-              <h3 className={styles.cardTitle}>Comments ({comments.length})</h3>
+            <section className="card">
+              <h3 className="cardTitle">Comments ({comments.length})</h3>
 
-              <div className={styles.commentInputWrapper}>
-                <textarea
-                  className={styles.commentInput}
-                  rows={2}
-                  placeholder="Add a comment..."
-                />
-                <button className={styles.commentSubmitBtn}>Post</button>
-              </div>
+              {currentUser ? (
+                <div className="commentInputWrapper">
+                  <textarea
+                    className="commentInput"
+                    rows={3}
+                    placeholder="Add a comment... (Ctrl+Enter to post)"
+                    value={newComment}
+                    onChange={(e) => setNewComment(e.target.value)}
+                    onKeyPress={handleCommentKeyPress}
+                    disabled={isSubmittingComment}
+                  />
+                  <button
+                    className="commentSubmitBtn"
+                    onClick={handleCommentSubmit}
+                    disabled={!newComment.trim() || isSubmittingComment}
+                  >
+                    {isSubmittingComment ? "Posting..." : "Post"}
+                  </button>
+                </div>
+              ) : (
+                <div className="commentLoginPrompt">
+                  <p>
+                    Please{" "}
+                    <button
+                      onClick={() => navigate("/login")}
+                      className="loginLink"
+                    >
+                      login
+                    </button>{" "}
+                    to add a comment
+                  </p>
+                </div>
+              )}
 
-              <div className={styles.commentList}>
+              <div className="commentList">
                 {comments.map((c) => (
-                  <div key={c.id} className={styles.commentRow}>
-                    <div className={styles.commentAvatar}>
+                  <div key={c.id} className="commentRow">
+                    <div className="commentAvatar">
                       {c.author?.[0]?.toUpperCase()}
                     </div>
-                    <div className={styles.commentContent}>
-                      <div className={styles.commentHeader}>
-                        <span className={styles.commentAuthor}>{c.author}</span>
-                        <span className={styles.commentTime}>2d ago</span>
+                    <div className="commentContent">
+                      <div className="commentHeader">
+                        <span className="commentAuthor">{c.author}</span>
+                        <span className="commentTime">
+                          {getTimeAgo(c.createdAt)}
+                          {c.edited && (
+                            <span className="editedBadge"> (edited)</span>
+                          )}
+                        </span>
+                        {currentUser && c.userId === currentUser.id && (
+                          <div className="commentActions">
+                            <button
+                              className="commentActionBtn"
+                              onClick={() => handleEditComment(c)}
+                              title="Edit comment"
+                            >
+                              ✏️
+                            </button>
+                            <button
+                              className="commentActionBtn deleteBtn"
+                              onClick={() => handleDeleteComment(c)}
+                              title="Delete comment"
+                            >
+                              🗑️
+                            </button>
+                          </div>
+                        )}
                       </div>
-                      <p className={styles.commentText}>{c.text}</p>
+                      {editingCommentId === c.id ? (
+                        <div className="commentEditWrapper">
+                          <textarea
+                            className="commentEditInput"
+                            value={editingCommentText}
+                            onChange={(e) =>
+                              setEditingCommentText(e.target.value)
+                            }
+                            rows={3}
+                            autoFocus
+                          />
+                          <div className="commentEditActions">
+                            <button
+                              className="commentEditSaveBtn"
+                              onClick={() => handleSaveEdit(c.id)}
+                            >
+                              Save
+                            </button>
+                            <button
+                              className="commentEditCancelBtn"
+                              onClick={handleCancelEdit}
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <p className="commentText">{c.text}</p>
+                      )}
                     </div>
                   </div>
                 ))}
                 {comments.length === 0 && (
-                  <div className={styles.empty}>No comments yet</div>
+                  <div className="empty">
+                    No comments yet.{" "}
+                    {currentUser
+                      ? "Be the first to comment!"
+                      : "Login to be the first to comment!"}
+                  </div>
                 )}
               </div>
-            </section>
+            </section>{" "}
           </aside>
         </div>
       </div>
+
+      <AlertModal
+        show={modalState.show}
+        onHide={hideAlert}
+        title={modalState.title}
+        message={modalState.message}
+        variant={modalState.variant}
+        onConfirm={modalState.onConfirm}
+        confirmText={modalState.confirmText}
+        cancelText={modalState.cancelText}
+      />
     </main>
   );
 };
