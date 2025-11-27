@@ -94,10 +94,9 @@ const Settings = () => {
       alert("Error saving settings");
     }
   };
-
-  const handleDeactivateAccount = () => {
+  const handleDeleteAccount = () => {
     const confirmed = confirm(
-      "Are you sure you want to deactivate your account? This action cannot be undone."
+      "Are you sure you want to delete your account? This action cannot be undone and all your data will be permanently removed."
     );
     if (confirmed) {
       // Clear authentication data
@@ -326,21 +325,20 @@ const Settings = () => {
             <p className="settings-card-sub">
               These actions may affect your data access. Please use with
               caution.
-            </p>
-
+            </p>{" "}
             <div className="settings-row">
               <div>
-                <div className="settings-toggle-title">Deactivate account</div>
+                <div className="settings-toggle-title">Delete account</div>
                 <div className="settings-toggle-sub">
-                  Temporarily suspend account usage. You will not be able to
-                  sign in to QuickHelp.
+                  Permanently delete your account and all associated data. This
+                  action cannot be undone.
                 </div>
               </div>
               <button
                 className="settings-btn danger"
-                onClick={handleDeactivateAccount}
+                onClick={handleDeleteAccount}
               >
-                Deactivate
+                Delete Account
               </button>
             </div>
           </section>

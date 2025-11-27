@@ -4,6 +4,7 @@ import { useTranslation } from "../utils/translations";
 import { useAlertModal } from "../hooks/useAlertModal";
 import AlertModal from "../components/AlertModal";
 import { addNotification } from "../utils/notifications";
+import { notifyBookmarkedUsers } from "../utils/manualInteractions";
 import { getAllUsers } from "../data/UserData";
 import manuals from "../data/ManualData";
 import "./css/EditManual.css";
@@ -57,11 +58,14 @@ const EditManual = () => {
           navigate("/creator-dashboard");
           return;
         } // Find the manual to edit from both static and custom manuals
+        // Check custom manuals FIRST so edited versions override static ones
         const customManuals = JSON.parse(
           localStorage.getItem("customManuals") || "[]"
         );
-        // customManuals first so edited versions override static ones
-        const allManuals = [...customManuals, ...manuals];
+        // Filter out static manuals that have been customized (prevent duplicates)
+        const customIds = new Set(customManuals.map((m) => m.id));
+        const staticManuals = manuals.filter((m) => !customIds.has(m.id));
+        const allManuals = [...customManuals, ...staticManuals];
 
         // Handle both string and number IDs
         const manualToEdit = allManuals.find((m) => {
@@ -109,17 +113,15 @@ const EditManual = () => {
           // Extract filename from URL if possible
           const urlParts = manualToEdit.thumbnail.split("/");
           setThumbName(urlParts[urlParts.length - 1]);
-        }
-
-        // Extract version from meta if available
+        } // Extract version from meta if available
         let extractedVersion = "1.0";
-        if (manualToEdit.meta) {
+        if (manualToEdit.version) {
+          extractedVersion = manualToEdit.version;
+        } else if (manualToEdit.meta) {
           const versionMatch = manualToEdit.meta.match(/v(\d+\.\d+)/);
           if (versionMatch) {
             extractedVersion = versionMatch[1];
           }
-        } else if (manualToEdit.version) {
-          extractedVersion = manualToEdit.version;
         }
         setVersion(extractedVersion);
 
@@ -393,16 +395,28 @@ const EditManual = () => {
     } else {
       // Fallback: preserve status
       newStatus = manual.status || "published";
+    } // Preserve original author when admin edits creator's manual
+    const originalAuthor = manual.author || authorName;
+
+    // Track old version for notification purposes
+    const oldVersion = manual.version || "1.0";
+    const normalizedVersion = version?.trim() || manual.version || "1.0";
+
+    // Build version history
+    const existingVersions = manual.versions || [oldVersion];
+    let newVersions = [...existingVersions];
+    if (!existingVersions.includes(normalizedVersion)) {
+      newVersions.push(normalizedVersion);
     }
 
-    // Preserve original author when admin edits creator's manual
-    const originalAuthor = manual.author || authorName;
     const updatedManual = {
       ...manual,
       title,
       description: desc,
       category,
-      meta: `${category} • ${version || "v1.0"}`,
+      version: normalizedVersion,
+      versions: newVersions,
+      meta: `${category} • v${normalizedVersion}`,
       tags,
       author: originalAuthor, // Keep original author
       updatedBy: currentUser
@@ -434,10 +448,16 @@ const EditManual = () => {
         existingManuals.push(updatedManual);
       }
       localStorage.setItem("customManuals", JSON.stringify(existingManuals));
-      console.log("Manual updated:", updatedManual);
-
-      // Dispatch custom event to notify other components
+      console.log("Manual updated:", updatedManual); // Dispatch custom event to notify other components
       window.dispatchEvent(new Event("manualUpdated"));
+
+      // Notify users who bookmarked this manual (only if version changed)
+      if (oldVersion !== normalizedVersion) {
+        console.log(
+          `Version changed from ${oldVersion} to ${normalizedVersion}, notifying bookmarked users`
+        );
+        notifyBookmarkedUsers(editId, title);
+      }
 
       // Notify admins if creator changed status from published to pending
       if (

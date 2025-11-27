@@ -162,12 +162,17 @@ const CreateManual = () => {
     } catch (e) {
       console.error("Error getting user data", e);
     }
+
+    const normalizedVersion = version?.trim() || "1.0";
+
     const newManual = {
       id: Date.now(),
       title,
       description: desc,
       category,
-      meta: `${category} • ${version || "v1.0"}`,
+      version: normalizedVersion,
+      versions: [normalizedVersion],
+      meta: `${category} • v${normalizedVersion}`,
       tags,
       views: 0,
       likes: 0,
@@ -224,17 +229,20 @@ const CreateManual = () => {
       }
     } catch (e) {
       console.error("Error getting user data", e);
-    }
-
-    // Determine manual status based on user role
+    } // Determine manual status based on user role
     const manualStatus =
       currentUser?.role === "admin" ? "published" : "pending";
+
+    const normalizedVersion = version?.trim() || "1.0";
+
     const newManual = {
       id: Date.now(), // Generate a unique ID
       title,
       description: desc,
       category,
-      meta: `${category} • ${version || "v1.0"}`,
+      version: normalizedVersion,
+      versions: [normalizedVersion],
+      meta: `${category} • v${normalizedVersion}`,
       tags,
       views: 0,
       likes: 0,

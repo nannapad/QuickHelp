@@ -216,6 +216,377 @@ const manuals = [
     ],
     versions: ["1.2", "1.1", "1.0"],
   },
+    {
+    id: 7,
+    title: "IT Acceptable Use Policy",
+    category: "IT",
+    meta: "IT • Policy • v1.0",
+    description:
+      "High-level rules for using company devices, networks, and applications in a safe and responsible way.",
+    tags: ["it-policy", "acceptable-use", "security", "devices", "network"],
+    views: 0,
+    likes: 0,
+    downloads: 0,
+    author: "IT Admin",
+    createdAt: "2024-11-27",
+    updatedAt: "2024-11-27",
+    difficulty: "Beginner",
+    estimatedTime: "10 minutes",
+    thumbnail:
+      "https://images.unsplash.com/photo-1518770660439-4636190af475?w=400&h=300&fit=crop",
+    sections: [
+      {
+        title: "1. Scope & Purpose",
+        content:
+          "This policy applies to all employees, contractors, and interns who use company IT resources. It explains why responsible use is important for security and productivity.",
+      },
+      {
+        title: "2. Acceptable Use of Devices & Network",
+        content:
+          "Company laptops, desktops, mobile devices, and Wi‑Fi should be used primarily for business purposes. Users must follow security controls and keep systems updated.",
+      },
+      {
+        title: "3. Prohibited Activities",
+        content:
+          "Employees must not install unlicensed software, disable security tools, access illegal or inappropriate content, share accounts, or attempt to bypass security controls.",
+      },
+    ],
+    versions: ["1.0"],
+  },
+  {
+    id: 8,
+    title: "Password & Multi-Factor Authentication Guidelines",
+    category: "IT",
+    meta: "IT • Security • v1.0",
+    description:
+      "Requirements for strong passwords, password manager usage, and multi-factor authentication on company systems.",
+    tags: ["password", "mfa", "authentication", "security", "accounts"],
+    views: 0,
+    likes: 0,
+    downloads: 0,
+    author: "IT Admin",
+    createdAt: "2024-11-27",
+    updatedAt: "2024-11-27",
+    difficulty: "Beginner",
+    estimatedTime: "15 minutes",
+    thumbnail:
+      "https://images.unsplash.com/photo-1556157382-97eda2d62296?w=400&h=300&fit=crop",
+    sections: [
+      {
+        title: "1. Password Rules",
+        content:
+          "Passwords must be at least 12 characters and include a mix of letters, numbers, and symbols. Do not reuse personal passwords on company systems or share credentials with others.",
+      },
+      {
+        title: "2. Password Manager & Storage",
+        content:
+          "Employees should use the approved password manager to store and generate unique passwords. Passwords should never be written on paper or stored in plain-text files.",
+      },
+      {
+        title: "3. Multi-Factor Authentication (MFA)",
+        content:
+          "MFA must be enabled on email, VPN, and all critical systems where available. Users should register at least one primary method (authenticator app) and one backup method.",
+      },
+    ],
+    versions: ["1.0"],
+  },
+  {
+    id: 9,
+    title: "Information Security & Data Classification",
+    category: "IT",
+    meta: "IT • Security • v1.0",
+    description:
+      "How to classify company information and handle each data type safely and consistently.",
+    tags: ["information-security", "data", "classification", "confidential"],
+    views: 0,
+    likes: 0,
+    downloads: 0,
+    author: "IT Admin",
+    createdAt: "2024-11-27",
+    updatedAt: "2024-11-27",
+    difficulty: "Intermediate",
+    estimatedTime: "20 minutes",
+    thumbnail:
+      "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&h=300&fit=crop",
+    sections: [
+      {
+        title: "1. Data Classification Levels",
+        content:
+          "Company information is classified into levels such as Public, Internal, Confidential, and Restricted. Each level has different requirements for storage and sharing.",
+      },
+      {
+        title: "2. Handling Sensitive Data",
+        content:
+          "Confidential and Restricted data must be stored only on approved systems, protected with access controls, and never sent via unsecured channels or personal accounts.",
+      },
+      {
+        title: "3. Sharing & Storage Rules",
+        content:
+          "Before sharing data, verify the recipient and send only what is necessary. Use approved tools such as shared drives or collaboration platforms for long-term storage.",
+      },
+    ],
+    versions: ["1.0"],
+  },
+  {
+    id: 10,
+    title: "IT Incident Reporting & Support Process",
+    category: "IT",
+    meta: "IT • Support • v1.0",
+    description:
+      "How employees should contact IT support, open tickets, and report incidents quickly and clearly.",
+    tags: ["support", "helpdesk", "incident", "ticket", "it-service"],
+    views: 0,
+    likes: 0,
+    downloads: 0,
+    author: "IT Admin",
+    createdAt: "2024-11-27",
+    updatedAt: "2024-11-27",
+    difficulty: "Beginner",
+    estimatedTime: "10 minutes",
+    thumbnail:
+      "https://images.unsplash.com/photo-1581090700227-1e37b190418e?w=400&h=300&fit=crop",
+    sections: [
+      {
+        title: "1. When to Contact IT",
+        content:
+          "Contact IT when you experience system errors, hardware failures, access issues, or if you suspect a security problem such as malware or unusual login activity.",
+      },
+      {
+        title: "2. Support Channels & Ticketing",
+        content:
+          "Employees can reach IT via the helpdesk portal, email, or phone during business hours. High-impact incidents should be reported using the fastest available channel.",
+      },
+      {
+        title: "3. Information to Include in Requests",
+        content:
+          "Include a clear description, screenshots, error messages, time of occurrence, and whether other colleagues are affected. Good information helps IT resolve issues faster.",
+      },
+    ],
+    versions: ["1.0"],
+  },
+  {
+    id: 11,
+    title: "VPN & Remote Access Guide",
+    category: "IT",
+    meta: "IT • Remote Work • v1.0",
+    description:
+      "Guidelines for securely connecting to company systems from outside the office using VPN and remote tools.",
+    tags: ["vpn", "remote-access", "wfh", "security", "network"],
+    views: 0,
+    likes: 0,
+    downloads: 0,
+    author: "IT Admin",
+    createdAt: "2024-11-27",
+    updatedAt: "2024-11-27",
+    difficulty: "Beginner",
+    estimatedTime: "15 minutes",
+    thumbnail:
+      "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=400&h=300&fit=crop",
+    sections: [
+      {
+        title: "1. Who Needs VPN Access",
+        content:
+          "Employees who access internal applications, file shares, or admin tools from outside the office must use the company VPN for security and compliance.",
+      },
+      {
+        title: "2. Installing and Connecting",
+        content:
+          "Explains how to install the approved VPN client, select the correct profile, sign in with corporate credentials, and confirm that the connection is active.",
+      },
+      {
+        title: "3. Remote Work Best Practices",
+        content:
+          "Use trusted networks where possible, avoid public Wi‑Fi without VPN, lock your screen when away from the device, and never leave laptops unattended in public spaces.",
+      },
+    ],
+    versions: ["1.0"],
+  },
+  {
+    id: 12,
+    title: "Company Device & Software Management",
+    category: "IT",
+    meta: "IT • Devices • v1.0",
+    description:
+      "Rules for using company laptops and mobiles, and how to request or install software safely.",
+    tags: ["devices", "laptops", "mobile", "software", "asset-management"],
+    views: 0,
+    likes: 0,
+    downloads: 0,
+    author: "IT Admin",
+    createdAt: "2024-11-27",
+    updatedAt: "2024-11-27",
+    difficulty: "Beginner",
+    estimatedTime: "15 minutes",
+    thumbnail:
+      "https://images.unsplash.com/photo-1518770660439-4636190af475?w=400&h=300&fit=crop",
+    sections: [
+      {
+        title: "1. Devices Issued by the Company",
+        content:
+          "Laptops, phones, and other equipment remain company property. Employees are responsible for reasonable care and must return devices when employment ends.",
+      },
+      {
+        title: "2. Approved Software & Updates",
+        content:
+          "Only approved software may be installed on company devices. New tools must go through an IT review, and users must not disable automatic updates or antivirus.",
+      },
+      {
+        title: "3. Lost or Stolen Devices",
+        content:
+          "If a device is lost or stolen, notify IT and your manager immediately so that remote wipe, account lock, and incident review can be performed.",
+      },
+    ],
+    versions: ["1.0"],
+  },
+  {
+    id: 13,
+    title: "Backup, File Storage & Shared Drives",
+    category: "IT",
+    meta: "IT • Storage • v1.0",
+    description:
+      "Guidelines for where to store files, how data is backed up, and how to use shared folders safely.",
+    tags: ["backup", "file-storage", "shared-drive", "onedrive", "sharepoint"],
+    views: 0,
+    likes: 0,
+    downloads: 0,
+    author: "IT Admin",
+    createdAt: "2024-11-27",
+    updatedAt: "2024-11-27",
+    difficulty: "Beginner",
+    estimatedTime: "15 minutes",
+    thumbnail:
+      "https://images.unsplash.com/photo-1518432031352-d6fc5c10da5a?w=400&h=300&fit=crop",
+    sections: [
+      {
+        title: "1. Where to Store Files",
+        content:
+          "Business documents should be stored on approved platforms such as shared drives, SharePoint, or OneDrive. Avoid keeping the only copy on your local desktop.",
+      },
+      {
+        title: "2. Backup Responsibilities",
+        content:
+          "Servers and cloud storage are backed up by IT on a regular schedule. Users are responsible for ensuring that important files are saved in those locations.",
+      },
+      {
+        title: "3. Restoring Deleted or Lost Files",
+        content:
+          "Explains how to restore files from recycle bins or version history, and when to contact IT if older backups are needed.",
+      },
+    ],
+    versions: ["1.0"],
+  },
+  {
+    id: 14,
+    title: "Email & Collaboration Tools Usage",
+    category: "IT",
+    meta: "IT • Communication • v1.0",
+    description:
+      "Best practices for using corporate email, calendars, and chat tools such as Teams or Slack.",
+    tags: ["email", "collaboration", "teams", "slack", "communication"],
+    views: 0,
+    likes: 0,
+    downloads: 0,
+    author: "IT Admin",
+    createdAt: "2024-11-27",
+    updatedAt: "2024-11-27",
+    difficulty: "Beginner",
+    estimatedTime: "15 minutes",
+    thumbnail:
+      "https://images.unsplash.com/photo-1553877522-43269d4ea984?w=400&h=300&fit=crop",
+    sections: [
+      {
+        title: "1. Email Usage",
+        content:
+          "Corporate email accounts should be used for business communication. Avoid sending sensitive information to personal addresses or using personal email for company work.",
+      },
+      {
+        title: "2. Calendar & Meetings",
+        content:
+          "Use clear meeting titles and agendas, invite only necessary attendees, and respect working hours. Keep your calendar up to date so colleagues can schedule effectively.",
+      },
+      {
+        title: "3. Chat & Channels",
+        content:
+          "Use channels by project or team, keep discussions on-topic, and avoid sharing confidential data in informal chats unless the channel is properly restricted.",
+      },
+    ],
+    versions: ["1.0"],
+  },
+  {
+    id: 15,
+    title: "Phishing & Social Engineering Awareness",
+    category: "IT",
+    meta: "IT • Security Awareness • v1.0",
+    description:
+      "How to recognize phishing emails, suspicious links, and social engineering attempts.",
+    tags: ["phishing", "security-awareness", "training", "email", "fraud"],
+    views: 0,
+    likes: 0,
+    downloads: 0,
+    author: "IT Admin",
+    createdAt: "2024-11-27",
+    updatedAt: "2024-11-27",
+    difficulty: "Beginner",
+    estimatedTime: "15 minutes",
+    thumbnail:
+      "https://images.unsplash.com/photo-1510511233900-1982d92bd835?w=400&h=300&fit=crop",
+    sections: [
+      {
+        title: "1. Recognizing Phishing",
+        content:
+          "Phishing messages often use urgent language, unexpected attachments, or suspicious links and may pretend to be from IT, banks, or well-known services.",
+      },
+      {
+        title: "2. What to Do with Suspicious Messages",
+        content:
+          "Do not click links or open attachments in suspicious emails. Use the phishing report button if available or forward the message to the security or IT team.",
+      },
+      {
+        title: "3. Safe Browsing Habits",
+        content:
+          "Always check the website address, avoid downloading software from unknown sites, and keep your browser and plugins up to date.",
+      },
+    ],
+    versions: ["1.0"],
+  },
+  {
+    id: 16,
+    title: "IT Onboarding Checklist for New Employees",
+    category: "IT",
+    meta: "IT • Onboarding • v1.0",
+    description:
+      "A step-by-step IT checklist to help new employees get set up on their first day and during the first week.",
+    tags: ["onboarding", "new-hire", "accounts", "setup", "it"],
+    views: 0,
+    likes: 0,
+    downloads: 0,
+    author: "IT Admin",
+    createdAt: "2024-11-27",
+    updatedAt: "2024-11-27",
+    difficulty: "Beginner",
+    estimatedTime: "20 minutes",
+    thumbnail:
+      "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=400&h=300&fit=crop",
+    sections: [
+      {
+        title: "1. Day-One Setup",
+        content:
+          "New employees receive their accounts, change their initial password, sign in to email and collaboration tools, and review the IT acceptable use policy.",
+      },
+      {
+        title: "2. First-Week Checklist",
+        content:
+          "By the end of the first week, employees should have access to all required systems, completed basic IT and security training, and tested VPN or remote access if needed.",
+      },
+      {
+        title: "3. Getting Help",
+        content:
+          "Explains how to contact the IT helpdesk, open support tickets, and use self-service resources such as FAQs or internal manuals.",
+      },
+    ],
+    versions: ["1.0"],
+  },
+
 ];
 
 // Helper to get all manuals (static + local)

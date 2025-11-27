@@ -47,6 +47,8 @@ export default defineConfig(({ mode }) => ({
 
     // Compression and optimization
     minify: "esbuild",
+
+    // Drop console and debugger in production
     esbuild: {
       drop:
         process.env.NODE_ENV === "production" ? ["console", "debugger"] : [],

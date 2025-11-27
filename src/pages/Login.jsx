@@ -14,7 +14,7 @@ import {
 } from "react-bootstrap";
 import "./css/Login.css";
 import { useTranslation } from "../utils/translations";
-import { authenticateUser } from "../data/UserData";
+import { authenticateUser, createUser } from "../data/UserData";
 import { useAuth } from "../contexts/AuthContext";
 
 const Login = () => {
@@ -149,44 +149,23 @@ const Login = () => {
         setError(t("login.passwordTooShort"));
         setLoading(false);
         return;
-      }
+      } // Simulate API call delay
+      await new Promise((resolve) => setTimeout(resolve, 1500));
 
-      // Simulate API call delay
-      await new Promise((resolve) => setTimeout(resolve, 1500)); // Mock registration logic
-      const newUser = {
-        id: Date.now(),
+      // Use createUser from UserData.jsx
+      const result = createUser({
         username,
         email,
         firstName,
         lastName,
-        role: "user",
-        avatar: null,
-        department: "",
-        position: "",
-        isActive: true,
-        preferences: {
-          notifications: true,
-          darkMode: false,
-          emailUpdates: true,
-          language: "en",
-        },
-        stats: {
-          manualsViewed: 0,
-          manualsDownloaded: 0,
-          manualsBookmarked: 0,
-          loginCount: 1,
-        },
-        createdAt: new Date().toISOString(),
-        lastLogin: new Date().toISOString(),
-        permissions: ["view_manuals"],
-      };
+      });
 
-      // Add user to quickhelp_users in localStorage
-      const existingUsers = JSON.parse(
-        localStorage.getItem("quickhelp_users") || "[]"
-      );
-      existingUsers.push(newUser);
-      localStorage.setItem("quickhelp_users", JSON.stringify(existingUsers));
+      if (!result.success) {
+        setError(result.message || t("login.registrationFailed"));
+        return;
+      }
+
+      const newUser = result.user;
 
       // Store user data and auth token
       localStorage.setItem("userData", JSON.stringify(newUser));

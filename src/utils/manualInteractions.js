@@ -17,6 +17,44 @@ export const getManualInteractions = () => {
 };
 
 /**
+ * Track which users have viewed which manuals to prevent duplicate view counts
+ */
+const VIEW_TRACKING_KEY = "manualViewTracking";
+
+const getViewTracking = () => {
+  try {
+    const data = localStorage.getItem(VIEW_TRACKING_KEY);
+    return data ? JSON.parse(data) : {};
+  } catch (error) {
+    console.error("Error reading view tracking:", error);
+    return {};
+  }
+};
+
+const saveViewTracking = (tracking) => {
+  try {
+    localStorage.setItem(VIEW_TRACKING_KEY, JSON.stringify(tracking));
+  } catch (error) {
+    console.error("Error saving view tracking:", error);
+  }
+};
+
+const hasUserViewedManual = (manualId, userId) => {
+  if (!userId) return false;
+  const tracking = getViewTracking();
+  const key = `${manualId}_${userId}`;
+  return tracking[key] === true;
+};
+
+const markManualAsViewed = (manualId, userId) => {
+  if (!userId) return;
+  const tracking = getViewTracking();
+  const key = `${manualId}_${userId}`;
+  tracking[key] = true;
+  saveViewTracking(tracking);
+};
+
+/**
  * Save manual interactions to localStorage
  */
 const saveManualInteractions = (interactions) => {
@@ -45,42 +83,66 @@ export const getManualStats = (manualId) => {
 };
 
 /**
- * Increment view count for a manual
+ * Increment view count for a manual (only once per user)
  */
-export const incrementViews = (manualId) => {
+export const incrementViews = (manualId, userId = null) => {
+  // If userId is provided, check if user has already viewed this manual
+  if (userId && hasUserViewedManual(manualId, userId)) {
+    // User has already viewed this manual, return current count without incrementing
+    const stats = getManualStats(manualId);
+    return stats.views;
+  }
+
   const interactions = getManualInteractions();
   const manualData = interactions[manualId] || {
     views: 0,
     likes: 0,
     downloads: 0,
-    hasLiked: false,
+    likedBy: [],
   };
 
   manualData.views = (manualData.views || 0) + 1;
   interactions[manualId] = manualData;
   saveManualInteractions(interactions);
 
+  // Mark this manual as viewed by this user
+  if (userId) {
+    markManualAsViewed(manualId, userId);
+  }
+
   return manualData.views;
 };
 
 /**
- * Toggle like for a manual
+ * Toggle like for a manual (user-specific)
  */
-export const toggleLike = (manualId) => {
+export const toggleLike = (manualId, userId) => {
+  if (!userId) return { likes: 0, isLiked: false };
+
   const interactions = getManualInteractions();
   const manualData = interactions[manualId] || {
     views: 0,
     likes: 0,
     downloads: 0,
-    hasLiked: false,
+    likedBy: [],
   };
 
-  if (manualData.hasLiked) {
+  // Ensure likedBy is an array
+  if (!manualData.likedBy) {
+    manualData.likedBy = [];
+  }
+
+  const userIdNum = parseInt(userId);
+  const isLiked = manualData.likedBy.includes(userIdNum);
+
+  if (isLiked) {
+    // Unlike
+    manualData.likedBy = manualData.likedBy.filter((id) => id !== userIdNum);
     manualData.likes = Math.max(0, (manualData.likes || 0) - 1);
-    manualData.hasLiked = false;
   } else {
+    // Like
+    manualData.likedBy.push(userIdNum);
     manualData.likes = (manualData.likes || 0) + 1;
-    manualData.hasLiked = true;
   }
 
   interactions[manualId] = manualData;
@@ -88,7 +150,7 @@ export const toggleLike = (manualId) => {
 
   return {
     likes: manualData.likes,
-    hasLiked: manualData.hasLiked,
+    isLiked: !isLiked,
   };
 };
 
@@ -112,15 +174,15 @@ export const incrementDownloads = (manualId) => {
 };
 
 /**
- * Get all bookmarked manual IDs
+ * Get all bookmarks (user-specific bookmarks with metadata)
  */
 export const getBookmarks = () => {
   try {
     const data = localStorage.getItem(BOOKMARKS_KEY);
-    return data ? JSON.parse(data) : [];
+    return data ? JSON.parse(data) : {};
   } catch (error) {
     console.error("Error reading bookmarks:", error);
-    return [];
+    return {};
   }
 };
 
@@ -137,45 +199,82 @@ const saveBookmarks = (bookmarks) => {
 };
 
 /**
- * Check if a manual is bookmarked
+ * Check if a manual is bookmarked by a specific user
  */
-export const isBookmarked = (manualId) => {
+export const isBookmarked = (manualId, userId) => {
+  if (!userId) return false;
   const bookmarks = getBookmarks();
-  return bookmarks.includes(manualId);
+  const key = `${manualId}_${userId}`;
+  return bookmarks[key] !== undefined;
 };
 
 /**
- * Toggle bookmark for a manual
+ * Get all users who bookmarked a specific manual
  */
-export const toggleBookmark = (manualId) => {
-  let bookmarks = getBookmarks();
+export const getUsersWhoBookmarked = (manualId) => {
+  const bookmarks = getBookmarks();
+  const users = [];
 
-  if (bookmarks.includes(manualId)) {
-    bookmarks = bookmarks.filter((id) => id !== manualId);
+  Object.keys(bookmarks).forEach((key) => {
+    const [mId, uId] = key.split("_");
+    if (mId === String(manualId)) {
+      users.push(parseInt(uId));
+    }
+  });
+
+  return users;
+};
+
+/**
+ * Toggle bookmark for a manual (user-specific with notification support)
+ */
+export const toggleBookmark = (manualId, userId) => {
+  if (!userId) return false;
+
+  const bookmarks = getBookmarks();
+  const key = `${manualId}_${userId}`;
+  const isCurrentlyBookmarked = bookmarks[key] !== undefined;
+
+  if (isCurrentlyBookmarked) {
+    // Remove bookmark
+    delete bookmarks[key];
   } else {
-    bookmarks.push(manualId);
+    // Add bookmark
+    bookmarks[key] = {
+      manualId,
+      userId: parseInt(userId),
+      bookmarkedAt: new Date().toISOString(),
+    };
   }
 
   saveBookmarks(bookmarks);
-  return bookmarks.includes(manualId);
+  return !isCurrentlyBookmarked;
 };
 
 /**
- * Get enhanced manual data with interaction stats
+ * Get enhanced manual data with interaction stats for a specific user
  * Merges base manual data with user interaction data
  */
-export const getEnhancedManual = (manual) => {
+export const getEnhancedManual = (manual, userId = null) => {
   if (!manual) return null;
 
   const stats = getManualStats(manual.id);
-  const bookmarked = isBookmarked(manual.id);
+  const bookmarked = userId ? isBookmarked(manual.id, userId) : false;
+
+  // Check if user has liked this manual
+  const interactions = getManualInteractions();
+  const manualData = interactions[manual.id] || { likedBy: [] };
+  const hasLiked =
+    userId && manualData.likedBy
+      ? manualData.likedBy.includes(parseInt(userId))
+      : false;
 
   return {
     ...manual,
-    views: (manual.views || 0) + (stats.views || 0),
-    likes: (manual.likes || 0) + (stats.likes || 0),
-    downloads: (manual.downloads || 0) + (stats.downloads || 0),
-    hasLiked: stats.hasLiked || false,
+    views: stats.views || 0,
+    likes: stats.likes || 0,
+    downloads: stats.downloads || 0,
+    hasLiked,
     isBookmarked: bookmarked,
   };
 };
@@ -183,7 +282,39 @@ export const getEnhancedManual = (manual) => {
 /**
  * Get enhanced manuals array with interaction stats
  */
-export const getEnhancedManuals = (manuals) => {
+export const getEnhancedManuals = (manuals, userId = null) => {
   if (!Array.isArray(manuals)) return [];
-  return manuals.map((manual) => getEnhancedManual(manual));
+  return manuals.map((manual) => getEnhancedManual(manual, userId));
+};
+
+/**
+ * Notify all users who bookmarked a manual that it has been updated
+ * Call this when a manual is edited/updated
+ */
+export const notifyBookmarkedUsers = (manualId, manualTitle) => {
+  try {
+    const usersToNotify = getUsersWhoBookmarked(manualId);
+
+    if (usersToNotify.length === 0) {
+      return;
+    }
+
+    // Import addNotification dynamically to avoid circular dependency
+    const { addNotification } = require("./notifications");
+
+    usersToNotify.forEach((userId) => {
+      addNotification({
+        userId,
+        message: `Manual "${manualTitle}" that you bookmarked has been updated!`,
+        type: "info",
+        link: `/manual/${manualId}`,
+      });
+    });
+
+    console.log(
+      `Notified ${usersToNotify.length} users about update to "${manualTitle}"`
+    );
+  } catch (error) {
+    console.error("Error notifying bookmarked users:", error);
+  }
 };

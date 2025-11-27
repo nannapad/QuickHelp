@@ -50,16 +50,23 @@ const CreatorDashboard = () => {
         manual.author === userFullName || manual.author === currentUser.username
     );
 
+    // FIX: Prevent duplicates - custom manuals override static ones
+    // Build set of custom IDs to filter out static manuals with same ID
+    const customIds = new Set(userCustomManuals.map((m) => m.id));
+    const filteredStaticManuals = staticUserManuals.filter(
+      (m) => !customIds.has(m.id)
+    );
+
     // Combine all user manuals and add status
     const allUserManuals = [
-      ...staticUserManuals.map((manual) => ({
-        ...manual,
-        status: "published", // Static manuals are always published
-        views: manual.views || 0,
-      })),
       ...userCustomManuals.map((manual) => ({
         ...manual,
         status: manual.status || "published", // Use status from manual or default to published
+        views: manual.views || 0,
+      })),
+      ...filteredStaticManuals.map((manual) => ({
+        ...manual,
+        status: "published", // Static manuals are always published
         views: manual.views || 0,
       })),
     ];

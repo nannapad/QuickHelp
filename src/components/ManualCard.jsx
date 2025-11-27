@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import "./css/ManualCard.css";
 import { getSafeImageUrl } from "../utils/cleanupBlobUrls";
@@ -14,8 +14,23 @@ const ManualCard = ({
 }) => {
   if (!manual) return null;
 
-  // Get enhanced manual with interaction data
-  const enhancedManual = getEnhancedManual(manual);
+  const [currentUserId, setCurrentUserId] = useState(null);
+
+  useEffect(() => {
+    // Get current user ID
+    const userData = localStorage.getItem("userData");
+    if (userData) {
+      try {
+        const user = JSON.parse(userData);
+        setCurrentUserId(user.id);
+      } catch (error) {
+        console.error("Error parsing user data:", error);
+      }
+    }
+  }, []);
+
+  // Get enhanced manual with interaction data for current user
+  const enhancedManual = getEnhancedManual(manual, currentUserId);
 
   const handleTagClick = (tag, e) => {
     e.preventDefault();

@@ -362,7 +362,7 @@ export const translations = {
         category: "Category",
         status: "Status",
         actions: "Actions",
-        title: "Title",
+        tableTitle: "Title",
         submitted: "Submitted",
         created: "Created",
         noRecentManuals: "No manuals found",
@@ -370,6 +370,18 @@ export const translations = {
         newUsers: "8 new users this week",
         recentEdits: "5 manuals edited in the last 24 hours",
         newCreators: "2 creators added from requests this week",
+        topSearches: "Top search terms (last 7 days)",
+        queries: "queries",
+        noSearchData:
+          "No search data yet. Search analytics will appear here once users start searching for manuals.",
+        query: "Query",
+        searchCount: "Count",
+        noResults: "No-result searches",
+        searchTip:
+          "Queries with no results may indicate missing manuals. Consider creating guides for these topics.",
+        userQuestions: "User Questions from FAQ",
+        noQuestions:
+          "No pending questions. Users can submit questions from the FAQ page.",
       },
       creator: {
         title: "Creator Dashboard",
@@ -770,7 +782,7 @@ export const translations = {
         category: "หมวดหมู่",
         status: "สถานะ",
         actions: "การดำเนินการ",
-        title: "ชื่อเรื่อง",
+        tableTitle: "ชื่อเรื่อง",
         submitted: "ส่งแล้ว",
         created: "สร้างเมื่อ",
         noRecentManuals: "ไม่พบคู่มือ",
@@ -778,6 +790,18 @@ export const translations = {
         newUsers: "ผู้ใช้ใหม่ 8 คนในสัปดาห์นี้",
         recentEdits: "แก้ไขคู่มือ 5 เล่มในช่วง 24 ชั่วโมงที่ผ่านมา",
         newCreators: "เพิ่ม creator 2 คนจากคำขอในสัปดาห์นี้",
+        topSearches: "คำค้นหายอดนิยม (7 วันล่าสุด)",
+        queries: "คำค้นหา",
+        noSearchData:
+          "ยังไม่มีข้อมูลการค้นหา ข้อมูลจะปรากฏที่นี่เมื่อผู้ใช้เริ่มค้นหาคู่มือ",
+        query: "คำค้นหา",
+        searchCount: "จำนวน",
+        noResults: "ค้นหาไม่พบผลลัพธ์",
+        searchTip:
+          "คำค้นหาที่ไม่พบผลลัพธ์อาจบ่งชี้ว่ามีคู่มือที่ขาดหายไป ลองพิจารณาสร้างคู่มือสำหรับหัวข้อเหล่านี้",
+        userQuestions: "คำถามจากผู้ใช้ในหน้า FAQ",
+        noQuestions:
+          "ไม่มีคำถามที่รอดำเนินการ ผู้ใช้สามารถส่งคำถามจากหน้า FAQ ได้",
       },
       creator: {
         title: "แดชบอร์ดผู้สร้าง",

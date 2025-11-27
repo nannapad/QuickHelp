@@ -9,6 +9,9 @@ import {
   incrementDownloads,
   toggleBookmark,
 } from "../utils/manualInteractions";
+import { aiSearchManuals } from "../utils/aiSearch";
+import { logSearch } from "../utils/searchAnalytics";
+import { Link } from "react-router-dom";
 
 const Feed = () => {
   const [category, setCategory] = useState("all");
@@ -16,6 +19,8 @@ const Feed = () => {
   const [search, setSearch] = useState("");
   const [activeTag, setActiveTag] = useState("");
   const [refreshKey, setRefreshKey] = useState(0);
+  const [aiResults, setAiResults] = useState([]);
+  const [aiExplanations, setAiExplanations] = useState([]);
   const { t } = useTranslation();
 
   const hasFilters = useMemo(
@@ -26,14 +31,20 @@ const Feed = () => {
     const keyword = search.toLowerCase().trim();
 
     // Combine static manuals with published custom manuals from localStorage
+    // FIX: Prevent duplicates - custom manuals override static ones
     const customManuals = JSON.parse(
       localStorage.getItem("customManuals") || "[]"
     );
     const publishedCustomManuals = customManuals.filter(
       (m) => m.status === "published"
     );
-    // customManuals first so edited versions override static ones
-    const allManuals = [...publishedCustomManuals, ...manuals];
+
+    // Build set of custom IDs to filter out static manuals with same ID
+    const customIds = new Set(publishedCustomManuals.map((m) => m.id));
+    const staticManuals = manuals.filter((m) => !customIds.has(m.id));
+
+    // Custom manuals first, then non-duplicate static manuals
+    const allManuals = [...publishedCustomManuals, ...staticManuals];
 
     return allManuals.filter((manual) => {
       const manualCategory = manual.category || "";
@@ -104,11 +115,33 @@ const Feed = () => {
       el.scrollIntoView({ behavior: "smooth", block: "start" });
     }
   };
-
   const handleSubmit = (e) => {
     e.preventDefault();
     setSearch(searchInput);
     setActiveTag("");
+
+    // Build allManuals array for AI search
+    const customManuals = JSON.parse(
+      localStorage.getItem("customManuals") || "[]"
+    );
+    const publishedCustomManuals = customManuals.filter(
+      (m) => m.status === "published"
+    );
+    const allManuals = [...publishedCustomManuals, ...manuals];
+
+    // Run AI search
+    if (searchInput.trim()) {
+      const { results, explanations } = aiSearchManuals(
+        searchInput,
+        allManuals
+      );
+      setAiResults(results);
+      setAiExplanations(explanations);
+    } else {
+      setAiResults([]);
+      setAiExplanations([]);
+    }
+
     scrollToList();
   };
 
@@ -116,6 +149,8 @@ const Feed = () => {
     setCategory(cat);
     setActiveTag("");
     setSearch("");
+    setAiResults([]);
+    setAiExplanations([]);
     scrollToList();
   };
   const handleTagClick = (tag) => {
@@ -123,14 +158,27 @@ const Feed = () => {
     setSearch("");
     setSearchInput("");
     setCategory("all");
+    setAiResults([]);
+    setAiExplanations([]);
     scrollToList();
   };
-
   const handleLike = (manual) => {
-    const result = toggleLike(manual.id);
-    console.log(
-      `${result.hasLiked ? "Liked" : "Unliked"} manual: ${manual.title}`
-    );
+    // Get current user
+    const userData = localStorage.getItem("userData");
+    if (!userData) {
+      console.log("Please log in to like manuals");
+      return;
+    }
+
+    try {
+      const user = JSON.parse(userData);
+      const result = toggleLike(manual.id, user.id);
+      console.log(
+        `${result.isLiked ? "Liked" : "Unliked"} manual: ${manual.title}`
+      );
+    } catch (error) {
+      console.error("Error liking manual:", error);
+    }
   };
 
   const handleDownload = (manual) => {
@@ -140,13 +188,49 @@ const Feed = () => {
   };
 
   const handleBookmark = (manual) => {
-    const isBookmarked = toggleBookmark(manual.id);
-    console.log(
-      `${isBookmarked ? "Bookmarked" : "Removed bookmark from"} manual: ${
-        manual.title
-      }`
-    );
+    // Get current user
+    const userData = localStorage.getItem("userData");
+    if (!userData) {
+      console.log("Please log in to bookmark manuals");
+      return;
+    }
+
+    try {
+      const user = JSON.parse(userData);
+      const isBookmarked = toggleBookmark(manual.id, user.id);
+      console.log(
+        `${isBookmarked ? "Bookmarked" : "Removed bookmark from"} manual: ${
+          manual.title
+        }`
+      );
+    } catch (error) {
+      console.error("Error bookmarking manual:", error);
+    }
   };
+
+  useEffect(() => {
+    // Component initialization
+  }, []);
+
+  // Log search analytics when search changes
+  useEffect(() => {
+    if (search && search.trim()) {
+      // Get current user
+      const userDataStr = localStorage.getItem("userData");
+      let currentUser = null;
+
+      try {
+        if (userDataStr) {
+          currentUser = JSON.parse(userDataStr);
+        }
+      } catch (error) {
+        console.error("Error parsing user data:", error);
+      }
+
+      // Log the search with results count
+      logSearch(search, filteredManuals.length, currentUser);
+    }
+  }, [search, filteredManuals.length]);
 
   useEffect(() => {
     // Component initialization
@@ -194,6 +278,54 @@ const Feed = () => {
           ))}
         </div>
       </section>
+
+      {/* AI SUGGESTIONS SECTION */}
+      {search && (
+        <section className="feed-ai-suggestions">
+          <div className="feed-ai-header">
+            <h2 className="feed-ai-title">
+              🤖 AI แนะนำคู่มือสำหรับ: "{search}"
+            </h2>
+          </div>
+          {aiResults.length === 0 ? (
+            <div className="feed-ai-empty">
+              <p>
+                ไม่พบคู่มือที่ตรงกับคำค้นหาของคุณ
+                ลองค้นหาด้วยคำอื่นหรือเลือกหมวดหมู่
+              </p>
+            </div>
+          ) : (
+            <div className="feed-ai-results">
+              {aiResults.map((manual, index) => (
+                <Link
+                  key={manual.id}
+                  to={`/manual/${manual.id}`}
+                  className="feed-ai-card"
+                >
+                  <div className="feed-ai-card-number">{index + 1}</div>
+                  <div className="feed-ai-card-content">
+                    <h3 className="feed-ai-card-title">{manual.title}</h3>
+                    <p className="feed-ai-card-meta">{manual.meta}</p>
+                    <p className="feed-ai-card-explanation">
+                      {aiExplanations[index]}
+                    </p>
+                    {manual.tags && manual.tags.length > 0 && (
+                      <div className="feed-ai-card-tags">
+                        {manual.tags.slice(0, 3).map((tag) => (
+                          <span key={tag} className="feed-ai-tag">
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  <div className="feed-ai-card-arrow">→</div>
+                </Link>
+              ))}
+            </div>
+          )}
+        </section>
+      )}
 
       {/* MAIN LIST */}
       <section className="feed-main" id="manual-list">

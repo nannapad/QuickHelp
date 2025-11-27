@@ -14,9 +14,13 @@ import {
   incrementViews,
   toggleLike,
   incrementDownloads,
-  toggleBookmark,
   getManualStats,
+  getManualInteractions,
 } from "../utils/manualInteractions";
+import {
+  isManualBookmarked,
+  toggleBookmark as toggleBookmarkUtil,
+} from "../utils/bookmarks";
 
 const ManualDetail = () => {
   const { id } = useParams();
@@ -34,7 +38,6 @@ const ManualDetail = () => {
   const [editingCommentId, setEditingCommentId] = useState(null);
   const [editingCommentText, setEditingCommentText] = useState("");
   const { modalState, showAlert, showConfirm, hideAlert } = useAlertModal();
-
   const manual = useMemo(() => {
     if (!manuals || manuals.length === 0) return null;
 
@@ -42,8 +45,10 @@ const ManualDetail = () => {
     const customManuals = JSON.parse(
       localStorage.getItem("customManuals") || "[]"
     );
-    // customManuals first so edited versions override static ones
-    const allManuals = [...customManuals, ...manuals];
+    // Filter out static manuals that have been customized (prevent duplicates)
+    const customIds = new Set(customManuals.map((m) => m.id));
+    const staticManuals = manuals.filter((m) => !customIds.has(m.id));
+    const allManuals = [...customManuals, ...staticManuals];
 
     return allManuals.find((m) => String(m.id) === String(id)) || allManuals[0];
   }, [id, refreshKey]);
@@ -71,21 +76,36 @@ const ManualDetail = () => {
     if (userData) {
       try {
         const user = JSON.parse(userData);
-        setCurrentUser(user);
-
-        // Initialize like and bookmark status for current user
+        setCurrentUser(user); // Initialize like and bookmark status for current user
         if (id) {
-          setLiked(isLikedByUser(id, user.id));
-          setBookmarked(isBookmarkedByUser(id, user.id));
+          const interactions = getManualInteractions();
+          const manualData = interactions[id] || { likedBy: [] };
+          setLiked(
+            manualData.likedBy
+              ? manualData.likedBy.includes(parseInt(user.id))
+              : false
+          );
+          setBookmarked(isManualBookmarked(user.id, id));
         }
       } catch (error) {
         console.error("Error parsing user data:", error);
       }
     }
 
-    // Increment view count once when manual loads
+    // Increment view count once when manual loads (only if user hasn't viewed before)
     if (id) {
-      const viewCount = incrementViews(id);
+      const userData = localStorage.getItem("userData");
+      let userId = null;
+      if (userData) {
+        try {
+          const user = JSON.parse(userData);
+          userId = user.id;
+        } catch (e) {
+          // Continue without userId
+        }
+      }
+
+      const viewCount = incrementViews(id, userId);
       const stats = getManualStats(id);
       setManualViews(viewCount);
       setManualLikes(stats.likes || 0);
@@ -105,17 +125,19 @@ const ManualDetail = () => {
       window.removeEventListener("manualUpdated", handleStorageChange);
     };
   }, [id]);
-
   useEffect(() => {
-    if (manual && manual.versions && manual.versions.length > 0) {
-      // Default to the first version (usually latest) if not set
-      // In a real app, this might come from the URL or manual data
-      const versionFromMeta = manual.meta ? manual.meta.split("v")[1] : null;
-      const currentVersion = versionFromMeta || manual.versions[0];
-      setSelectedVersion(currentVersion);
-    } else if (manual && manual.version) {
-      // Fallback to manual.version if versions array doesn't exist
+    if (manual && manual.version) {
+      // Use manual.version as the current version
       setSelectedVersion(manual.version);
+    } else if (manual && manual.versions && manual.versions.length > 0) {
+      // Fallback to first version in versions array
+      setSelectedVersion(manual.versions[0]);
+    } else if (manual && manual.meta) {
+      // Fallback to extracting from meta
+      const versionMatch = manual.meta.match(/v(\d+\.\d+)/);
+      if (versionMatch) {
+        setSelectedVersion(versionMatch[1]);
+      }
     }
   }, [manual]);
   const relatedManuals = useMemo(() => {
@@ -125,8 +147,10 @@ const ManualDetail = () => {
     const customManuals = JSON.parse(
       localStorage.getItem("customManuals") || "[]"
     );
-    // customManuals first so edited versions override static ones
-    const allManuals = [...customManuals, ...manuals];
+    // Filter out static manuals that have been customized (prevent duplicates)
+    const customIds = new Set(customManuals.map((m) => m.id));
+    const staticManuals = manuals.filter((m) => !customIds.has(m.id));
+    const allManuals = [...customManuals, ...staticManuals];
 
     return allManuals
       .filter(
@@ -159,7 +183,9 @@ const ManualDetail = () => {
   };
   const handleBookmark = () => {
     if (!currentUser) return;
-    const newState = toggleBookmark(id, currentUser.id);
+    if (!manual) return;
+
+    const newState = toggleBookmarkUtil(currentUser.id, manual);
     setBookmarked(newState);
     if (newState) {
       showAlert(
@@ -547,7 +573,6 @@ const ManualDetail = () => {
                 Get the full {manual.fileInfo ? "version" : "PDF version"} for
                 offline reading.
               </p>
-
               <button
                 type="button"
                 className="btn primary full"
@@ -575,27 +600,27 @@ const ManualDetail = () => {
                 }}
               >
                 {manual.fileInfo ? "Download File" : "Download PDF"}
-              </button>
-
+              </button>{" "}
               <div className="fileInfo">
                 {manual.fileInfo && typeof manual.fileInfo === "object" ? (
                   <>
                     <span>
                       {manual.fileInfo.type?.split("/")[1]?.toUpperCase() ||
                         "FILE"}{" "}
-                      • {(manual.fileInfo.size / 1024).toFixed(1)} KB
+                      • {(manual.fileInfo.size / 1024 / 1024).toFixed(2)} MB
                     </span>
                     <span>{manual.fileInfo.name}</span>
                   </>
-                ) : manual.fileInfo ? (
+                ) : manual.fileInfo && typeof manual.fileInfo === "string" ? (
                   <>
                     <span>FILE</span>
                     <span>{manual.fileInfo}</span>
                   </>
                 ) : (
                   <>
-                    <span>PDF • 2.4 MB</span>
-                    <span>v{selectedVersion || manual.version || "1.0"}</span>
+                    <span style={{ color: "var(--text-muted)" }}>
+                      📄 No file uploaded yet
+                    </span>
                   </>
                 )}
               </div>

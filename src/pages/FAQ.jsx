@@ -11,6 +11,30 @@ const FAQ = () => {
     email: "",
     question: "",
   });
+  const [userQuestions, setUserQuestions] = useState([]);
+  const [currentUserEmail, setCurrentUserEmail] = useState("");
+
+  // Load user questions on mount
+  React.useEffect(() => {
+    try {
+      const userData = localStorage.getItem("userData");
+      if (userData) {
+        const user = JSON.parse(userData);
+        setCurrentUserEmail(user.email);
+
+        // Load all questions and filter by user email
+        const allQuestions = JSON.parse(
+          localStorage.getItem("userQuestions") || "[]"
+        );
+        const filteredQuestions = allQuestions.filter(
+          (q) => q.email === user.email
+        );
+        setUserQuestions(filteredQuestions);
+      }
+    } catch (error) {
+      console.error("Error loading user questions:", error);
+    }
+  }, []);
 
   const faqs = [
     {
@@ -39,9 +63,37 @@ const FAQ = () => {
   );
   const handleQuestionSubmit = (e) => {
     e.preventDefault();
-    // Here you would typically send the question to a backend
-    console.log("Question submitted:", questionForm);
-    alert("Thank you for your question! We'll get back to you soon.");
+
+    // Save question to localStorage
+    try {
+      const existingQuestions = JSON.parse(
+        localStorage.getItem("userQuestions") || "[]"
+      );
+
+      const newQuestion = {
+        id: Date.now(),
+        name: questionForm.name,
+        email: questionForm.email,
+        question: questionForm.question,
+        createdAt: new Date().toISOString(),
+        status: "pending", // pending, answered, archived
+        answer: null,
+      };
+
+      existingQuestions.push(newQuestion);
+      localStorage.setItem("userQuestions", JSON.stringify(existingQuestions));
+
+      // Update userQuestions state if it's the current user
+      if (questionForm.email === currentUserEmail) {
+        setUserQuestions((prev) => [...prev, newQuestion]);
+      }
+
+      alert("Thank you for your question! Our team will review it shortly.");
+    } catch (error) {
+      console.error("Error saving question:", error);
+      alert("There was an error submitting your question. Please try again.");
+    }
+
     setQuestionForm({ name: "", email: "", question: "" });
     setIsModalOpen(false);
   };
@@ -65,6 +117,63 @@ const FAQ = () => {
           <h1 className="faq-title">{t("faq.title")}</h1>
           <p className="faq-subtitle">{t("faq.subtitle")}</p>
         </header>{" "}
+        {/* My Questions Section - Only show if user is logged in and has questions */}
+        {currentUserEmail && userQuestions.length > 0 && (
+          <div className="my-questions-section">
+            <h2 className="my-questions-title">📋 My Questions</h2>
+            <div className="my-questions-list">
+              {userQuestions
+                .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+                .map((q) => (
+                  <div key={q.id} className="my-question-card">
+                    <div className="my-question-header">
+                      <span className={`question-status status-${q.status}`}>
+                        {q.status === "pending" && "⏳ Pending"}
+                        {q.status === "answered" && "✅ Answered"}
+                        {q.status === "archived" && "📦 Archived"}
+                      </span>
+                      <span className="question-date">
+                        {new Date(q.createdAt).toLocaleDateString("en-US", {
+                          year: "numeric",
+                          month: "short",
+                          day: "numeric",
+                        })}
+                      </span>
+                    </div>
+                    <div className="my-question-content">
+                      <h4 className="my-question-text">Q: {q.question}</h4>
+                      {q.answer && (
+                        <div className="my-question-answer">
+                          <div className="answer-header">
+                            <span className="answer-icon">💬</span>
+                            <span className="answer-label">
+                              Admin Response:
+                            </span>
+                            {q.answeredAt && (
+                              <span className="answer-date">
+                                {new Date(q.answeredAt).toLocaleDateString(
+                                  "en-US",
+                                  {
+                                    year: "numeric",
+                                    month: "short",
+                                    day: "numeric",
+                                  }
+                                )}
+                              </span>
+                            )}
+                          </div>
+                          <p className="answer-text">{q.answer}</p>
+                          {q.answeredBy && (
+                            <p className="answered-by">— {q.answeredBy}</p>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+            </div>
+          </div>
+        )}
         {/* Search Section */}
         <div className="faq-search-section">
           <div className="faq-search-wrapper">
