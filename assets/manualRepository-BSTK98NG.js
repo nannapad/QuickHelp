@@ -1,0 +1,1 @@
+import{a as n}from"./ManualData-CCWVZZls.js";const o="customManuals";function e(){try{const t=localStorage.getItem(o);if(!t)return[];const a=JSON.parse(t);return Array.isArray(a)?a:[]}catch(t){return console.error("Failed to load custom manuals:",t),[]}}function c(){const t=e(),a=new Set(t.map(r=>String(r.id))),s=n.filter(r=>!a.has(String(r.id)));return[...t,...s]}export{c as g};
