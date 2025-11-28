@@ -321,3 +321,118 @@
   color: #8b5cf6;
   border: 1px solid rgba(139, 92, 246, 0.2);
 }
+
+/* ==============================================
+   MOBILE RESPONSIVE STYLES
+   ============================================== */
+
+@media (max-width: 960px) {
+  .cd-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .cd-inner {
+    padding: 0 12px 20px;
+    margin: 16px auto 30px;
+  }
+
+  .cd-header {
+    margin-bottom: 12px;
+  }
+
+  .cd-title {
+    font-size: 20px;
+  }
+
+  .cd-sub {
+    font-size: 12px;
+  }
+
+  .cd-grid {
+    gap: 12px;
+  }
+
+  /* Cards */
+  .cd-card,
+  .cd-statCard {
+    padding: 14px 12px;
+  }
+
+  .cd-cardTitle {
+    font-size: 14px;
+  }
+
+  .cd-cardSub {
+    font-size: 11px;
+  }
+
+  /* Stats */
+  .cd-statsGrid {
+    gap: 10px;
+  }
+
+  .cd-statValue {
+    font-size: 22px;
+  }
+
+  .cd-statLabel {
+    font-size: 11px;
+  }
+
+  /* Table */
+  .cd-table {
+    font-size: 11px;
+  }
+
+  .cd-tableRow td {
+    padding: 8px 6px;
+  }
+
+  /* Actions */
+  .cd-actionRow {
+    flex-wrap: wrap;
+  }
+
+  .cd-actionBtn {
+    font-size: 11px;
+    padding: 5px 10px;
+  }
+
+  /* Activity list */
+  .cd-activityList {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .cd-inner {
+    padding: 0 10px 16px;
+    margin: 12px auto 24px;
+  }
+
+  .cd-title {
+    font-size: 18px;
+  }
+
+  .cd-card,
+  .cd-statCard {
+    padding: 12px 10px;
+  }
+
+  .cd-cardTitle {
+    font-size: 13px;
+  }
+
+  /* Table scroll */
+  .cd-table {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .cd-statValue {
+    font-size: 20px;
+  }
+}

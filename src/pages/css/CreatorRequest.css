@@ -269,3 +269,111 @@
   font-size: 11px;
   color: var(--text-muted);
 }
+
+/* ==============================================
+   MOBILE RESPONSIVE STYLES
+   ============================================== */
+
+@media (max-width: 768px) {
+  .creq-inner {
+    padding: 0 12px 20px;
+    margin: 16px auto 30px;
+  }
+
+  .creq-header {
+    margin-bottom: 12px;
+  }
+
+  .creq-title {
+    font-size: 20px;
+  }
+
+  .creq-sub {
+    font-size: 12px;
+  }
+
+  /* Cards */
+  .creq-card {
+    padding: 14px 12px;
+  }
+
+  .creq-cardTitle {
+    font-size: 14px;
+  }
+
+  .creq-cardSub {
+    font-size: 11px;
+  }
+
+  /* Form */
+  .creq-formLabel {
+    font-size: 11px;
+  }
+
+  .creq-formInput,
+  .creq-formTextarea {
+    font-size: 14px;
+    padding: 8px 10px;
+  }
+
+  .creq-formHint {
+    font-size: 10px;
+  }
+
+  .creq-formBtn {
+    padding: 10px 16px;
+    font-size: 13px;
+  }
+
+  /* Status */
+  .creq-statusLabel {
+    font-size: 11px;
+  }
+
+  .creq-statusNote {
+    font-size: 12px;
+  }
+
+  /* Timeline */
+  .creq-tlTitle {
+    font-size: 13px;
+  }
+
+  .creq-tlSub {
+    font-size: 12px;
+  }
+
+  /* Help box */
+  .creq-helpTitle {
+    font-size: 13px;
+  }
+
+  .creq-helpText {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .creq-inner {
+    padding: 0 10px 16px;
+    margin: 12px auto 24px;
+  }
+
+  .creq-title {
+    font-size: 18px;
+  }
+
+  .creq-card {
+    padding: 12px 10px;
+  }
+
+  .creq-cardTitle {
+    font-size: 13px;
+  }
+
+  .creq-formBtn {
+    font-size: 12px;
+    padding: 9px 14px;
+    width: 100%;
+  }
+}

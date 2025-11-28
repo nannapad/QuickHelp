@@ -468,7 +468,82 @@
 }
 
 /* Responsive adjustments */
+@media (max-width: 1100px) {
+  .ad-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width: 768px) {
+  .ad-inner {
+    padding: 0 12px 20px;
+    margin: 16px auto 30px;
+  }
+
+  .ad-header {
+    margin-bottom: 12px;
+  }
+
+  .ad-title {
+    font-size: 20px;
+  }
+
+  .ad-sub {
+    font-size: 12px;
+  }
+
+  .ad-grid {
+    gap: 12px;
+  }
+
+  /* Cards */
+  .ad-card,
+  .ad-statCard {
+    padding: 14px 12px;
+  }
+
+  .ad-cardTitle {
+    font-size: 14px;
+  }
+
+  .ad-cardSub {
+    font-size: 11px;
+  }
+
+  /* Stats */
+  .ad-statsGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .ad-statValue {
+    font-size: 22px;
+  }
+
+  .ad-statLabel {
+    font-size: 11px;
+  }
+
+  /* Tables */
+  .ad-table {
+    font-size: 11px;
+  }
+
+  .ad-tableHead,
+  .ad-tableRow {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .ad-tableHead span:not(:first-child),
+  .ad-tableRow span:not(:first-child):not(.ad-tableActions) {
+    display: none;
+  }
+
+  .ad-tableActions {
+    justify-content: flex-start;
+  }
+
   .ad-card-compact .ad-table .ad-tableHead,
   .ad-card-compact .ad-table .ad-tableRow {
     grid-template-columns: 1fr;
@@ -482,6 +557,13 @@
     display: none;
   }
 
+  /* Actions */
+  .ad-actionBtn {
+    font-size: 11px;
+    padding: 5px 10px;
+  }
+
+  /* Questions */
   .ad-questionMeta {
     flex-direction: column;
     align-items: flex-start;
@@ -492,5 +574,58 @@
   .ad-questionDate::before {
     content: "";
     margin-right: 0;
+  }
+
+  .ad-questionText {
+    font-size: 12px;
+  }
+
+  /* Search tip */
+  .ad-searchTip {
+    padding: 10px;
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 480px) {
+  .ad-inner {
+    padding: 0 10px 16px;
+    margin: 12px auto 24px;
+  }
+
+  .ad-title {
+    font-size: 18px;
+  }
+
+  .ad-card,
+  .ad-statCard {
+    padding: 12px 10px;
+  }
+
+  .ad-cardTitle {
+    font-size: 13px;
+  }
+
+  .ad-statsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .ad-statValue {
+    font-size: 20px;
+  }
+
+  /* Scroll tables horizontally */
+  .ad-table {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .ad-questionActions {
+    flex-direction: column;
+  }
+
+  .ad-questionActions .ad-actionBtn {
+    width: 100%;
   }
 }

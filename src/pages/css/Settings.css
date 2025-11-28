@@ -214,3 +214,135 @@
   display: flex;
   gap: 8px;
 }
+
+/* ==============================================
+   MOBILE RESPONSIVE STYLES
+   ============================================== */
+
+@media (max-width: 768px) {
+  .settings-inner {
+    padding: 0 12px 20px;
+    margin: 16px auto 30px;
+  }
+
+  .settings-header {
+    margin-bottom: 14px;
+  }
+
+  .settings-title {
+    font-size: 20px;
+  }
+
+  .settings-sub {
+    font-size: 12px;
+  }
+
+  /* Grid becomes single column */
+  .settings-grid {
+    gap: 12px;
+  }
+
+  /* Cards */
+  .settings-card {
+    padding: 14px 12px;
+  }
+
+  .settings-card-title {
+    font-size: 15px;
+  }
+
+  .settings-card-sub {
+    font-size: 12px;
+  }
+
+  /* Rows */
+  .settings-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .settings-row-label {
+    min-width: auto;
+    font-size: 12px;
+  }
+
+  .settings-row-main {
+    width: 100%;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .settings-row-text {
+    font-size: 13px;
+  }
+
+  /* Toggle rows */
+  .settings-toggleRow {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .settings-toggle-title {
+    font-size: 13px;
+  }
+
+  .settings-toggle-sub {
+    font-size: 12px;
+  }
+
+  /* Options */
+  .settings-options {
+    width: 100%;
+  }
+
+  .settings-pillOption {
+    font-size: 12px;
+    padding: 6px 10px;
+  }
+
+  /* Buttons */
+  .settings-btn {
+    padding: 8px 14px;
+    font-size: 13px;
+  }
+
+  .settings-footer {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .settings-footer .settings-btn {
+    width: 100%;
+  }
+
+  /* Badge */
+  .settings-badge {
+    font-size: 12px;
+    padding: 6px 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .settings-inner {
+    padding: 0 10px 16px;
+    margin: 12px auto 24px;
+  }
+
+  .settings-title {
+    font-size: 18px;
+  }
+
+  .settings-card {
+    padding: 12px 10px;
+  }
+
+  .settings-card-title {
+    font-size: 14px;
+  }
+
+  .settings-btn {
+    font-size: 12px;
+    padding: 8px 12px;
+  }
+}

@@ -550,3 +550,188 @@
     align-self: flex-start;
   }
 }
+
+/* ==============================================
+   MOBILE RESPONSIVE STYLES
+   ============================================== */
+
+@media (max-width: 960px) {
+  .page {
+    padding: 0 14px 24px;
+    margin: 20px auto;
+  }
+
+  .meta-card {
+    position: relative;
+    top: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .page {
+    padding: 0 12px 20px;
+    margin: 16px auto;
+    gap: 16px;
+  }
+
+  /* Editor panel */
+  .editor-panel {
+    padding: 16px 14px;
+  }
+
+  .editor-title {
+    font-size: 22px;
+    margin-bottom: 8px;
+  }
+
+  .editor-desc {
+    font-size: 14px;
+    margin-bottom: 14px;
+  }
+
+  /* Blocks */
+  .blocks {
+    margin-top: 8px;
+  }
+
+  .block {
+    margin-left: 20px;
+  }
+
+  .block-plus {
+    left: -20px;
+    width: 18px;
+    height: 18px;
+    font-size: 12px;
+  }
+
+  .block-toolbar {
+    left: 0;
+    top: -20px;
+    padding: 3px 6px;
+  }
+
+  .toolbar-btn {
+    padding: 2px 6px;
+    font-size: 10px;
+  }
+
+  .block-input {
+    font-size: 15px;
+  }
+
+  .block-heading {
+    font-size: 20px;
+  }
+
+  .block-code {
+    padding: 8px 10px;
+    font-size: 13px;
+  }
+
+  .btn-add-block {
+    font-size: 13px;
+    padding: 8px 14px;
+  }
+
+  /* Meta panel */
+  .meta-card {
+    padding: 14px 12px 16px;
+  }
+
+  .meta-title {
+    font-size: 13px;
+  }
+
+  .meta-caption {
+    font-size: 10px;
+  }
+
+  .thumb-box {
+    font-size: 11px;
+    margin-bottom: 8px;
+  }
+
+  .meta-field-label {
+    font-size: 11px;
+    margin: 6px 0 3px;
+  }
+
+  .meta-select,
+  .meta-input {
+    padding: 8px 10px;
+    font-size: 14px;
+  }
+
+  .tag-box {
+    padding: 8px;
+  }
+
+  .tag-pill {
+    padding: 4px 10px;
+    font-size: 12px;
+  }
+
+  .file-btn {
+    padding: 10px 12px;
+    font-size: 14px;
+  }
+
+  .meta-note {
+    font-size: 12px;
+  }
+
+  .publish-btn,
+  .draft-btn {
+    padding: 10px 14px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .page {
+    padding: 0 10px 16px;
+    margin: 12px auto;
+  }
+
+  .editor-panel {
+    padding: 14px 12px;
+  }
+
+  .editor-title {
+    font-size: 20px;
+  }
+
+  .editor-desc {
+    font-size: 13px;
+  }
+
+  .block {
+    margin-left: 16px;
+  }
+
+  .block-plus {
+    left: -16px;
+    width: 16px;
+    height: 16px;
+    font-size: 11px;
+  }
+
+  .block-input {
+    font-size: 14px;
+  }
+
+  .block-heading {
+    font-size: 18px;
+  }
+
+  .meta-card {
+    padding: 12px 10px 14px;
+  }
+
+  .publish-btn,
+  .draft-btn {
+    font-size: 13px;
+    padding: 9px 12px;
+  }
+}

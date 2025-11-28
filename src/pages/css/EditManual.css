@@ -604,14 +604,48 @@
 @media (max-width: 480px) {
   .page {
     margin: 16px auto;
-    padding: 0 8px 16px;
+    padding: 0 10px 16px;
+  }
+
+  .editor-panel {
+    padding: 14px 12px;
   }
 
   .editor-title {
     font-size: 20px;
   }
 
+  .editor-desc {
+    font-size: 13px;
+  }
+
+  .block {
+    margin-left: 16px;
+  }
+
+  .block-plus {
+    left: -16px;
+    width: 16px;
+    height: 16px;
+    font-size: 11px;
+  }
+
+  .block-input {
+    font-size: 14px;
+  }
+
+  .block-heading {
+    font-size: 18px;
+  }
+
   .meta-card {
-    padding: 12px;
+    padding: 12px 10px 14px;
+  }
+
+  .publish-btn,
+  .draft-btn,
+  .update-btn {
+    font-size: 13px;
+    padding: 9px 12px;
   }
 }
