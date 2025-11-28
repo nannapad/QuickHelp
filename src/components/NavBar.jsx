@@ -140,11 +140,11 @@ const NavBar = () => {
       {/* Sidebar Overlay */}
       {showSidebar && (
         <div className="sidebar-overlay" onClick={closeSidebar}></div>
-      )}
+      )}{" "}
       {/* Mobile Sidebar */}
       <aside className={`mobile-sidebar ${showSidebar ? "open" : ""}`}>
         <div className="sidebar-header">
-          <h3 className="sidebar-title">Menu</h3>
+          <h3 className="sidebar-title">{t("nav.menu")}</h3>
           <button className="sidebar-close" onClick={closeSidebar}>
             ✕
           </button>
@@ -185,6 +185,7 @@ const NavBar = () => {
           {/* User-specific links */}
           {isLoggedIn && (
             <>
+              {" "}
               {user && (user.role === "admin" || user.role === "creator") && (
                 <Link
                   to="/dashboard"
@@ -192,10 +193,9 @@ const NavBar = () => {
                   onClick={closeSidebar}
                 >
                   <span className="sidebar-icon">📊</span>
-                  Dashboard
+                  {t("nav.dashboard")}
                 </Link>
               )}
-
               <Link
                 to="/profile"
                 className="sidebar-link"
@@ -204,7 +204,6 @@ const NavBar = () => {
                 <span className="sidebar-icon">👤</span>
                 {t("nav.profile")}
               </Link>
-
               <Link
                 to="/settings"
                 className="sidebar-link"
@@ -213,7 +212,6 @@ const NavBar = () => {
                 <span className="sidebar-icon">⚙️</span>
                 {t("nav.settings")}
               </Link>
-
               {user && user.role !== "admin" && user.role !== "creator" && (
                 <Link
                   to="/creator-request"
@@ -224,9 +222,7 @@ const NavBar = () => {
                   {t("nav.creatorRequest")}
                 </Link>
               )}
-
               <div className="sidebar-separator"></div>
-
               <button
                 onClick={() => {
                   handleLogout();
@@ -269,10 +265,10 @@ const NavBar = () => {
               <Link to="/faq">
                 <Button>{t("nav.faq")}</Button>
               </Link>
-            </li>
+            </li>{" "}
           </ul>
         </nav>
-      </div>{" "}
+      </div>
       <div className="nav-right">
         <nav className="nav-links">
           <ul>
@@ -313,6 +309,7 @@ const NavBar = () => {
               <LanguageSwitcher />
             </li>
             <li>
+              {" "}
               <Button
                 className="btn-theme"
                 title="Toggle theme"
@@ -320,7 +317,7 @@ const NavBar = () => {
               >
                 {isDarkMode ? "☀️" : "🌙"}
               </Button>
-            </li>{" "}
+            </li>
             {/* Show login button or profile based on auth status */}
             {isLoggedIn ? (
               <li className="profile-dropdown">
@@ -329,13 +326,13 @@ const NavBar = () => {
                   title={`Profile: ${user?.username || "User"}`}
                 >
                   <ProfileAvatar user={user} size="small" />
-                </Button>{" "}
+                </Button>
                 <div className="profile-menu">
                   {/* Dashboard link for Creator and Admin */}
                   {user &&
                     (user.role === "admin" || user.role === "creator") && (
                       <Link to="/dashboard" className="profile-menu-item">
-                        Dashboard
+                        {t("nav.dashboard")}
                       </Link>
                     )}
 

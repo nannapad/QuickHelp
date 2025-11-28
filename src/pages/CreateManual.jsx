@@ -269,15 +269,13 @@ const CreateManual = () => {
       console.log("Manual saved:", newManual);
 
       // Dispatch custom event to notify other components
-      window.dispatchEvent(new Event("manualUpdated"));
-
-      // Notify admins if manual is pending
+      window.dispatchEvent(new Event("manualUpdated")); // Notify admins if manual is pending
       if (manualStatus === "pending") {
         const allUsers = getAllUsers();
         const admins = allUsers.filter((u) => u.role === "admin");
         admins.forEach((admin) => {
           addNotification({
-            userId: admin.id,
+            userId: String(admin.id),
             message: `New manual pending approval: "${title}" by ${authorName}`,
             type: "info",
             link: "/admin-dashboard",
@@ -530,17 +528,18 @@ const CreateManual = () => {
           >
             + {t("createManual.addBlock")}
           </button>
-        </section>
-
+        </section>{" "}
         {/* RIGHT: META PANEL */}
         <aside className="meta-panel">
           <div className="meta-card">
-            <div className="meta-title">Manual details</div>
+            <div className="meta-title">{t("createManual.manualDetails")}</div>
             <div className="meta-caption">
-              กำหนดหมวดใหญ่ แท็ก และไฟล์คู่มือจริง
+              {t("createManual.manualDetailsCaption")}
             </div>
             {/* Thumbnail */}
-            <div className="meta-field-label">Thumbnail</div>
+            <div className="meta-field-label">
+              {t("createManual.thumbnailLabel")}
+            </div>
             {thumbnailUrl && (
               <div className="thumbnail-preview">
                 <img

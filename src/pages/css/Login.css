@@ -192,11 +192,6 @@
   margin-bottom: 1rem;
   font-size: 0.875rem;
   font-weight: 500;
-  position: absolute;
-  top: -70px;
-  left: 0;
-  right: 0;
-  z-index: 10;
   animation: slideDown 0.3s ease-out;
 }
 
@@ -247,11 +242,10 @@
 @media (max-width: 576px) {
   .login-page {
     padding: 1rem;
-    min-height: calc(100vh - 52px);
   }
 
   .login-card .card-body {
-    padding: 1.5rem;
+    padding: 1.5rem !important;
   }
 
   .login-title {
@@ -264,7 +258,7 @@
   }
 
   .tab-title i {
-    display: none;
+    font-size: 0.875rem;
   }
 }
 

@@ -291,6 +291,21 @@
   box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
 }
 
+/* Copied button specific styling */
+.actionBtn.copied {
+  background: #10b981;
+  border-color: #10b981;
+  color: white;
+  font-weight: 600;
+}
+
+.actionBtn.copied:hover {
+  background: #10b981;
+  border-color: #10b981;
+  color: white;
+  cursor: default;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .header {

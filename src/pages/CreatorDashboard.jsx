@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAlertModal } from "../hooks/useAlertModal";
 import AlertModal from "../components/AlertModal";
 import "./css/Creatordashboard.css";
-import manuals from "../data/ManualData";
+import { getAllManuals } from "../utils/manualRepository";
 import { useTranslation } from "../utils/translations";
 
 const CreatorDashboard = () => {
@@ -32,16 +32,11 @@ const CreatorDashboard = () => {
     }
     setUser(currentUser); // Get both static and custom manuals created by this user
     const userFullName = `${currentUser.firstName} ${currentUser.lastName}`;
-
+    const allManuals = getAllManuals();
     // Filter static manuals created by this user (only exact matches)
     const staticUserManuals = manuals.filter(
       (manual) =>
         manual.author === userFullName || manual.author === currentUser.username
-    );
-
-    // Get custom manuals from localStorage
-    const customManuals = JSON.parse(
-      localStorage.getItem("customManuals") || "[]"
     );
 
     // Filter custom manuals created by this user
@@ -49,10 +44,6 @@ const CreatorDashboard = () => {
       (manual) =>
         manual.author === userFullName || manual.author === currentUser.username
     );
-
-    // FIX: Prevent duplicates - custom manuals override static ones
-    // Build set of custom IDs to filter out static manuals with same ID
-    const customIds = new Set(userCustomManuals.map((m) => m.id));
     const filteredStaticManuals = staticUserManuals.filter(
       (m) => !customIds.has(m.id)
     );

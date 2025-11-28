@@ -31,7 +31,7 @@ const CreateManual = lazy(() => import("./pages/CreateManual"));
 const EditManual = lazy(() => import("./pages/EditManual"));
 const EditDraft = lazy(() => import("./pages/EditDraft"));
 
-// Loading component
+// Loading component with translation support
 const LoadingFallback = () => (
   <div
     style={{
@@ -104,7 +104,7 @@ function App() {
                         <AdminDashboard />
                       </ProtectedRoute>
                     }
-                  />
+                  />{" "}
                   <Route
                     path="create-manual"
                     element={
@@ -112,7 +112,7 @@ function App() {
                         <CreateManual />
                       </ProtectedRoute>
                     }
-                  />{" "}
+                  />
                   <Route
                     path="edit-manual/:id"
                     element={

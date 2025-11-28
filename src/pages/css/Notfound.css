@@ -1,5 +1,7 @@
 .notfound {
-  min-height: calc(100vh - 52px); /* ลบความสูง navbar คร่าว ๆ */
+  min-height: calc(100vh - 52px);
+  background: var(--bg);
+  color: var(--text);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -11,10 +13,10 @@
 .notfound-inner {
   max-width: 520px;
   width: 100%;
-  background: var(--surface, #ffffff);
+  background: var(--bg-light);
   border-radius: 22px;
-  border: 1px solid var(--border-subtle, #e5e7eb);
-  box-shadow: var(--shadow-soft, 0 18px 40px rgba(15, 23, 42, 0.08));
+  border: 1px solid var(--border);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.08);
   padding: 18px 18px 16px;
   text-align: center;
   position: relative;
@@ -27,8 +29,8 @@
   justify-content: center;
   padding: 4px 12px;
   border-radius: 999px;
-  background: var(--accent-soft, rgba(139, 92, 246, 0.16));
-  color: var(--accent, #8b5cf6);
+  background: var(--primary-soft);
+  color: var(--primary);
   font-size: 12px;
   font-weight: 600;
   margin-bottom: 10px;
@@ -37,16 +39,16 @@
 .notfound-title {
   margin: 0 0 6px;
   font-size: 24px;
-  font-weight: 650;
+  font-weight: 700;
   letter-spacing: -0.04em;
-  color: var(--text, #111827);
+  color: var(--text);
 }
 
 .notfound-sub {
   margin: 0;
   font-size: 13px;
   line-height: 1.7;
-  color: var(--text-muted, #6b7280);
+  color: var(--text-muted);
 }
 
 .notfound-actions {
@@ -68,35 +70,39 @@
   justify-content: center;
   gap: 6px;
   background: transparent;
+  transition: all 0.2s ease;
 }
 
 .notfound-btn.primary {
-  background: linear-gradient(
-    135deg,
-    var(--accent, #8b5cf6),
-    #ec4899
-  );
-  color: var(--text);
-  box-shadow: 0 12px 26px rgba(139, 92, 246, 0.6);
+  background: linear-gradient(135deg, var(--primary), #ec4899);
+  color: white;
+  border: none;
+  box-shadow: 0 8px 20px rgba(139, 92, 246, 0.3);
+}
+
+.notfound-btn.primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 26px rgba(139, 92, 246, 0.4);
 }
 
 .notfound-btn.ghost {
-  background: var(--bg-light, #f3f4f6);
-  color: var(--text, #111827);
-  border-color: var(--border-muted, #e5e7eb);
+  background: var(--bg-light);
+  color: var(--text);
+  border-color: var(--border);
 }
 
-.notfound-btn:hover {
-  filter: brightness(0.98);
+.notfound-btn.ghost:hover {
+  background: var(--bg-subtle);
+  border-color: var(--primary);
 }
 
 .notfound-hint {
   margin-top: 10px;
   font-size: 11px;
-  color: var(--text-muted, #6b7280);
+  color: var(--text-muted);
 }
 
-/* background blobs */
+/* Background blobs */
 .notfound-blob {
   position: absolute;
   width: 260px;
@@ -122,16 +128,18 @@
   top: -40px;
 }
 
-/* DARK MODE (ถ้าใช้ body.dark เหมือนหน้าอื่น) */
+/* Dark mode */
 body.dark .notfound-inner {
-  background: var(--surface, #020617);
-  border-color: var(--border-subtle, #1f2937);
+  background: var(--bg-light);
+  border-color: var(--border);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.3);
 }
 
 body.dark .notfound-blob {
-  opacity: 0.9;
+  opacity: 0.5;
 }
 
+/* Responsive */
 @media (max-width: 640px) {
   .notfound-inner {
     padding: 16px 14px 14px;

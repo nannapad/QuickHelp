@@ -1,15 +1,18 @@
+// src/pages/NotFound.jsx
 import { useNavigate } from "react-router-dom";
 import "./css/NotFound.css";
+import { useTranslation } from "../utils/translations";
 
 const NotFound = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const handleGoHome = () => {
     navigate("/");
   };
 
   const handleGoBack = () => {
-    // ถ้าย้อนกลับไม่ได้ ให้กลับไปหน้า home แทน
+    // If can't go back, navigate to home instead
     if (window.history.length > 1) {
       navigate(-1);
     } else {
@@ -21,25 +24,19 @@ const NotFound = () => {
     <div className="notfound">
       <div className="notfound-inner">
         <div className="notfound-badge">404</div>
-
-        <h1 className="notfound-title">Page not found</h1>
-        <p className="notfound-sub">
-          ดูเหมือนว่าหน้านี้ไม่มีอยู่ใน QuickHelp อาจถูกย้าย ลบไปแล้ว
-          หรือคุณอาจพิมพ์ลิงก์ผิดเล็กน้อย ลองกลับไปหน้า Home หรือย้อนกลับไปหน้าที่แล้วดูนะคะ
-        </p>
+        <h1 className="notfound-title">{t("notFoundPage.title")}</h1>
+        <p className="notfound-sub">{t("notFoundPage.description")}</p>
 
         <div className="notfound-actions">
           <button className="notfound-btn primary" onClick={handleGoHome}>
-            ⬅ กลับหน้า Home
+            {t("notFoundPage.goHome")}
           </button>
           <button className="notfound-btn ghost" onClick={handleGoBack}>
-            ◀ ย้อนกลับหน้าก่อนหน้า
+            {t("notFoundPage.goBack")}
           </button>
         </div>
 
-        <div className="notfound-hint">
-          หรือใช้ Quick Search ที่หน้า Home เพื่อค้นหาคู่มือที่คุณต้องการอีกครั้ง 💜
-        </div>
+        <div className="notfound-hint">{t("notFoundPage.hint")}</div>
       </div>
 
       <div className="notfound-blob notfound-blob-left" />

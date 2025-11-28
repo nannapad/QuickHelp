@@ -47,7 +47,6 @@ class ErrorBoundary extends React.Component {
           >
             ⚠️
           </div>
-
           <h1
             style={{
               fontSize: "1.5rem",
@@ -57,7 +56,6 @@ class ErrorBoundary extends React.Component {
           >
             Something went wrong
           </h1>
-
           <p
             style={{
               fontSize: "1rem",
@@ -69,7 +67,6 @@ class ErrorBoundary extends React.Component {
             We're sorry, but something unexpected happened. Please try
             refreshing the page.
           </p>
-
           <div
             style={{ display: "flex", gap: "12px", justifyContent: "center" }}
           >
@@ -102,8 +99,7 @@ class ErrorBoundary extends React.Component {
             >
               Go Back
             </button>
-          </div>
-
+          </div>{" "}
           {process.env.NODE_ENV === "development" && (
             <details
               style={{
@@ -127,7 +123,7 @@ class ErrorBoundary extends React.Component {
               >
                 {this.state.error && this.state.error.toString()}
                 <br />
-                {this.state.errorInfo.componentStack}
+                {this.state.errorInfo && this.state.errorInfo.componentStack}
               </pre>
             </details>
           )}

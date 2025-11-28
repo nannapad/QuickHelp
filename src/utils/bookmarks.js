@@ -1,117 +1,98 @@
-// Bookmark management utility
-// Stores user bookmarks in localStorage with user-specific tracking
+const KEY = "quickhelp_bookmarks";
 
-const STORAGE_KEY = "quickhelp_bookmarks";
-
-/**
- * Load all bookmarks from localStorage
- * Returns array of bookmark objects: { userId, manualId, createdAt, manualTitle }
- */
+// Load bookmarks from localStorage
 function loadBookmarks() {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = localStorage.getItem(KEY);
     if (!raw) return [];
     const parsed = JSON.parse(raw);
     return Array.isArray(parsed) ? parsed : [];
-  } catch (err) {
-    console.error("Failed to load bookmarks", err);
+  } catch (e) {
+    console.error("Failed to load bookmarks:", e);
     return [];
   }
 }
 
-/**
- * Save bookmarks array to localStorage
- */
-function saveBookmarks(items) {
+// Save bookmarks to localStorage
+function saveBookmarks(list) {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
-    // Dispatch event to notify other components
-    window.dispatchEvent(new Event("bookmarksChanged"));
-  } catch (err) {
-    console.error("Failed to save bookmarks", err);
+    localStorage.setItem(KEY, JSON.stringify(list));
+  } catch (e) {
+    console.error("Failed to save bookmarks:", e);
   }
 }
 
 /**
- * Check if a specific user has bookmarked a specific manual
- * @param {number|string} userId - The user's ID
- * @param {number|string} manualId - The manual's ID
- * @returns {boolean}
+ * Check if a user has bookmarked a manual
  */
 export function isManualBookmarked(userId, manualId) {
-  if (!userId || !manualId) return false;
+  if (!userId || manualId == null) return false;
+  const idStr = String(manualId);
   const bookmarks = loadBookmarks();
   return bookmarks.some(
-    (b) =>
-      String(b.userId) === String(userId) &&
-      String(b.manualId) === String(manualId)
+    (b) => String(b.userId) === String(userId) && String(b.manualId) === idStr
   );
 }
 
 /**
- * Toggle bookmark for a user and manual
- * @param {number|string} userId - The user's ID
- * @param {object} manual - The manual object (must have id and title)
- * @returns {boolean} - true if bookmarked, false if unbookmarked
+ * Toggle bookmark status for a manual
+ * @returns {boolean} true if bookmarked, false if unbookmarked
  */
 export function toggleBookmark(userId, manual) {
-  if (!userId || !manual || !manual.id) {
-    console.warn("Invalid userId or manual for bookmark toggle");
+  if (!userId || !manual || manual.id == null) {
+    console.warn("toggleBookmark: missing user or manual", { userId, manual });
     return false;
   }
 
+  const idStr = String(manual.id);
   const bookmarks = loadBookmarks();
-  const existingIndex = bookmarks.findIndex(
-    (b) =>
-      String(b.userId) === String(userId) &&
-      String(b.manualId) === String(manual.id)
+  const index = bookmarks.findIndex(
+    (b) => String(b.userId) === String(userId) && String(b.manualId) === idStr
   );
 
-  if (existingIndex !== -1) {
-    // Remove bookmark
-    bookmarks.splice(existingIndex, 1);
-    saveBookmarks(bookmarks);
-    return false;
-  } else {
+  let isBookmarkedNow = false;
+
+  if (index === -1) {
     // Add bookmark
     bookmarks.push({
       userId: String(userId),
-      manualId: String(manual.id),
-      manualTitle: manual.title || "Untitled Manual",
+      manualId: idStr,
+      manualTitle: manual.title || "",
       createdAt: new Date().toISOString(),
     });
-    saveBookmarks(bookmarks);
-    return true;
+    isBookmarkedNow = true;
+  } else {
+    // Remove bookmark
+    bookmarks.splice(index, 1);
+    isBookmarkedNow = false;
   }
+
+  saveBookmarks(bookmarks);
+  // Dispatch event for other components to listen
+  window.dispatchEvent(new Event("bookmarksChanged"));
+
+  return isBookmarkedNow;
 }
 
 /**
- * Get all user IDs who have bookmarked a specific manual
- * @param {number|string} manualId - The manual's ID
- * @returns {string[]} - Array of user IDs
+ * Get list of user IDs who bookmarked a manual (for notifications)
  */
 export function getUsersWhoBookmarkedManual(manualId) {
-  if (!manualId) return [];
+  if (manualId == null) return [];
+  const idStr = String(manualId);
   const bookmarks = loadBookmarks();
-  return bookmarks
-    .filter((b) => String(b.manualId) === String(manualId))
-    .map((b) => b.userId);
+  const users = bookmarks
+    .filter((b) => String(b.manualId) === idStr)
+    .map((b) => String(b.userId));
+  // Remove duplicates
+  return Array.from(new Set(users));
 }
 
 /**
  * Get all bookmarks for a specific user
- * @param {number|string} userId - The user's ID
- * @returns {array} - Array of bookmark objects
  */
 export function getUserBookmarks(userId) {
   if (!userId) return [];
   const bookmarks = loadBookmarks();
   return bookmarks.filter((b) => String(b.userId) === String(userId));
-}
-
-/**
- * Clear all bookmarks (for testing/admin purposes)
- */
-export function clearAllBookmarks() {
-  saveBookmarks([]);
 }

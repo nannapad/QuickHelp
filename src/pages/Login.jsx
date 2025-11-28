@@ -208,10 +208,10 @@ const Login = () => {
             <div className="text-center mb-4">
               <h1 className="login-title">{t("login.title")}</h1>
               <p className="login-subtitle">{t("login.subtitle")}</p>
-            </div>
-
+            </div>{" "}
             <Card className="login-card">
               <Card.Body>
+                {/* Alert messages */}
                 {error && (
                   <Alert variant="danger" className="mb-3">
                     {error}
@@ -229,17 +229,17 @@ const Login = () => {
                   className="login-tabs nav-justified"
                   fill
                 >
+                  {" "}
                   {/* --------- LOGIN TAB --------- */}
                   <Tab
                     eventKey="login"
                     title={
                       <span className="tab-title">
-                        <i className="fas fa-sign-in-alt"></i>
+                        <i className="fas fa-sign-in-alt me-2"></i>
                         {t("login.signIn")}
                       </span>
                     }
                   >
-                    {" "}
                     {activeTab === "login" && (
                       <Form onSubmit={handleLogin} className="mt-3">
                         <Form.Group className="mb-3">
@@ -288,7 +288,6 @@ const Login = () => {
                       </Form>
                     )}
                   </Tab>
-
                   {/* --------- REGISTER TAB --------- */}
                   <Tab
                     eventKey="register"
@@ -416,9 +415,8 @@ const Login = () => {
                     {t("login.continueAsGuest")}
                   </Button>
                 </div>
-              </Card.Body>{" "}
+              </Card.Body>
             </Card>
-
             {/* Demo Credentials Info */}
             <div className="text-center mt-4">
               <div className="demo-credentials-box">
@@ -442,7 +440,6 @@ const Login = () => {
                 </small>
               </div>
             </div>
-
             <div className="text-center mt-3">
               <small className="text-muted">
                 <Link to="/about" className="text-decoration-none">

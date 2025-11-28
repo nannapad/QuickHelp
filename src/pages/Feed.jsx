@@ -1,14 +1,11 @@
 // src/pages/Feed.jsx
 import React, { useEffect, useMemo, useState } from "react";
 import ManualGrid from "../components/ManualGrid";
-import manuals from "../data/ManualData";
+import { getAllManuals } from "../utils/manualRepository";
 import "./css/Feed.css";
 import { useTranslation } from "../utils/translations";
-import {
-  toggleLike,
-  incrementDownloads,
-  toggleBookmark,
-} from "../utils/manualInteractions";
+import { toggleLike, incrementDownloads } from "../utils/manualInteractions";
+import { toggleBookmark } from "../utils/bookmarks";
 import { aiSearchManuals } from "../utils/aiSearch";
 import { logSearch } from "../utils/searchAnalytics";
 import { Link } from "react-router-dom";
@@ -29,22 +26,7 @@ const Feed = () => {
   );
   const filteredManuals = useMemo(() => {
     const keyword = search.toLowerCase().trim();
-
-    // Combine static manuals with published custom manuals from localStorage
-    // FIX: Prevent duplicates - custom manuals override static ones
-    const customManuals = JSON.parse(
-      localStorage.getItem("customManuals") || "[]"
-    );
-    const publishedCustomManuals = customManuals.filter(
-      (m) => m.status === "published"
-    );
-
-    // Build set of custom IDs to filter out static manuals with same ID
-    const customIds = new Set(publishedCustomManuals.map((m) => m.id));
-    const staticManuals = manuals.filter((m) => !customIds.has(m.id));
-
-    // Custom manuals first, then non-duplicate static manuals
-    const allManuals = [...publishedCustomManuals, ...staticManuals];
+    const allManuals = getAllManuals();
 
     return allManuals.filter((manual) => {
       const manualCategory = manual.category || "";
@@ -120,14 +102,8 @@ const Feed = () => {
     setSearch(searchInput);
     setActiveTag("");
 
-    // Build allManuals array for AI search
-    const customManuals = JSON.parse(
-      localStorage.getItem("customManuals") || "[]"
-    );
-    const publishedCustomManuals = customManuals.filter(
-      (m) => m.status === "published"
-    );
-    const allManuals = [...publishedCustomManuals, ...manuals];
+    // Get all manuals for AI search
+    const allManuals = getAllManuals();
 
     // Run AI search
     if (searchInput.trim()) {
@@ -186,7 +162,6 @@ const Feed = () => {
     console.log(`Downloaded manual: ${manual.title} (Total: ${newCount})`);
     // You can add actual download logic here
   };
-
   const handleBookmark = (manual) => {
     // Get current user
     const userData = localStorage.getItem("userData");
@@ -194,10 +169,9 @@ const Feed = () => {
       console.log("Please log in to bookmark manuals");
       return;
     }
-
     try {
       const user = JSON.parse(userData);
-      const isBookmarked = toggleBookmark(manual.id, user.id);
+      const isBookmarked = toggleBookmark(user.id, manual);
       console.log(
         `${isBookmarked ? "Bookmarked" : "Removed bookmark from"} manual: ${
           manual.title
@@ -207,10 +181,6 @@ const Feed = () => {
       console.error("Error bookmarking manual:", error);
     }
   };
-
-  useEffect(() => {
-    // Component initialization
-  }, []);
 
   // Log search analytics when search changes
   useEffect(() => {
@@ -225,30 +195,21 @@ const Feed = () => {
         }
       } catch (error) {
         console.error("Error parsing user data:", error);
-      }
-
-      // Log the search with results count
+      } // Log the search with results count
       logSearch(search, filteredManuals.length, currentUser);
     }
   }, [search, filteredManuals.length]);
-
-  useEffect(() => {
-    // Component initialization
-  }, []);
 
   return (
     <main className="feed-page">
       {/* HERO */}
       <section className="feed-hero" id="hero-top">
-        <h1 className="feed-hero-title">Quick Search</h1>
-        <p className="feed-hero-sub">
-          ค้นหาคู่มือทั้งหมดขององค์กรจากที่เดียว — ลองพิมพ์ “VS Code”,
-          “Onboarding”, “Brand guideline” หรือเลือกหมวดด้านล่าง
-        </p>
+        <h1 className="feed-hero-title">{t("feed.title")}</h1>
+        <p className="feed-hero-sub">{t("feed.subtitle")}</p>
 
         <form className="feed-hero-searchWrapper" onSubmit={handleSubmit}>
           <div className="feed-hero-search">
-            <span className="feed-hero-searchIcon">🔍</span>{" "}
+            <span className="feed-hero-searchIcon">🔍</span>
             <input
               type="text"
               placeholder={t("feed.searchPlaceholder")}
@@ -259,21 +220,14 @@ const Feed = () => {
         </form>
 
         <div className="feed-chipRow">
-          {" "}
-          {[
-            { id: "all", label: t("feed.categories.all") },
-            { id: "IT", label: t("feed.categories.it") },
-            { id: "Design", label: t("feed.categories.design") },
-            { id: "Marketing", label: t("feed.categories.marketing") },
-            { id: "HR", label: t("feed.categories.hr") },
-          ].map((chip) => (
+          {["all", "IT", "Design", "Marketing", "HR"].map((chip) => (
             <button
-              key={chip.id}
+              key={chip}
               type="button"
-              className={`feed-chip ${category === chip.id ? "is-active" : ""}`}
-              onClick={() => handleCategoryClick(chip.id)}
+              className={`feed-chip ${category === chip ? "is-active" : ""}`}
+              onClick={() => handleCategoryClick(chip)}
             >
-              {chip.label}
+              {t(`feed.categories.${chip.toLowerCase()}`)}
             </button>
           ))}
         </div>
@@ -284,15 +238,12 @@ const Feed = () => {
         <section className="feed-ai-suggestions">
           <div className="feed-ai-header">
             <h2 className="feed-ai-title">
-              🤖 AI แนะนำคู่มือสำหรับ: "{search}"
+              {t("feed.aiSuggestions")} "{search}"
             </h2>
           </div>
           {aiResults.length === 0 ? (
             <div className="feed-ai-empty">
-              <p>
-                ไม่พบคู่มือที่ตรงกับคำค้นหาของคุณ
-                ลองค้นหาด้วยคำอื่นหรือเลือกหมวดหมู่
-              </p>
+              <p>{t("feed.noAiResults")}</p>
             </div>
           ) : (
             <div className="feed-ai-results">
@@ -329,13 +280,12 @@ const Feed = () => {
 
       {/* MAIN LIST */}
       <section className="feed-main" id="manual-list">
-        {" "}
         <header className="feed-mainHeader">
           <div className="feed-mainTitle">
             {hasFilters ? t("feed.searchResults") : t("feed.recommended")}
           </div>
           <div className="feed-mainSub">{resultText}</div>
-        </header>{" "}
+        </header>
         <ManualGrid
           manuals={filteredManuals}
           activeTag={activeTag}

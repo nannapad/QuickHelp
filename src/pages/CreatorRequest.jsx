@@ -76,14 +76,12 @@ const CreatorRequest = () => {
           .filter(Boolean),
       });
 
-      setRequest(newRequest);
-
-      // Notify all admins about new creator request
+      setRequest(newRequest); // Notify all admins about new creator request
       const allUsers = getAllUsers();
       const admins = allUsers.filter((u) => u.role === "admin");
       admins.forEach((admin) => {
         addNotification({
-          userId: admin.id,
+          userId: String(admin.id),
           message: `New creator request from ${currentUser.username} (${currentUser.firstName} ${currentUser.lastName})`,
           type: "info",
           link: "/admin-dashboard",

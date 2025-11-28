@@ -216,7 +216,7 @@ const manuals = [
     ],
     versions: ["1.2", "1.1", "1.0"],
   },
-    {
+  {
     id: 7,
     title: "IT Acceptable Use Policy",
     category: "IT",
@@ -586,7 +586,6 @@ const manuals = [
     ],
     versions: ["1.0"],
   },
-
 ];
 
 // Helper to get all manuals (static + local)
@@ -602,4 +601,5 @@ const getAllManuals = () => {
   }
 };
 
+export { manuals };
 export default getAllManuals();

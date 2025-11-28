@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAlertModal } from "../hooks/useAlertModal";
 import AlertModal from "../components/AlertModal";
 import "./css/AdminDashboard.css";
-import manuals from "../data/ManualData";
+import { getAllManuals } from "../utils/manualRepository";
 import { getAllUsers, updateUserProfile } from "../data/UserData";
 import { getAllRequests, updateRequestStatus } from "../data/CreatorRequests";
 import { addNotification } from "../utils/notifications";
@@ -58,19 +58,12 @@ const AdminDashboard = () => {
       const admins = allUsers.filter((u) => u.role === "admin"); // Get creator requests from localStorage
       const requests = getAllRequests();
       const pendingRequests = requests.filter((r) => r.status === "pending");
+      const allManuals = getAllManuals();
 
-      // Get recent manuals including custom manuals with status
-      // FIX: Prevent duplicates - custom manuals override static ones
+      // Load custom manuals from localStorage
       const customManuals = JSON.parse(
         localStorage.getItem("customManuals") || "[]"
       );
-
-      // Build set of custom IDs to filter out static manuals with same ID
-      const customIds = new Set(customManuals.map((m) => m.id));
-      const staticManuals = manuals.filter((m) => !customIds.has(m.id));
-
-      // Custom manuals first, then non-duplicate static manuals
-      const allManuals = [...customManuals, ...staticManuals];
 
       const sortedManuals = allManuals.sort(
         (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
@@ -80,7 +73,9 @@ const AdminDashboard = () => {
       const recent = sortedManuals.slice(0, 5).map((manual) => ({
         ...manual,
         status: manual.status || "published", // Default to published for existing manuals
-      })); // Count pending and draft manuals
+      }));
+
+      // Count pending and draft manuals
       const pendingManuals = customManuals.filter(
         (m) => m.status === "pending"
       );
@@ -122,12 +117,10 @@ const AdminDashboard = () => {
         manual.id === manualId ? { ...manual, status: "published" } : manual
       );
 
-      localStorage.setItem("customManuals", JSON.stringify(updatedManuals));
-
-      // Send notification to manual creator
+      localStorage.setItem("customManuals", JSON.stringify(updatedManuals)); // Send notification to manual creator
       if (manual && manual.authorId) {
         addNotification({
-          userId: manual.authorId,
+          userId: String(manual.authorId),
           message: `Your manual "${manual.title}" has been approved and published!`,
           type: "success",
           link: `/manual/${manualId}`,
@@ -174,12 +167,10 @@ const AdminDashboard = () => {
         (manual) => manual.id !== manualId
       );
 
-      localStorage.setItem("customManuals", JSON.stringify(updatedManuals));
-
-      // Send notification to manual creator
+      localStorage.setItem("customManuals", JSON.stringify(updatedManuals)); // Send notification to manual creator
       if (manual && manual.authorId) {
         addNotification({
-          userId: manual.authorId,
+          userId: String(manual.authorId),
           message: `Your manual "${manual.title}" was not approved.`,
           type: "warning",
           link: null,
@@ -227,12 +218,10 @@ const AdminDashboard = () => {
         (manual) => manual.id !== manualId
       );
 
-      localStorage.setItem("customManuals", JSON.stringify(updatedManuals));
-
-      // Send notification to manual creator
+      localStorage.setItem("customManuals", JSON.stringify(updatedManuals)); // Send notification to manual creator
       if (manual && manual.authorId) {
         addNotification({
-          userId: manual.authorId,
+          userId: String(manual.authorId),
           message: `Your draft "${manual.title}" has been deleted by an admin.`,
           type: "warning",
           link: null,
@@ -515,11 +504,9 @@ const AdminDashboard = () => {
                                   new Event("authStateChanged")
                                 );
                               }
-                            }
-
-                            // Send notification
+                            } // Send notification
                             addNotification({
-                              userId: r.userId,
+                              userId: String(r.userId),
                               message:
                                 "Your creator request has been approved! You can now create manuals.",
                               type: "success",
@@ -561,11 +548,9 @@ const AdminDashboard = () => {
                               status: "rejected",
                               reviewerId: user.id,
                               note: "Request rejected by admin",
-                            });
-
-                            // Send notification
+                            }); // Send notification
                             addNotification({
-                              userId: r.userId,
+                              userId: String(r.userId),
                               message:
                                 "Your creator request was not approved at this time.",
                               type: "warning",

@@ -31,7 +31,7 @@ export const addNotification = ({
   const id = Date.now();
   const n = {
     id,
-    userId,
+    userId: String(userId), // Always store as string for consistency
     message,
     type, // info | success | warning | error
     link,
@@ -49,7 +49,7 @@ export const addNotification = ({
 export const getNotificationsForUser = (userId) => {
   if (!userId) return [];
   const items = getNotifications();
-  return items.filter((n) => n.userId === parseInt(userId));
+  return items.filter((n) => String(n.userId) === String(userId));
 };
 
 // Get unread count for a specific user
@@ -64,7 +64,7 @@ export const markAllReadForUser = (userId) => {
   if (!userId) return;
   const items = getNotifications();
   const updated = items.map((n) => {
-    if (n.userId === parseInt(userId) && !n.read) {
+    if (String(n.userId) === String(userId) && !n.read) {
       return { ...n, read: true };
     }
     return n;
@@ -77,7 +77,7 @@ export const markAllReadForUser = (userId) => {
 export const markNotificationAsRead = (notificationId) => {
   const items = getNotifications();
   const updated = items.map((n) => {
-    if (n.id === parseInt(notificationId)) {
+    if (String(n.id) === String(notificationId)) {
       return { ...n, read: true };
     }
     return n;

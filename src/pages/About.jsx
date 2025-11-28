@@ -1,128 +1,73 @@
-import React from "react";
 import "./css/About.css";
+import { useTranslation } from "../utils/translations";
 
 const About = () => {
+  const { t } = useTranslation();
   return (
-    <div className="page">
-      <div className="container">
-        <header className="header">
-          <h1 className="title">About QuickHelp</h1>{" "}
-          <p className="lead">
-            <strong>QuickHelp</strong> is a first-semester capstone project for{" "}
-            <span className="highlight">
-              Computer Science and Innovation (CSI) Year 2
-            </span>{" "}
-            students, focusing primarily on <strong>Frontend</strong> web
-            development.
-          </p>
-        </header>
-
-        <div className="grid">
-          <section className="card">
-            <div className="card-icon">🎯</div>
-            <h2 className="card-title">Project Objective</h2>
-            <p className="card-text">
-              This project is designed as a platform to help users quickly find
-              answers, short explanations, and basic user guides. We focus on
-              web structure and user experience (UI/UX) design.
-            </p>{" "}
-          </section>
-
-          <section className="card">
-            <div className="card-icon">🚀</div>
-            <h2 className="card-title">What We Focus On</h2>
-            <ul className="list">
-              <li>Web page layout design</li>
-              <li>React component management</li>
-              <li>CSS Module implementation for modular styling</li>
-              <li>Creating user-friendly and visually appealing interfaces</li>
-              <li>Responsive design for all device sizes</li>
-            </ul>{" "}
-          </section>
-
-          <section className="card">
-            <div className="card-icon">⚡</div>
-            <h2 className="card-title">Key Features</h2>
-            <ul className="list">
-              <li>📚 Manual browsing and searching</li>
-              <li>👤 User authentication and profiles</li>
-              <li>✍️ Content creation for approved users</li>
-              <li>🏷️ Categorization and tagging system</li>
-              <li>🌍 Multi-language support (EN/TH)</li>
-              <li>🌓 Dark/Light theme toggle</li>
-            </ul>{" "}
-          </section>
-
-          <section className="card">
-            <div className="card-icon">🔧</div>
-            <h2 className="card-title">Technology Stack</h2>
-            <div className="tech-stack">
-              <span className="tech">React</span>
-              <span className="tech">CSS Modules</span>
-              <span className="tech">React Router</span>
-              <span className="tech">Local Storage</span>
-              <span className="tech">Responsive Design</span>
-            </div>{" "}
-          </section>
-
-          <section className="card">
-            <div className="card-icon">📋</div>
-            <h2 className="card-title">Project Scope</h2>
-            <p className="card-text">
-              As a first-semester project, we haven't delved deep into{" "}
-              <strong>Backend</strong> development or <strong>Database</strong>{" "}
-              management yet. The system is not connected to a real database.{" "}
-            </p>
-            <p className="card-text">
-              All data displayed on the website is currently{" "}
-              <strong>mock data</strong> used for testing and demonstrating the
-              web functionality.
-            </p>{" "}
-          </section>
-
-          <section className="card">
-            <div className="card-icon">🎓</div>
-            <h2 className="card-title">Learning Goals</h2>
-            <p className="card-text">
-              The main goal of this project is to practice designing and
-              building websites with clear structure, professional appearance,
-              and understanding user flow from a user perspective.
-            </p>
-            <div className="goals">
-              <div className="goal">
-                <span className="goal-icon">✅</span>
-                Master React component architecture
-              </div>
-              <div className="goal">
-                <span className="goal-icon">✅</span>
-                Implement modern CSS techniques
-              </div>
-              <div className="goal">
-                <span className="goal-icon">✅</span>
-                Create responsive user interfaces
-              </div>
-              <div className="goal">
-                <span className="goal-icon">✅</span>
-                Understand user experience principles
-              </div>
-            </div>
-          </section>
+    <div className="about-page">
+      <div className="about-inner">
+        <div className="about-hero">
+          <h1 className="about-title">{t("about.title")}</h1>
+          <p className="about-subtitle">{t("about.subtitle")}</p>
         </div>
 
-        <footer className="footer">
-          <div className="footer-content">
-            {" "}
-            <p className="footer-text">
-              Built with ❤️ by CSI Year 2 students as a learning project
-            </p>
-            <div className="footer-note">
-              <small>
-                This is a demonstration project for educational purposes. All
-                data is simulated for testing functionality.
-              </small>
-            </div>
-          </div>
-        </footer>
+        <div className="about-grid">
+          <section className="about-card">
+            <h2>❓{t("about.whatIsQuickHelp.title")}</h2>
+            <p>{t("about.whatIsQuickHelp.body1")}</p>
+            <p>{t("about.whatIsQuickHelp.body2")}</p>
+          </section>
+
+          <section className="about-card">
+            <h2>⁉️{t("about.whyWeBuiltIt.title")}</h2>
+            <p>{t("about.whyWeBuiltIt.body1")}</p>
+            <ul>
+              <li>{t("about.whyWeBuiltIt.point1")}</li>
+              <li>{t("about.whyWeBuiltIt.point2")}</li>
+              <li>{t("about.whyWeBuiltIt.point3")}</li>
+            </ul>
+          </section>
+
+          <section className="about-card">
+            <h2>👤{t("about.whoIsItFor.title")}</h2>
+            <p>{t("about.whoIsItFor.body")}</p>
+            <ul>
+              <li>{t("about.whoIsItFor.roleUser")}</li>
+              <li>{t("about.whoIsItFor.roleCreator")}</li>
+              <li>{t("about.whoIsItFor.roleAdmin")}</li>
+            </ul>
+          </section>
+
+          <section className="about-card">
+            <h2>🔐{t("about.keyFeatures.title")}</h2>
+            <ul className="about-feature-list">
+              <li>{t("about.keyFeatures.search")}</li>
+              <li>{t("about.keyFeatures.bookmark")}</li>
+              <li>{t("about.keyFeatures.version")}</li>
+              <li>{t("about.keyFeatures.comments")}</li>
+              <li>{t("about.keyFeatures.roleBased")}</li>
+              <li>{t("about.keyFeatures.i18n")}</li>
+            </ul>
+          </section>
+
+          <section className="about-card">
+            <h2>⚙️{t("about.techAndArchitecture.title")}</h2>
+            <p>{t("about.techAndArchitecture.body1")}</p>
+            <ul>
+              <li>{t("about.techAndArchitecture.frontend")}</li>
+              <li>{t("about.techAndArchitecture.state")}</li>
+              <li>{t("about.techAndArchitecture.data")}</li>
+              <li>{t("about.techAndArchitecture.i18n")}</li>
+            </ul>
+            <p>{t("about.techAndArchitecture.body2")}</p>
+          </section>
+
+          <section className="about-card">
+            <h2>📋{t("about.projectContext.title")}</h2>
+            <p>{t("about.projectContext.body1")}</p>{" "}
+            <p>{t("about.projectContext.body2")}</p>
+          </section>
+        </div>
       </div>
     </div>
   );

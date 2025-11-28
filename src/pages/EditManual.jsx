@@ -398,15 +398,24 @@ const EditManual = () => {
     } // Preserve original author when admin edits creator's manual
     const originalAuthor = manual.author || authorName;
 
+    // Helper function to normalize version strings
+    const normalizeVersion = (v) => {
+      return (
+        String(v || "")
+          .trim()
+          .replace(/^v/i, "") || "1.0"
+      );
+    };
+
     // Track old version for notification purposes
-    const oldVersion = manual.version || "1.0";
-    const normalizedVersion = version?.trim() || manual.version || "1.0";
+    const oldVersion = normalizeVersion(manual.version);
+    const newVersion = normalizeVersion(version);
 
     // Build version history
     const existingVersions = manual.versions || [oldVersion];
     let newVersions = [...existingVersions];
-    if (!existingVersions.includes(normalizedVersion)) {
-      newVersions.push(normalizedVersion);
+    if (!existingVersions.includes(newVersion)) {
+      newVersions.push(newVersion);
     }
 
     const updatedManual = {
@@ -414,9 +423,9 @@ const EditManual = () => {
       title,
       description: desc,
       category,
-      version: normalizedVersion,
+      version: newVersion,
       versions: newVersions,
-      meta: `${category} • v${normalizedVersion}`,
+      meta: `${category} • v${newVersion}`,
       tags,
       author: originalAuthor, // Keep original author
       updatedBy: currentUser
@@ -448,18 +457,22 @@ const EditManual = () => {
         existingManuals.push(updatedManual);
       }
       localStorage.setItem("customManuals", JSON.stringify(existingManuals));
-      console.log("Manual updated:", updatedManual); // Dispatch custom event to notify other components
+      console.log("Manual updated:", updatedManual);
+
+      // Dispatch custom event to notify other components
       window.dispatchEvent(new Event("manualUpdated"));
 
       // Notify users who bookmarked this manual (only if version changed)
-      if (oldVersion !== normalizedVersion) {
+      if (oldVersion !== newVersion) {
         console.log(
-          `Version changed from ${oldVersion} to ${normalizedVersion}, notifying bookmarked users`
+          `Version changed from ${oldVersion} to ${newVersion}, notifying bookmarked users`
         );
         notifyBookmarkedUsers(editId, title);
-      }
-
-      // Notify admins if creator changed status from published to pending
+      } else {
+        console.log(
+          `Version unchanged (${oldVersion}), skipping bookmark notifications`
+        );
+      } // Notify admins if creator changed status from published to pending
       if (
         currentUser?.role === "creator" &&
         manual.status === "published" &&
@@ -469,7 +482,7 @@ const EditManual = () => {
         const admins = allUsers.filter((u) => u.role === "admin");
         admins.forEach((admin) => {
           addNotification({
-            userId: admin.id,
+            userId: String(admin.id),
             message: `Manual "${title}" by ${originalAuthor} updated and needs re-approval`,
             type: "info",
             link: "/admin-dashboard",
@@ -748,17 +761,18 @@ const EditManual = () => {
           >
             + {t("createManual.addBlock")}
           </button>
-        </section>
-
+        </section>{" "}
         {/* RIGHT: META PANEL */}
         <aside className="meta-panel">
           <div className="meta-card">
-            <div className="meta-title">Manual details</div>
+            <div className="meta-title">{t("editManual.manualDetails")}</div>
             <div className="meta-caption">
-              กำหนดหมวดใหญ่ แท็ก และไฟล์คู่มือจริง
+              {t("editManual.manualDetailsCaption")}
             </div>
             {/* Thumbnail */}
-            <div className="meta-field-label">Thumbnail</div>
+            <div className="meta-field-label">
+              {t("editManual.thumbnailLabel")}
+            </div>
             {thumbnailUrl && (
               <div className="thumbnail-preview">
                 <img

@@ -27,6 +27,7 @@ const ManualDetail = () => {
   const navigate = useNavigate();
   const [liked, setLiked] = useState(false);
   const [bookmarked, setBookmarked] = useState(false);
+  const [copied, setCopied] = useState(false);
   const [manualViews, setManualViews] = useState(0);
   const [manualLikes, setManualLikes] = useState(0);
   const [selectedVersion, setSelectedVersion] = useState("");
@@ -174,11 +175,10 @@ const ManualDetail = () => {
       (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
     );
   }, [manual, localComments]);
-
   const handleLike = () => {
     if (!currentUser) return;
-    const { isLiked, likes } = toggleLike(id, currentUser.id);
-    setLiked(isLiked);
+    const { liked, likes } = toggleLike(id, currentUser.id);
+    setLiked(liked);
     setManualLikes(likes);
   };
   const handleBookmark = () => {
@@ -197,20 +197,32 @@ const ManualDetail = () => {
   };
   const handleShare = async () => {
     try {
+      // Always copy to clipboard
+      await navigator.clipboard.writeText(window.location.href);
+
+      // Show "Copied!" state
+      setCopied(true);
+
+      // Reset after 2 seconds
+      setTimeout(() => {
+        setCopied(false);
+      }, 2000);
+
+      // Try native share if available
       if (navigator.share) {
         await navigator.share({
           title: manual.title,
           text: manual.description,
           url: window.location.href,
         });
-      } else {
-        // Fallback for browsers that don't support Web Share API
-        await navigator.clipboard.writeText(window.location.href);
-        showAlert("Share link copied to clipboard!", "success", "Link Copied");
       }
     } catch (error) {
+      // If clipboard write fails, still show copied state
       console.error("Error sharing:", error);
-      showAlert("Share link copied to clipboard!", "success", "Link Copied");
+      setCopied(true);
+      setTimeout(() => {
+        setCopied(false);
+      }, 2000);
     }
   };
 
@@ -422,7 +434,7 @@ const ManualDetail = () => {
                     title={liked ? "Unlike this manual" : "Like this manual"}
                   >
                     {liked ? "Liked" : "Like"}
-                  </button>
+                  </button>{" "}
                   <button
                     className={`actionBtn ${bookmarked ? "bookmarked" : ""}`}
                     onClick={handleBookmark}
@@ -432,13 +444,13 @@ const ManualDetail = () => {
                     }
                   >
                     {bookmarked ? "Bookmarked" : "Bookmark"}
-                  </button>
+                  </button>{" "}
                   <button
-                    className="actionBtn"
+                    className={`actionBtn ${copied ? "copied" : ""}`}
                     onClick={handleShare}
-                    title="Share this manual"
+                    title={copied ? "Link copied!" : "Share this manual"}
                   >
-                    Share
+                    {copied ? "Copied!" : "Share"}
                   </button>
                 </div>
               </div>
@@ -448,15 +460,6 @@ const ManualDetail = () => {
             <div className="hero">
               <div className="heroContent">
                 <div className="heroTitle">{manual.description}</div>
-                <div className="heroStats">
-                  <span>⏱ {manual.estimatedTime || "10 min"} read</span>
-                  <span>•</span>
-                  <span>👁 {manualViews} views</span>
-                  <span>•</span>
-                  <span>★ {manual.difficulty || "Beginner"}</span>
-                  <span>•</span>
-                  <span>👍 {manualLikes} likes</span>
-                </div>
               </div>
             </div>
 

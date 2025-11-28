@@ -3,8 +3,21 @@ import { LanguageContext } from "../contexts/LanguageContext";
 
 export const translations = {
   en: {
-    // Navigation
+    // Common
+    common: {
+      loading: "Loading...",
+      error: "Error",
+      success: "Success",
+      cancel: "Cancel",
+      save: "Save",
+      delete: "Delete",
+      edit: "Edit",
+      view: "View",
+      download: "Download",
+    }, // Navigation
     nav: {
+      menu: "Menu",
+      dashboard: "Dashboard",
       feed: "Feed",
       about: "About",
       faq: "FAQ",
@@ -35,6 +48,9 @@ export const translations = {
       resultsText: "Based on what's popular this week",
       noResults: "No manuals found",
       noResultsDesc: "Try adjusting your search terms or browse by category",
+      aiSuggestions: "🤖 AI suggestions for:",
+      noAiResults:
+        "No manuals found matching your search. Try different keywords or select a category.",
     },
 
     // About Page
@@ -211,6 +227,16 @@ export const translations = {
 
     // Manual Detail Page
     manualDetail: {
+      loading: "Loading...",
+      notFound: "Manual not found",
+      like: "Like",
+      liked: "Liked",
+      download: "Download",
+      bookmark: "Bookmark",
+      bookmarked: "Bookmarked",
+      viewsLabel: "Views",
+      likesLabel: "Likes",
+      downloadsLabel: "Downloads",
       backToFeed: "← Back to Feed",
       quickStart: "Quick start",
       overview: "Overview",
@@ -236,6 +262,8 @@ export const translations = {
     createManual: {
       title: "Create Manual",
       subtitle: "Create a new manual for your team and organization",
+      manualDetails: "Manual details",
+      manualDetailsCaption: "Set category, tags, and manual files",
       titleLabel: "Title",
       titlePlaceholder: "Enter manual title...",
       categoryLabel: "Category",
@@ -271,8 +299,24 @@ export const translations = {
 
     // Edit Manual Page
     editManual: {
+      pageTitle: "Edit Manual",
       title: "Edit Manual",
       subtitle: "Update your manual content and settings",
+      manualDetails: "Manual details",
+      manualDetailsCaption: "Set category, tags, and manual files",
+      nameLabel: "Manual Title",
+      categoryLabel: "Category",
+      versionLabel: "Version",
+      descriptionLabel: "Short Description",
+      saveButton: "Save Changes",
+      loading: "Loading...",
+      notFound: "Manual not found",
+      confirmTitle: "Save Changes",
+      confirmMessage: "Are you sure you want to save changes to this manual?",
+      missingTitle: "Please enter the manual title.",
+      missingTitleTitle: "Incomplete data",
+      successTitle: "Success",
+      successMessage: "Manual changes have been saved.",
       backToDashboard: "Back to Dashboard",
       updateManual: "Update Manual",
       saveAsDraft: "Save as Draft",
@@ -423,11 +467,85 @@ export const translations = {
         updatedVersion: "You updated version",
       },
     },
+    // Not Found Page
+    notFoundPage: {
+      title: "Page not found",
+      description: "We couldn't find the page you're looking for.",
+      goHome: "Go to Home",
+      goBack: "Go Back",
+      hint: 'Or use "Quick Search" on the Home page to find the manual you need again 💜',
+    },
+    // ใน translations.en = { ... }
+about: {
+  title: "About QuickHelp",
+  subtitle: "A simple internal knowledge base for manuals, built as a frontend capstone project.",
+
+  whatIsQuickHelp: {
+    title: "What is QuickHelp?",
+    body1:
+      "QuickHelp is a web-based manual management system. It collects scattered how-to documents into one place, so people can quickly search, read, and reuse the knowledge they need.",
+    body2:
+      "The app is designed for internal use in a team or organization, but the core idea is simple: reduce repeated questions by making good manuals easy to find."
   },
 
+  whyWeBuiltIt: {
+    title: "Why we built it",
+    body1:
+      "In many teams, important knowledge is hidden in slides, chat messages, or someone’s memory. New members have to ask the same questions again and again.",
+    point1: "Manuals are often stored in many different places.",
+    point2: "People don’t know which version is the latest or who wrote it.",
+    point3: "There is no simple way to search, bookmark, or update manuals in one system."
+  },
+
+  whoIsItFor: {
+    title: "Who is it for?",
+    body:
+      "QuickHelp is designed for small teams, clubs, internal projects, or classes that want to manage their own manuals without a complex backend system.",
+    roleUser: "• Regular users can search, read, bookmark, like, and comment on manuals.",
+    roleCreator:
+      "• Creators can create new manuals, update content, manage versions, and respond to feedback.",
+    roleAdmin:
+      "• Admins can approve creator requests, review pending manuals, manage users, and see search analytics."
+  },
+
+  keyFeatures: {
+    title: "Key features",
+    search: "Fast manual search with simple AI-style relevance scoring.",
+    bookmark: "Bookmark manuals and get notified when they are updated.",
+    version: "Basic version tracking so readers know which version they are reading.",
+    comments: "Comments and feedback on each manual for continuous improvement.",
+    roleBased: "Role-based dashboards for Admin, Creator, and regular users.",
+    i18n: "Language switching between English and Thai using a shared translation system."
+  },
+
+  techAndArchitecture: {
+    title: "Tech & architecture",
+    body1:
+      "QuickHelp intentionally focuses on the frontend. It simulates a full system using React and browser storage instead of a real backend.",
+    frontend: "• Frontend: React + React Router, custom CSS, and some Bootstrap-style components.",
+    state: "• Global state: AuthContext and LanguageContext manage login and language for the whole app.",
+    data: "• Data layer: mock users, manuals, comments, and requests stored in localStorage via simple utils.",
+    i18n:
+      "• i18n: translation.js + useTranslation() to keep all user-facing text in one place for EN/TH switching.",
+    body2:
+      "This structure makes it easier to later replace the mock data layer with a real API and database without changing most of the UI code."
+  },
+
+  projectContext: {
+    title: "Project context",
+    body1:
+      "This project is a frontend-focused capstone for the second year, first term, in the Computer Science and Innovation (CSI) program.",
+    body2:
+      "The main goal is to practice building a clean, maintainable React application with real-world UX flows such as login, role-based dashboards, manual management, bookmarking, version updates, and basic analytics."
+  }
+},
+
+  },
   th: {
     // Navigation
     nav: {
+      menu: "เมนู",
+      dashboard: "แดชบอร์ด",
       feed: "ฟีด",
       about: "เกี่ยวกับ",
       faq: "คำถามที่พบบ่อย",
@@ -458,6 +576,9 @@ export const translations = {
       resultsText: "อิงจากความนิยมในสัปดาห์นี้",
       noResults: "ไม่พบคู่มือ",
       noResultsDesc: "ลองปรับคำค้นหาหรือเลือกดูตามหมวดหมู่",
+      aiSuggestions: "🤖 คำแนะนำจาก AI สำหรับ:",
+      noAiResults:
+        "ไม่พบคู่มือที่ตรงกับการค้นหาของคุณ ลองใช้คำค้นหาอื่นหรือเลือกหมวดหมู่",
     },
 
     // About Page
@@ -632,6 +753,16 @@ export const translations = {
 
     // Manual Detail Page
     manualDetail: {
+      loading: "กำลังโหลด...",
+      notFound: "ไม่พบคู่มือ",
+      like: "ถูกใจ",
+      liked: "ถูกใจแล้ว",
+      download: "ดาวน์โหลด",
+      bookmark: "บุ๊กมาร์ก",
+      bookmarked: "บุ๊กมาร์กแล้ว",
+      viewsLabel: "จำนวนเข้าชม",
+      likesLabel: "จำนวนถูกใจ",
+      downloadsLabel: "จำนวนดาวน์โหลด",
       backToFeed: "← กลับไปยังฟีด",
       quickStart: "เริ่มต้นด่วน",
       overview: "ภาพรวม",
@@ -657,6 +788,8 @@ export const translations = {
     createManual: {
       title: "สร้างคู่มือ",
       subtitle: "สร้างคู่มือใหม่สำหรับทีมและองค์กรของคุณ",
+      manualDetails: "รายละเอียดคู่มือ",
+      manualDetailsCaption: "ตั้งค่าหมวดหมู่ แท็ก และไฟล์คู่มือ",
       titleLabel: "ชื่อเรื่อง",
       titlePlaceholder: "ใส่ชื่อคู่มือ...",
       categoryLabel: "หมวดหมู่",
@@ -692,8 +825,24 @@ export const translations = {
 
     // Edit Manual Page
     editManual: {
+      pageTitle: "แก้ไขคู่มือ",
       title: "แก้ไขคู่มือ",
       subtitle: "อัปเดตเนื้อหาและการตั้งค่าคู่มือของคุณ",
+      manualDetails: "รายละเอียดคู่มือ",
+      manualDetailsCaption: "ตั้งค่าหมวดหมู่ แท็ก และไฟล์คู่มือ",
+      nameLabel: "ชื่อคู่มือ",
+      categoryLabel: "หมวดหมู่",
+      versionLabel: "เวอร์ชัน",
+      descriptionLabel: "คำอธิบายสั้น ๆ",
+      saveButton: "บันทึกการแก้ไข",
+      loading: "กำลังโหลด...",
+      notFound: "ไม่พบคู่มือ",
+      confirmTitle: "บันทึกการแก้ไข",
+      confirmMessage: "ยืนยันการบันทึกการแก้ไขคู่มือนี้หรือไม่?",
+      missingTitle: "กรุณากรอกชื่อคู่มือ",
+      missingTitleTitle: "ข้อมูลไม่ครบ",
+      successTitle: "สำเร็จ",
+      successMessage: "บันทึกการแก้ไขคู่มือเรียบร้อยแล้ว",
       backToDashboard: "กลับไปที่แดชบอร์ด",
       updateManual: "อัปเดตคู่มือ",
       saveAsDraft: "บันทึกร่าง",
@@ -841,6 +990,82 @@ export const translations = {
         updatedVersion: "คุณได้อัปเดตเวอร์ชัน",
       },
     },
+    // Not Found Page
+    notFoundPage: {
+      title: "ไม่พบหน้านี้",
+      description: "เราไม่พบหน้าที่คุณต้องการ",
+      goHome: "กลับไปหน้าแรก",
+      goBack: "ย้อนกลับ",
+      hint: "หรือใช้ Quick Search ที่หน้า Home เพื่อค้นหาคู่มือที่คุณต้องการอีกครั้ง 💜",
+    },
+    // ใน translations.th = { ... }
+about: {
+  title: "เกี่ยวกับ QuickHelp",
+  subtitle: "ระบบจัดการคู่มือแบบง่าย ๆ สำหรับใช้ภายในทีม พัฒนาเป็นโปรเจกต์ฝึกฝั่ง Frontend.",
+
+  whatIsQuickHelp: {
+    title: "QuickHelp คืออะไร?",
+    body1:
+      "QuickHelp คือเว็บสำหรับจัดการคู่มือ (Manual Management System) เอาคู่มือการใช้งานที่กระจายอยู่หลายที่มารวมไว้ในที่เดียว ให้คนเข้ามาค้นหา อ่าน และนำกลับไปใช้ต่อได้ง่ายขึ้น.",
+    body2:
+      "ออกแบบมาเพื่อใช้ภายในทีม / องค์กรขนาดเล็ก แนวคิดหลักคือ ลดการถามคำถามเดิม ๆ ซ้ำ ๆ ด้วยการทำให้คู่มือดี ๆ ถูกค้นหาเจอได้ง่าย."
+  },
+
+  whyWeBuiltIt: {
+    title: "ทำไมถึงสร้างระบบนี้",
+    body1:
+      "ในหลายทีม ความรู้สำคัญมักกระจายอยู่ตามสไลด์ แชท หรือในหัวของรุ่นพี่เท่านั้น สมาชิกใหม่เลยต้องถามคำถามเดิม ๆ อยู่เรื่อย ๆ.",
+    point1: "คู่มือมักเก็บอยู่หลายที่ ทั้งไฟล์ สไลด์ แชท และเอกสารกระดาษ.",
+    point2: "คนไม่แน่ใจว่าเวอร์ชันไหนล่าสุด ใครเป็นคนเขียน หรือควรเชื่ออันไหน.",
+    point3: "ยังไม่มีระบบง่าย ๆ ที่ช่วยค้นหา บุ๊กมาร์ก หรืออัปเดตคู่มือผ่านที่เดียว."
+  },
+
+  whoIsItFor: {
+    title: "เหมาะกับใคร?",
+    body:
+      "QuickHelp เหมาะกับทีมเล็ก ๆ ชมรม โปรเจกต์ภายใน หรือรายวิชาที่อยากจัดการคู่มือของตัวเอง โดยไม่ต้องตั้ง Backend ที่ซับซ้อน.",
+    roleUser: "• ผู้ใช้ทั่วไป: ค้นหา อ่าน บุ๊กมาร์ก กดถูกใจ และคอมเมนต์คู่มือได้.",
+    roleCreator:
+      "• Creator: สร้างคู่มือใหม่ ปรับปรุงเนื้อหา จัดการเวอร์ชัน และตอบรับฟีดแบ็ค.",
+    roleAdmin:
+      "• Admin: อนุมัติคำขอเป็น Creator ตรวจคู่มือที่รออนุมัติ จัดการผู้ใช้ และดูสถิติการค้นหา."
+  },
+
+  keyFeatures: {
+    title: "ฟีเจอร์หลัก",
+    search: "ค้นหาคู่มือได้รวดเร็ว พร้อมระบบให้คะแนนความเกี่ยวข้องแบบง่าย ๆ.",
+    bookmark: "บุ๊กมาร์กคู่มือที่ใช้บ่อย และรับการแจ้งเตือนเมื่อคู่มือนั้นมีการอัปเดต.",
+    version: "มีระบบเวอร์ชันพื้นฐาน ให้ผู้อ่านรู้ว่ากำลังอ่านเวอร์ชันไหน.",
+    comments: "คอมเมนต์และฟีดแบ็คใต้คู่มือ เพื่อช่วยปรับปรุงเนื้อหาให้ดีขึ้นเรื่อย ๆ.",
+    roleBased:
+      "แดชบอร์ดแยกตามบทบาท Admin, Creator และผู้ใช้ทั่วไป ทำให้หน้าที่แต่ละคนชัดเจน.",
+    i18n: "รองรับทั้งภาษาอังกฤษและภาษาไทย ด้วยระบบแปลกลางจาก translation.js."
+  },
+
+  techAndArchitecture: {
+    title: "เทคโนโลยีและโครงสร้างระบบ",
+    body1:
+      "QuickHelp ตั้งใจโฟกัสฝั่ง Frontend เป็นหลัก โดยจำลองระบบจริงด้วย React และ localStorage แทนการมี Backend จริง.",
+    frontend: "• Frontend: ใช้ React + React Router พร้อม CSS ของโปรเจกต์และ component แบบ Bootstrap.",
+    state:
+      "• Global state: ใช้ AuthContext และ LanguageContext จัดการสถานะการล็อกอินและภาษาในระดับทั้งระบบ.",
+    data:
+      "• Data layer: mock ข้อมูลผู้ใช้ คู่มือ คอมเมนต์ และคำขอต่าง ๆ ผ่าน localStorage ด้วย utility ที่แยกฟังก์ชันชัดเจน.",
+    i18n:
+      "• หลายภาษา (i18n): ใช้ translation.js + useTranslation() เพื่อเก็บข้อความทุกหน้าผ่าน key เดียวกัน รองรับ EN/TH.",
+    body2:
+      "ด้วยโครงนี้ ถ้าจะย้ายไปใช้ API และฐานข้อมูลจริงในอนาคต สามารถเปลี่ยนเฉพาะ data layer ได้ โดยไม่ต้องรื้อ UI ทั้งระบบ."
+  },
+
+  projectContext: {
+    title: "บริบทของโปรเจกต์",
+    body1:
+      "โปรเจกต์นี้เป็นงาน Capstone ฝั่ง Frontend ของนักศึกษาชั้นปีที่ 2 เทอม 1 สาขา Computer Science and Innovation (CSI).",
+    body2:
+      "เป้าหมายหลักคือฝึกออกแบบและพัฒนาเว็บด้วย React ให้โค้ดอ่านง่าย แยกส่วนชัดเจน มี Flow ใกล้เคียงระบบจริง เช่น ระบบล็อกอิน แดชบอร์ดตามบทบาท การจัดการคู่มือ บุ๊กมาร์ก การอัปเดตเวอร์ชัน และสถิติการค้นหา."
+  }
+},
+
   },
 };
 

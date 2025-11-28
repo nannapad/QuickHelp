@@ -1,274 +1,117 @@
-/* About Page - Consistent with Project Theme */
-
-.page {
+.about-page {
   min-height: calc(100vh - 52px);
   background: var(--bg);
   color: var(--text);
-  padding: 40px 20px;
 }
 
-.container {
-  max-width: 1120px;
-  margin: 0 auto;
-  position: relative;
+.about-inner {
+  max-width: 1080px;
+  margin: 24px auto 40px;
+  padding: 0 18px 24px;
 }
 
-.header {
+.about-hero {
   text-align: center;
-  margin-bottom: 40px;
-  color: var(--text);
-  position: relative;
-  z-index: 1;
+  margin-bottom: 48px;
+  padding-top: 40px;
 }
 
-.title {
+.about-title {
   font-size: 2.5rem;
   font-weight: 700;
   margin-bottom: 16px;
-  letter-spacing: -0.04em;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
-.lead {
+.about-subtitle {
   font-size: 1.125rem;
-  line-height: 1.7;
   color: var(--text-muted);
-  max-width: 600px;
+  max-width: 640px;
   margin: 0 auto;
-  font-weight: 400;
-}
-
-.highlight {
-  font-weight: 600;
-  color: var(--primary);
-}
-
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 24px;
-  margin-bottom: 40px;
-}
-
-.card {
-  background: var(--surface);
-  border-radius: 12px;
-  padding: 24px;
-  border: 1px solid var(--border-muted);
-  transition: all 0.3s ease;
-  position: relative;
-}
-
-.card::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, #667eea, #764ba2);
-  border-radius: 12px 12px 0 0;
-}
-
-.card:hover {
-  transform: translateY(-2px);
-  border-color: var(--border);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-}
-
-.cardIcon {
-  font-size: 2.5rem;
-  margin-bottom: 16px;
-  display: block;
-}
-
-.cardTitle {
-  font-size: 1.25rem;
-  font-weight: 650;
-  margin-bottom: 12px;
-  color: var(--text);
-  line-height: 1.4;
-  letter-spacing: -0.02em;
-}
-
-.cardText {
-  font-size: 0.95rem;
   line-height: 1.6;
-  color: var(--text-muted);
-  margin-bottom: 12px;
 }
 
-.list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
+.about-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 24px;
 }
 
-.list li {
-  font-size: 0.95rem;
-  line-height: 1.5;
-  color: var(--text-muted);
-  margin-bottom: 8px;
-  padding-left: 20px;
-  position: relative;
-}
-
-.list li::before {
-  content: "•";
-  position: absolute;
-  left: 0;
-  color: var(--primary);
-  font-weight: 600;
-  font-size: 1.1rem;
-}
-
-.techStack {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 12px;
-}
-
-.tech {
+.about-card {
   background: var(--bg-light);
-  color: var(--text);
+  border-radius: 16px;
+  padding: 24px;
   border: 1px solid var(--border);
-  padding: 6px 12px;
-  border-radius: 6px;
-  font-size: 0.85rem;
-  font-weight: 500;
-  transition: all 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.tech:hover {
-  background: var(--primary-soft);
-  border-color: var(--primary-border);
+.about-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.about-card h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: var(--text);
+}
+
+.about-card p {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+.about-card ul {
+  margin: 12px 0 0;
+  padding-left: 20px;
+}
+
+.about-card li {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+
+.about-feature-list li::marker {
+  content: "• ";
   color: var(--primary);
 }
 
-.goals {
-  margin-top: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.goal {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 0.95rem;
-  color: var(--text-muted);
-  padding: 6px 0;
-}
-
-.goalIcon {
-  font-size: 1rem;
-  color: var(--success);
-}
-
-.footer {
-  text-align: center;
-  padding: 24px 20px;
-  background: var(--bg-subtle);
-  border: 1px solid var(--border-muted);
-  border-radius: 12px;
-  margin-top: 20px;
-}
-
-.footerContent {
-  max-width: 600px;
-  margin: 0 auto;
-}
-
-.footerText {
-  font-size: 1rem;
-  color: var(--text);
-  margin-bottom: 8px;
-  font-weight: 500;
-}
-
-.footerNote {
-  color: var(--text-muted);
-  font-size: 0.875rem;
-  line-height: 1.5;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-  .page {
-    padding: 20px 10px;
+/* Responsive */
+@media (min-width: 768px) {
+  .about-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .title {
+  .about-title {
+    font-size: 3rem;
+  }
+
+  .about-subtitle {
+    font-size: 1.25rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .about-title {
     font-size: 2rem;
-    margin-bottom: 12px;
   }
 
-  .lead {
+  .about-subtitle {
     font-size: 1rem;
-    padding: 0 10px;
   }
 
-  .grid {
-    grid-template-columns: 1fr;
-    gap: 16px;
-    margin-bottom: 24px;
-  }
-
-  .card {
+  .about-card {
     padding: 20px;
-    border-radius: 10px;
   }
 
-  .cardTitle {
-    font-size: 1.125rem;
-  }
-
-  .cardIcon {
-    font-size: 2rem;
-    margin-bottom: 12px;
-  }
-
-  .techStack {
-    gap: 6px;
-  }
-
-  .tech {
-    padding: 4px 8px;
-    font-size: 0.8rem;
-  }
-
-  .footer {
-    padding: 20px 15px;
-    border-radius: 10px;
+  .about-grid {
+    gap: 16px;
   }
 }
-
-@media (max-width: 480px) {
-  .title {
-    font-size: 1.75rem;
-  }
-
-  .lead {
-    font-size: 0.95rem;
-  }
-
-  .card {
-    padding: 16px;
-  }
-
-  .cardTitle {
-    font-size: 1rem;
-  }
-
-  .cardText,
-  .list li {
-    font-size: 0.9rem;
-  }
-}
-
-/* Consistent theme support with project variables */
