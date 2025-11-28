@@ -31,7 +31,6 @@ export default defineConfig(({ mode }) => ({
           // UI components
           ui: [
             "./src/components/ManualCard.jsx",
-            "./src/components/SearchBar.jsx",
             "./src/components/NavBar.jsx",
           ],
 
